@@ -5,7 +5,7 @@ O projeto tem duas partes publicáveis:
 | O quê | Onde | Custo | Atualiza sozinho? |
 | --- | --- | --- | --- |
 | **Página de apresentação** (pasta `site/`) | GitHub Pages: https://douglasvargass.github.io/crm-loja-roupas/ | Grátis | Sim, a cada push que muda `site/` |
-| **Sistema funcionando** (telas + API + banco) | Render, a partir do `render.yaml` | Grátis com limites (veja abaixo) | Sim, a cada push no `main` |
+| **Sistema funcionando** (telas + API + banco) | Render: https://crm-loja.onrender.com (serviço `crm-loja`, banco `crm-loja-db`) | Grátis com limites (veja abaixo) | Sim, a cada push no `main` |
 
 O GitHub Pages só hospeda arquivos estáticos (HTML, CSS, JS). Ele **não** roda Java nem banco, por isso o sistema em si vai para o Render.
 
@@ -27,6 +27,19 @@ Já configurada: cada push que altera `site/` publica a página. Para editar, mu
 Se um dia a página sumir, confira em *Settings → Pages* que a origem (*Source*) é **GitHub Actions**.
 
 ## 2. Sistema funcionando (Render)
+
+> **Já está publicado** em https://crm-loja.onrender.com, na conta Render do dono do repositório. As seções abaixo servem para publicar uma **nova cópia** (outra conta, outra loja) ou refazer do zero.
+
+### 2.0 Armadilha mais comum: criar o serviço sem o Blueprint
+
+Se o serviço for criado pelo botão **New → Web Service** (em vez do link do Blueprint), ele nasce **sem** as variáveis de ambiente e **sem** banco. O sintoma no log é:
+
+```
+No active profile set, falling back to 1 default profile: "default"
+... Exited with status 1 while running your code.
+```
+
+Sem `JWT_SECRET` o sistema se recusa a subir (fail-fast). Solução: apagar esse serviço e criar pelo Blueprint (2.1), ou pelo CLI (2.6).
 
 ### 2.1 Criar (uma vez)
 
@@ -75,6 +88,42 @@ Salvar uma variável reinicia o serviço.
 - **Build falhou:** veja o log de build. O mesmo `Dockerfile` é testado no GitHub a cada push (workflow `docker.yml`); se lá estiver verde, o problema costuma ser do Render (memória, tempo).
 - **"Application failed to respond":** o serviço ainda está acordando, ou o banco não está pronto. Aguarde um minuto e recarregue.
 - **Banco expirou:** crie um novo banco `crm-loja-db` no painel; o serviço se reconecta pelas variáveis `DB_*`.
+- **Serviço criado pelo CLI:** as variáveis `DB_*` são fixas (não seguem o banco automaticamente como no Blueprint). Se trocar de banco, atualize `DB_HOST`, `DB_PASSWORD` etc. em *Environment*.
+
+### 2.6 Pelo Render CLI (sem clicar no painel)
+
+Foi assim que a demonstração atual foi publicada. Precisa do [Render CLI](https://github.com/render-oss/cli/releases) (arquivo `.zip`, sem instalador) e de um login autorizado no navegador.
+
+```bash
+render login                                   # abre o navegador; autorize o código mostrado
+render workspace set "My Workspace" --confirm
+render blueprints validate ./render.yaml       # confere o arquivo: deve responder "valid": true
+
+# 1) banco PostgreSQL 16 grátis (expira em 30 dias)
+render postgres create --confirm --name crm-loja-db --plan free --version 16 --region oregon \
+  --database-name crm_loja --database-user crm
+
+# 2) espere "status": "available"
+render postgres get crm-loja-db -o json
+
+# 3) serviço web com as variáveis. Pegue host, porta e senha em:
+#    render postgres get crm-loja-db --include-sensitive-connection-info -o json  (campo internalConnectionString)
+MSYS_NO_PATHCONV=1 render services create --confirm -o json --name crm-loja --type web_service \
+  --repo https://github.com/Douglasvargass/crm-loja-roupas --branch main --runtime docker \
+  --plan free --region oregon --health-check-path /login --auto-deploy \
+  --env-var SPRING_PROFILES_ACTIVE=demo --env-var COOKIE_SECURE=true \
+  --env-var "JWT_SECRET=$(openssl rand -hex 48)" \
+  --env-var DB_HOST=<host interno dpg-…-a> --env-var DB_PORT=5432 --env-var DB_NAME=crm_loja \
+  --env-var DB_USER=crm --env-var "DB_PASSWORD=<senha>"
+
+# 4) acompanhar
+render deploys list crm-loja
+render logs -r crm-loja --limit 50
+```
+
+> No **Git Bash** do Windows, `/login` vira `C:/Program Files/Git/login` por causa da conversão de caminhos. O `MSYS_NO_PATHCONV=1` na frente do comando evita isso; se já aconteceu, corrija com `MSYS_NO_PATHCONV=1 render services update crm-loja --health-check-path /login --confirm`.
+
+O CLI não edita variáveis de um serviço já criado; para isso use o painel (*Environment*).
 
 ## 3. Outras hospedagens
 
