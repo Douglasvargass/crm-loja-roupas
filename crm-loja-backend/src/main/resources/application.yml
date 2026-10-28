@@ -35,8 +35,12 @@ app:
   # Assistente de IA. Sem chave ele fica desligado e o resto do sistema funciona normalmente.
   assistant:
     api-key: ${ANTHROPIC_API_KEY:}
+    # Vazio = API da Anthropic. Ex.: https://openrouter.ai/api para usar uma chave do OpenRouter.
+    base-url: ${ANTHROPIC_BASE_URL:}
     model: ${ASSISTANT_MODEL:claude-opus-5-5}
     effort: ${ASSISTANT_EFFORT:medium}
+    # Teto de tokens por resposta. Abaixe se o provedor recusar por falta de créditos (erro 402).
+    max-tokens: ${ASSISTANT_MAX_TOKENS:16000}
     max-tool-rounds: 8
 
 ---

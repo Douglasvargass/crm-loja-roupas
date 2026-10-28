@@ -95,8 +95,23 @@ Configurações (variáveis de ambiente):
 | `ANTHROPIC_API_KEY` | vazio | Liga o assistente |
 | `ASSISTANT_MODEL` | `claude-opus-5-5` | Modelo usado |
 | `ASSISTANT_EFFORT` | `medium` | `low` responde mais rápido e gasta menos; `high` pensa mais em perguntas difíceis |
+| `ASSISTANT_MAX_TOKENS` | `16000` | Teto de tokens por resposta. Abaixe (ex.: `4000`) se o provedor recusar por falta de créditos (erro 402) |
+| `ANTHROPIC_BASE_URL` | vazio | Vazio = API da Anthropic. Preencha para usar um provedor compatível, como o OpenRouter |
 
-O assistente também ativa o *fallback* do servidor da Anthropic (`fallbacks: "default"`): se um filtro de segurança recusar uma pergunta legítima por engano, a própria API tenta de novo com outro modelo.
+O assistente também ativa o *fallback* do servidor da Anthropic (`fallbacks: "default"`): se um filtro de segurança recusar uma pergunta legítima por engano, a própria API tenta de novo com outro modelo. Com `ANTHROPIC_BASE_URL` preenchido esse recurso fica desligado, porque só existe na API da Anthropic.
+
+### Usar uma chave do OpenRouter
+
+O [OpenRouter](https://openrouter.ai) dá acesso aos modelos Claude com uma API compatível. Chaves dele começam com `sk-or-` (as da Anthropic, com `sk-ant-`). No OpenRouter o nome do modelo é diferente:
+
+```powershell
+$env:ANTHROPIC_API_KEY  = "sk-or-v1-..."
+$env:ANTHROPIC_BASE_URL = "https://openrouter.ai/api"
+$env:ASSISTANT_MODEL    = "anthropic/claude-opus-5.5"   # ou anthropic/claude-haiku-5.5, mais barato
+.\mvnw.cmd spring-boot:test-run
+```
+
+Conta gratuita do OpenRouter tem saldo pequeno: use `anthropic/claude-haiku-5.5` com `ASSISTANT_MAX_TOKENS=4000`. Sem créditos, a tela mostra "A conta da chave do assistente está sem créditos".
 
 ## Custo
 

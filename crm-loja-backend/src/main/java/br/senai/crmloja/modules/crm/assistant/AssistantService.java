@@ -58,7 +58,13 @@ public class AssistantService {
         this.props = props;
         this.tools = tools;
         this.app = app;
-        this.client = props.enabled() ? AnthropicOkHttpClient.builder().apiKey(props.apiKey()).build() : null;
+        this.client = props.enabled() ? buildClient(props) : null;
+    }
+
+    // Provedores compatíveis (ex.: OpenRouter) autenticam com "Authorization: Bearer", não com x-api-key.
+    private static AnthropicClient buildClient(AssistantProperties props) {
+        if (props.baseUrl() == null) return AnthropicOkHttpClient.builder().apiKey(props.apiKey()).build();
+        return AnthropicOkHttpClient.builder().baseUrl(props.baseUrl()).authToken(props.apiKey()).build();
     }
 
     public boolean enabled() { return client != null; }
@@ -108,13 +114,16 @@ public class AssistantService {
         for (int round = 0; round <= props.maxToolRounds(); round++) {
             var builder = MessageCreateParams.builder()
                     .model(props.model())
-                    .maxTokens(16000L)
+                    .maxTokens(props.maxTokens())
                     .system(systemPrompt(conv.role(), user))
                     .outputConfig(OutputConfig.builder().effort(OutputConfig.Effort.of(props.effort())).build())
-                    .messages(conv.messages())
-                    // Se um classificador de segurança recusar por engano, a API tenta outro modelo sozinha.
-                    .putAdditionalHeader("anthropic-beta", "server-side-fallback-2026-07-01")
-                    .putAdditionalBodyProperty("fallbacks", JsonValue.from("default"));
+                    .messages(conv.messages());
+            if (props.baseUrl() == null) {
+                // Se um classificador de segurança recusar por engano, a API tenta outro modelo sozinha.
+                // Recurso só da API da Anthropic: outros provedores não conhecem esse campo.
+                builder.putAdditionalHeader("anthropic-beta", "server-side-fallback-2026-07-01")
+                        .putAdditionalBodyProperty("fallbacks", JsonValue.from("default"));
+            }
             available.forEach(builder::addTool);
 
             Message response = client.messages().create(builder.build());
@@ -187,6 +196,10 @@ public class AssistantService {
             log.error("Erro da API do Claude: status {}", se.statusCode(), e);
             if (se.statusCode() == 401) {
                 return new BusinessRuleException("assistant_auth", "A chave ANTHROPIC_API_KEY do servidor é inválida.");
+            }
+            if (se.statusCode() == 402) {
+                return new BusinessRuleException("assistant_credits",
+                        "A conta da chave do assistente está sem créditos. Adicione créditos no provedor ou use um modelo mais barato.");
             }
             return new BusinessRuleException("assistant_error", "O assistente não conseguiu responder agora. Tente de novo.");
         }

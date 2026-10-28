@@ -55,7 +55,11 @@ export function AssistantPage() {
   const [busy, setBusy] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => endRef.current?.scrollIntoView({ behavior: 'smooth' }), [messages, busy]);
+  // Chaves obrigatórias: em navegadores novos scrollIntoView devolve uma Promise, e o React
+  // a trataria como função de limpeza ("destroy is not a function" ao sair da página).
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, busy]);
 
   async function send(text: string) {
     const question = text.trim();
