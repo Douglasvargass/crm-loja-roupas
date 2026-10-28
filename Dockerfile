@@ -30,6 +30,8 @@ RUN useradd --system --uid 1001 crm
 COPY --from=back /back/target/crm-loja-backend-0.1.0.jar app.jar
 USER crm
 EXPOSE 8080
-# Memória proporcional ao contêiner (os planos grátis têm ~512 MB).
-ENV JAVA_TOOL_OPTIONS="-XX:MaxRAMPercentage=75 -XX:+UseSerialGC"
+# Cabe nos 512 MB do plano grátis: heap em 55% (o resto fica para metaspace, código e threads),
+# JIT só no nível 1 (menos memória e subida mais rápida com pouca CPU), pilhas menores.
+# ExitOnOutOfMemoryError: se faltar memória, o log mostra isso claramente em vez de travar.
+ENV JAVA_TOOL_OPTIONS="-XX:MaxRAMPercentage=55 -XX:+UseSerialGC -XX:TieredStopAtLevel=1 -XX:ReservedCodeCacheSize=48m -Xss512k -XX:+ExitOnOutOfMemoryError"
 ENTRYPOINT ["java", "-jar", "app.jar"]

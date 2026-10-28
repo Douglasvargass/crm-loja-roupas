@@ -4,7 +4,8 @@
 [![frontend](https://github.com/Douglasvargass/crm-loja-roupas/actions/workflows/frontend.yml/badge.svg)](https://github.com/Douglasvargass/crm-loja-roupas/actions/workflows/frontend.yml)
 [![docker](https://github.com/Douglasvargass/crm-loja-roupas/actions/workflows/docker.yml/badge.svg)](https://github.com/Douglasvargass/crm-loja-roupas/actions/workflows/docker.yml)
 
-**Página do projeto:** https://douglasvargass.github.io/crm-loja-roupas/ · **Publicar o sistema online:** [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Douglasvargass/crm-loja-roupas) ([passo a passo](crm-loja-docs/docs/13-publicar-online.md))
+**Sistema online (demonstração):** https://crm-loja.onrender.com · login `gerente@loja.local` / `loja12345` (plano grátis: o primeiro acesso pode levar até 1 minuto para "acordar")
+**Página do projeto:** https://douglasvargass.github.io/crm-loja-roupas/ · **Publicar sua própria cópia:** [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Douglasvargass/crm-loja-roupas) ([passo a passo](crm-loja-docs/docs/13-publicar-online.md))
 
 Sistema web para uma loja de roupas organizar clientes, produtos, estoque e vendas, com painel de indicadores e um **assistente de IA** que responde dúvidas consultando os dados reais da loja. MVP feito para o Mini Projeto SENAI.
 

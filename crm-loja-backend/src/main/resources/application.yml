@@ -7,6 +7,9 @@ spring:
     url: ${DB_URL:jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:crm_loja}}
     username: ${DB_USER:crm}
     password: ${DB_PASSWORD:crm}
+    # Poucas conexões bastam para uma loja e economizam memória no servidor e no banco grátis.
+    hikari:
+      maximum-pool-size: ${DB_POOL_SIZE:5}
   jpa:
     hibernate:
       ddl-auto: validate      # schema só muda por Flyway
