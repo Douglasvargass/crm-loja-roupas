@@ -1,0 +1,27 @@
+{
+  "folders": [
+    { "name": "backend", "path": "crm-loja-backend" },
+    { "name": "frontend", "path": "crm-loja-frontend" },
+    { "name": "docs", "path": "crm-loja-docs" },
+    { "name": "raiz", "path": "." }
+  ],
+  "settings": {
+    "files.encoding": "utf8",
+    "files.eol": "\n",
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "editor.formatOnSave": true
+  },
+  "extensions": {
+    "recommendations": [
+      "vscjava.vscode-java-pack",
+      "vmware.vscode-boot-dev-pack",
+      "ms-azuretools.vscode-docker",
+      "bierner.markdown-mermaid",
+      "dbaeumer.vscode-eslint",
+      "esbenp.prettier-vscode",
+      "bradlc.vscode-tailwindcss",
+      "mtxr.sqltools",
+      "mtxr.sqltools-driver-pg"
+    ]
+  }
+}

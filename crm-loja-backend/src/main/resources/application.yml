@@ -1,0 +1,42 @@
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/crm_loja}
+    username: ${DB_USER:crm}
+    password: ${DB_PASSWORD:crm}
+  jpa:
+    hibernate:
+      ddl-auto: validate      # schema só muda por Flyway
+    open-in-view: false
+    properties:
+      hibernate.jdbc.time_zone: UTC
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  jackson:
+    default-property-inclusion: always
+app:
+  jwt-secret: ${JWT_SECRET}
+  access-token-ttl-seconds: ${ACCESS_TOKEN_TTL_SECONDS:600}
+  refresh-token-ttl-hours: ${REFRESH_TOKEN_TTL_HOURS:24}
+  frontend-origins: ${FRONTEND_ORIGINS:http://localhost:5173}
+  super-admin-login: ${SUPER_ADMIN_LOGIN:admin@loja.local}
+  # Vazio = senha aleatória impressa uma vez no console no primeiro boot.
+  super-admin-password: ${SUPER_ADMIN_PASSWORD:}
+  # true em produção (HTTPS); em localhost o navegador recusa cookie Secure via http.
+  cookie-secure: ${COOKIE_SECURE:false}
+  time-zone: America/Sao_Paulo
+  # Assistente de IA. Sem chave ele fica desligado e o resto do sistema funciona normalmente.
+  assistant:
+    api-key: ${ANTHROPIC_API_KEY:}
+    model: ${ASSISTANT_MODEL:claude-opus-5-5}
+    effort: ${ASSISTANT_EFFORT:medium}
+    max-tool-rounds: 8
+
+---
+# Perfil dev: dados de demonstração e usuários de teste (DevDataSeeder).
+spring:
+  config:
+    activate:
+      on-profile: dev
+app:
+  jwt-secret: ${JWT_SECRET:dev-only-secret-troque-em-producao-0123456789abcdef0123456789abcdef}

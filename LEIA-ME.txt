@@ -1,0 +1,16 @@
+CRM LOJA DE ROUPAS — MINI PROJETO SENAI
+=======================================
+
+Comece pelo README.md (na mesma pasta). Ele tem o resumo, como rodar em 5 minutos
+e os links para toda a documentação.
+
+Documentos mais usados:
+- crm-loja-docs/docs/11-guia-de-comandos.md ... todos os comandos e solução de problemas
+- crm-loja-docs/docs/12-roteiro-de-testes.md .. checklist para testar pela tela
+- CONTRIBUTING.md ............................. como fazer mudanças e enviar ao GitHub
+- crm-loja-docs/docs/10-assistente-ia.md ...... como ligar o assistente de IA
+
+RESUMO PARA RODAR (precisa de Java 21+ e Node 22+)
+  Terminal 1:  cd crm-loja-backend   e   mvnw.cmd spring-boot:test-run
+  Terminal 2:  cd crm-loja-frontend  e   npx pnpm install   e   npx pnpm dev
+  Navegador:   http://localhost:5173   (gerente@loja.local / loja12345)

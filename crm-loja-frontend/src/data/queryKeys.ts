@@ -1,0 +1,15 @@
+// Chaves do TanStack Query. Mutação de venda, estoque ou produto invalida dashboard, products e stockAlerts.
+export const qk = {
+  me: ['me'] as const,
+  customers: ['customers'] as const,
+  customer: (id: number) => ['customers', id] as const,
+  categories: ['categories'] as const,
+  products: ['products'] as const,
+  product: (id: number) => ['products', id] as const,
+  stockMovements: ['stockMovements'] as const,
+  stockAlerts: ['stockAlerts'] as const,
+  sales: ['sales'] as const,
+  sale: (id: number) => ['sales', id] as const,
+  dashboard: ['dashboard'] as const,
+  users: ['users'] as const,
+};

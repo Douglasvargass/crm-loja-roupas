@@ -1,0 +1,18 @@
+# Back-end
+crm-loja-backend/target/
+crm-loja-backend/.data/
+crm-loja-backend/.env
+
+# Front-end
+crm-loja-frontend/node_modules/
+crm-loja-frontend/dist/
+
+# Editores e sistema
+.idea/
+*.iml
+.vscode/*
+!.vscode/extensions.json
+.DS_Store
+Thumbs.db
+*.log
+.env

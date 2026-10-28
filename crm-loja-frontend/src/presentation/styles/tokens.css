@@ -1,0 +1,50 @@
+/* Paleta da loja. Num projeto novo só estes valores mudam; os componentes usam as classes do @theme. */
+:root {
+  --bg: #f7f5f3;
+  --surface: #ffffff;
+  --surface-2: #f1eeeb;
+  --border: #e4dfda;
+  --text: #1f1a17;
+  --text-muted: #6b625b;
+  --primary: #9f1d4e;
+  --primary-hover: #84173f;
+  --primary-soft: #fbe8ef;
+  --on-primary: #ffffff;
+  --success: #17803d;
+  --success-soft: #e3f4e8;
+  --warning: #a35c00;
+  --warning-soft: #fdf1dc;
+  --error: #c0262d;
+  --error-soft: #fbe5e5;
+  --info: #2459b3;
+  --info-soft: #e5edfb;
+  --chart: #9f1d4e;
+  --chart-2: #d98aa8;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #161312;
+    --surface: #201c1a;
+    --surface-2: #2a2522;
+    --border: #3a3330;
+    --text: #f3eeea;
+    --text-muted: #b2a79f;
+    --primary: #f06b9b;
+    --primary-hover: #f48bb1;
+    --primary-soft: #3d1d2a;
+    --on-primary: #1a0f13;
+    --success: #4cc77a;
+    --success-soft: #16301f;
+    --warning: #f0a53a;
+    --warning-soft: #36280f;
+    --error: #f2716f;
+    --error-soft: #3b1a1a;
+    --info: #7aa7f5;
+    --info-soft: #182540;
+    --chart: #f06b9b;
+    --chart-2: #8a4a63;
+    color-scheme: dark;
+  }
+}
