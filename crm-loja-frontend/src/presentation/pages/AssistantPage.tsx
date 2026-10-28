@@ -8,7 +8,16 @@ import { Button } from '../components/atoms/Button';
 import { Markdown } from '../components/molecules/Markdown';
 import { Card, PageHeader } from '../components/templates/Page';
 
-interface Status { enabled: boolean; model: string | null }
+interface Status { enabled: boolean; provider: string | null; model: string | null }
+
+const PROVIDER_LABEL: Record<string, string> = {
+  anthropic: 'Claude (Anthropic)',
+  groq: 'Groq',
+  gemini: 'Google Gemini',
+  openrouter: 'OpenRouter',
+  ollama: 'Ollama (local)',
+  openai: 'provedor compatível',
+};
 interface Reply { conversationId: string; answer: string; toolsUsed: string[] }
 type Msg = { from: 'user' | 'assistant' | 'error'; text: string; tools?: string[] };
 
@@ -97,8 +106,9 @@ export function AssistantPage() {
 
       {disabled && (
         <div role="alert" className="mb-4 rounded-lg border border-warning/40 bg-warning-soft px-4 py-3 text-sm text-warning">
-          O assistente está desligado neste servidor. Para ligar, configure a variável <code>ANTHROPIC_API_KEY</code> no
-          back-end e reinicie (veja docs/10-assistente-ia.md).
+          O assistente está desligado neste servidor. Para ligar, configure um provedor de IA no back-end
+          (<code>ASSISTANT_PROVIDER</code> e <code>ASSISTANT_API_KEY</code>). Há opções grátis, como Groq e Google Gemini:
+          veja docs/10-assistente-ia.md.
         </div>
       )}
 
@@ -166,6 +176,9 @@ export function AssistantPage() {
       </Card>
       <p className="mt-2 text-xs text-muted">
         O assistente só consulta: não cadastra, não vende e não altera estoque. Ele pode errar; confira números importantes nas telas.
+        {status.data?.enabled && status.data.provider && (
+          <> · IA: {PROVIDER_LABEL[status.data.provider] ?? status.data.provider}{status.data.model ? ` (${status.data.model})` : ''}</>
+        )}
       </p>
     </>
   );

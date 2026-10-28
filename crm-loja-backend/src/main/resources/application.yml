@@ -36,15 +36,24 @@ app:
   cookie-secure: ${COOKIE_SECURE:false}
   time-zone: America/Sao_Paulo
   # Assistente de IA. Sem chave ele fica desligado e o resto do sistema funciona normalmente.
+  # Provedores: anthropic (padrão, pago) · groq | gemini | openrouter (planos grátis) · ollama (local) · openai (outro).
+  # Detalhes e limites em crm-loja-docs/docs/10-assistente-ia.md.
   assistant:
-    api-key: ${ANTHROPIC_API_KEY:}
-    # Vazio = API da Anthropic. Ex.: https://openrouter.ai/api para usar uma chave do OpenRouter.
-    base-url: ${ANTHROPIC_BASE_URL:}
-    model: ${ASSISTANT_MODEL:claude-opus-5-5}
-    effort: ${ASSISTANT_EFFORT:medium}
+    provider: ${ASSISTANT_PROVIDER:anthropic}
+    api-key: ${ASSISTANT_API_KEY:${ANTHROPIC_API_KEY:}}
+    # Vazio = padrão do provedor. Ex.: https://openrouter.ai/api (anthropic) ou http://localhost:11434/v1 (ollama).
+    base-url: ${ASSISTANT_BASE_URL:${ANTHROPIC_BASE_URL:}}
+    # Vazio = padrão do provedor (claude-opus-5-5, llama-3.3-70b-versatile, gemini-2.5-flash…).
+    model: ${ASSISTANT_MODEL:}
+    effort: ${ASSISTANT_EFFORT:medium}          # só na Anthropic
     # Teto de tokens por resposta. Abaixe se o provedor recusar por falta de créditos (erro 402).
     max-tokens: ${ASSISTANT_MAX_TOKENS:16000}
     max-tool-rounds: 8
+
+# Chamadas aos provedores OpenAI-compatíveis (RestClient): uma resposta de IA pode levar mais de um minuto.
+spring.http.client:
+  connect-timeout: 15s
+  read-timeout: 120s
 
 ---
 # Perfil dev: dados de demonstração e usuários de teste (DevDataSeeder).
