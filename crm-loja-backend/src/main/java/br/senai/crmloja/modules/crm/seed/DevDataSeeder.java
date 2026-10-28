@@ -28,11 +28,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionTemplate;
 
-// Dados de demonstração (perfil dev, só com o catálogo vazio). Tudo passa pelos Services para gerar
+// Dados de demonstração (perfis dev e demo, só com o catálogo vazio). Tudo passa pelos Services para gerar
 // as movimentações ENTRY e SALE corretas, como aconteceria pela tela.
 // CPFs são números de teste válidos, não de pessoas reais.
 @Component
-@Profile("dev")
+@Profile({"dev", "demo"})
 @Order(30)
 public class DevDataSeeder implements ApplicationRunner {
 

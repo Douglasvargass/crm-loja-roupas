@@ -17,5 +17,6 @@ Documentação do CRM da loja de roupas.
 | [docs/10-assistente-ia.md](docs/10-assistente-ia.md) | Assistente de IA |
 | [docs/11-guia-de-comandos.md](docs/11-guia-de-comandos.md) | **Todos os comandos** e solução de problemas |
 | [docs/12-roteiro-de-testes.md](docs/12-roteiro-de-testes.md) | Checklist de testes manuais |
+| [docs/13-publicar-online.md](docs/13-publicar-online.md) | GitHub Pages, Render, custos e atualizações |
 | [docs/decisions/](docs/decisions/) | ADRs (registros de decisão) |
 | [specs/](specs/) | Contrato da API, ERD e specs por entrega (requirements, design, tasks) |

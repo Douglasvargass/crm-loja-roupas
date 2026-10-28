@@ -1,5 +1,11 @@
 # CRM Loja de Roupas
 
+[![backend](https://github.com/Douglasvargass/crm-loja-roupas/actions/workflows/backend.yml/badge.svg)](https://github.com/Douglasvargass/crm-loja-roupas/actions/workflows/backend.yml)
+[![frontend](https://github.com/Douglasvargass/crm-loja-roupas/actions/workflows/frontend.yml/badge.svg)](https://github.com/Douglasvargass/crm-loja-roupas/actions/workflows/frontend.yml)
+[![docker](https://github.com/Douglasvargass/crm-loja-roupas/actions/workflows/docker.yml/badge.svg)](https://github.com/Douglasvargass/crm-loja-roupas/actions/workflows/docker.yml)
+
+**Página do projeto:** https://douglasvargass.github.io/crm-loja-roupas/ · **Publicar o sistema online:** [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Douglasvargass/crm-loja-roupas) ([passo a passo](crm-loja-docs/docs/13-publicar-online.md))
+
 Sistema web para uma loja de roupas organizar clientes, produtos, estoque e vendas, com painel de indicadores e um **assistente de IA** que responde dúvidas consultando os dados reais da loja. MVP feito para o Mini Projeto SENAI.
 
 | Camada | Tecnologia |
@@ -56,6 +62,7 @@ O assistente de IA precisa de uma chave da Anthropic: veja [10-assistente-ia.md]
 | [Roteiro de testes manuais](crm-loja-docs/docs/12-roteiro-de-testes.md) | Checklist para testar cada funcionalidade pela tela |
 | [Como contribuir](CONTRIBUTING.md) | Fluxo de Git, onde mexer em cada tipo de mudança, receitas passo a passo |
 | [Assistente de IA](crm-loja-docs/docs/10-assistente-ia.md) | Como ligar, como funciona, custo, como adicionar consultas |
+| [Publicar online](crm-loja-docs/docs/13-publicar-online.md) | GitHub Pages, Render, custos, como funcionam as atualizações |
 | [Rastreabilidade](crm-loja-docs/docs/09-rastreabilidade.md) | Cada história de usuário → tela → API → teste |
 | [Histórias de usuário](crm-loja-docs/docs/03-historias-de-usuario.md) | As 35 histórias com critérios de aceitação |
 | [Regras de negócio](crm-loja-docs/docs/04-regras-de-negocio.md) | RN01–RN25 e o ciclo de vida da venda |
@@ -71,6 +78,9 @@ crm-loja-roupas/
 ├── crm-loja-backend/     API Java (Spring Boot), migrations do banco, testes
 ├── crm-loja-frontend/    Telas em React + TypeScript
 ├── crm-loja-docs/        Documentação: visão, histórias, regras, testes, ADRs, specs
-├── .github/workflows/    CI: testes do back-end e build do front a cada push/PR
+├── site/                 Página de apresentação (GitHub Pages)
+├── Dockerfile            Imagem única (front + back) para publicar online
+├── render.yaml           Configuração do Render (banco + serviço)
+├── .github/workflows/    CI: testes, build, imagem Docker e publicação da página
 └── crm-loja-roupas.code-workspace   abre os três projetos juntos no VS Code
 ```

@@ -1,0 +1,11 @@
+**/node_modules
+**/dist
+**/target
+**/.data
+**/.env
+.git
+.github
+site
+crm-loja-docs
+*.md
+!crm-loja-frontend/**/*.md

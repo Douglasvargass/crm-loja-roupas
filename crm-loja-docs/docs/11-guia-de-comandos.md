@@ -446,9 +446,11 @@ Todo erro volta como `{"error": "frase em português", "code": "codigo_estavel"}
 
 | Variável | Padrão | Para quê |
 | --- | --- | --- |
-| `SERVER_PORT` | `8080` | Porta da API |
+| `SERVER_PORT` ou `PORT` | `8080` | Porta da API (`PORT` é a que as hospedagens usam) |
 | `EMBEDDED_PG_PORT` | `54329` | Porta do banco embutido (só no `test-run`) |
 | `DB_URL` | `jdbc:postgresql://localhost:5432/crm_loja` | Banco (modo Docker/produção) |
+| `DB_HOST` / `DB_PORT` / `DB_NAME` | `localhost` / `5432` / `crm_loja` | Alternativa ao `DB_URL`, em partes (usada no Render) |
+| `SPRING_PROFILES_ACTIVE` | vazio | `dev` (local) ou `demo` (servidor de demonstração) |
 | `DB_USER` / `DB_PASSWORD` | `crm` / `crm` | Credenciais do banco |
 | `JWT_SECRET` | só no perfil `dev` | Assina os tokens. **Obrigatório** fora do `dev`, com 32+ caracteres; sem ele a aplicação não sobe |
 | `ACCESS_TOKEN_TTL_SECONDS` | `600` | Validade do token de acesso (10 min) |
@@ -461,7 +463,9 @@ Todo erro volta como `{"error": "frase em português", "code": "codigo_estavel"}
 | `ASSISTANT_MODEL` | `claude-opus-5-5` | Modelo do assistente |
 | `ASSISTANT_EFFORT` | `medium` | Profundidade do raciocínio: `low`, `medium`, `high`, `xhigh`, `max` |
 
-Perfis do Spring: `dev` cria os dados de demonstração e tem um `JWT_SECRET` padrão. Sem perfil, o sistema sobe sem dados de demonstração.
+Perfis do Spring: `dev` cria os dados de demonstração e tem um `JWT_SECRET` padrão. `demo` também cria os dados de demonstração, mas exige `JWT_SECRET` (para servidor público). Sem perfil, o sistema sobe sem dados de demonstração.
+
+Publicar online (GitHub Pages, Render, Docker): veja [13-publicar-online.md](13-publicar-online.md).
 
 ### 8.2 Front-end
 

@@ -43,9 +43,11 @@ public class SecurityConfig {
             .httpBasic(b -> b.disable())
             .formLogin(f -> f.disable())
             .logout(l -> l.disable())
+            // API exige sessão; o resto são as telas do front (servidas pelo SpaConfig no deploy único).
             .authorizeHttpRequests(a -> a
                 .requestMatchers("/auth/login", "/auth/refresh", "/auth/logout", "/error").permitAll()
-                .anyRequest().authenticated())
+                .requestMatchers("/auth/**", "/crm/**", "/admin/**").authenticated()
+                .anyRequest().permitAll())
             .exceptionHandling(e -> e
                 .authenticationEntryPoint((req, res, ex) -> write(res, json, HttpServletResponse.SC_UNAUTHORIZED,
                         "Sua sessão expirou. Entre novamente.", "unauthenticated"))

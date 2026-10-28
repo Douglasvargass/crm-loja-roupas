@@ -15,7 +15,9 @@ export class ApiError extends Error {
   }
 }
 
-const BASE = '/api';
+// '/api' no Vite (o proxy tira o prefixo). No deploy único o back-end serve as telas na mesma origem,
+// então o build usa VITE_API_BASE='' e chama /auth, /crm… direto.
+const BASE = import.meta.env.VITE_API_BASE ?? '/api';
 const LOCK_KEY = 'crm.refresh-lock';
 const LOCK_MS = 30_000;
 

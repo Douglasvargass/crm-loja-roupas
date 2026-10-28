@@ -1,0 +1,40 @@
+# Blueprint do Render: cria o banco PostgreSQL e o serviço web (imagem do Dockerfile) de uma vez.
+# Uso: https://render.com/deploy?repo=https://github.com/Douglasvargass/crm-loja-roupas
+# Passo a passo e limites do plano grátis: crm-loja-docs/docs/13-publicar-online.md
+databases:
+  - name: crm-loja-db
+    plan: free
+    databaseName: crm_loja
+    user: crm
+    postgresMajorVersion: "16"
+
+services:
+  - type: web
+    name: crm-loja-roupas
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /login
+    autoDeploy: true            # cada push no main publica a versão nova
+    envVars:
+      # demo = cria os dados de demonstração e os 3 logins na primeira subida
+      - key: SPRING_PROFILES_ACTIVE
+        value: demo
+      - key: JWT_SECRET
+        generateValue: true
+      - key: COOKIE_SECURE
+        value: "true"
+      - key: DB_HOST
+        fromDatabase: { name: crm-loja-db, property: host }
+      - key: DB_PORT
+        fromDatabase: { name: crm-loja-db, property: port }
+      - key: DB_NAME
+        fromDatabase: { name: crm-loja-db, property: database }
+      - key: DB_USER
+        fromDatabase: { name: crm-loja-db, property: user }
+      - key: DB_PASSWORD
+        fromDatabase: { name: crm-loja-db, property: password }
+      # Opcional: liga o assistente de IA. O Render pede o valor na criação (não fica no Git).
+      - key: ANTHROPIC_API_KEY
+        sync: false
