@@ -18,6 +18,9 @@ spring:
     locations: classpath:db/migration
   jackson:
     default-property-inclusion: always
+  # Login é próprio (JWT em cookie); sem isto o Spring cria um usuário "user" e imprime a senha no log.
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
 app:
   jwt-secret: ${JWT_SECRET}
   access-token-ttl-seconds: ${ACCESS_TOKEN_TTL_SECONDS:600}
