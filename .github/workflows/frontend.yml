@@ -5,7 +5,9 @@ on:
     paths: ['crm-loja-frontend/**', '.github/workflows/frontend.yml']
   pull_request:
     paths: ['crm-loja-frontend/**', '.github/workflows/frontend.yml']
-concurrency: { group: frontend-${{ github.ref }}, cancel-in-progress: true }
+concurrency:
+  group: frontend-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   build:
     runs-on: ubuntu-latest
