@@ -8,18 +8,19 @@
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <style>
     :root {
-      --bg: #f7f5f3; --surface: #fff; --surface-2: #f1eeeb; --border: #e4dfda;
-      --text: #1f1a17; --muted: #6b625b; --primary: #9f1d4e; --primary-soft: #fbe8ef; --on-primary: #fff;
-      --success: #17803d; --success-soft: #e3f4e8; --warning: #a35c00; --warning-soft: #fdf1dc;
-      --error: #c0262d; --error-soft: #fbe5e5; --chart: #9f1d4e;
+      /* Creme #F6F1E9 · Areia #D8C7B0 · Caramelo #6B4F3A · Café #29231F */
+      --bg: #f6f1e9; --surface: #fffcf7; --surface-2: #efe6d9; --border: #d8c7b0;
+      --text: #29231f; --muted: #6e6156; --primary: #6b4f3a; --primary-soft: #ebdfcf; --on-primary: #f6f1e9;
+      --success: #3f6b35; --success-soft: #e4ecd9; --warning: #87500f; --warning-soft: #f6e6cc;
+      --error: #a63a2b; --error-soft: #f5dcd6; --chart: #6b4f3a;
       color-scheme: light;
     }
     @media (prefers-color-scheme: dark) {
       :root {
-        --bg: #161312; --surface: #201c1a; --surface-2: #2a2522; --border: #3a3330;
-        --text: #f3eeea; --muted: #b2a79f; --primary: #f06b9b; --primary-soft: #3d1d2a; --on-primary: #1a0f13;
-        --success: #4cc77a; --success-soft: #16301f; --warning: #f0a53a; --warning-soft: #36280f;
-        --error: #f2716f; --error-soft: #3b1a1a; --chart: #f06b9b;
+        --bg: #1f1a17; --surface: #29231f; --surface-2: #342d28; --border: #4a3f37;
+        --text: #f6f1e9; --muted: #c4b5a3; --primary: #d8c7b0; --primary-soft: #3e332b; --on-primary: #29231f;
+        --success: #9cc48e; --success-soft: #26301f; --warning: #e3b06b; --warning-soft: #3a2c19;
+        --error: #e59384; --error-soft: #3d221d; --chart: #d8c7b0;
         color-scheme: dark;
       }
     }
@@ -107,8 +108,8 @@
     .stat b { display: block; font-size: 28px; letter-spacing: -0.02em; color: var(--primary); }
     .stat span { color: var(--muted); font-size: 14px; }
 
-    pre { background: #1f1a17; color: #f3eeea; padding: 16px; border-radius: 12px; overflow-x: auto; font-size: 13px; line-height: 1.6; }
-    pre .c { color: #b2a79f; }
+    pre { background: #29231f; color: #f6f1e9; padding: 16px; border-radius: 12px; overflow-x: auto; font-size: 13px; line-height: 1.6; }
+    pre .c { color: #d8c7b0; }
     code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
 
     footer { padding: 32px 0 48px; color: var(--muted); font-size: 14px; border-top: 1px solid var(--border); }
