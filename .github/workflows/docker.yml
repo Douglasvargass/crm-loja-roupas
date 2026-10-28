@@ -23,11 +23,13 @@ jobs:
       - run: docker build -t crm-loja:ci .
       - name: Sobe a imagem como no Render (perfil demo)
         run: |
-          docker run -d --name crm --network host \
+          # Mesmos limites do plano grátis do Render: 512 MB de memória e pouca CPU.
+          docker run -d --name crm --network host --memory 512m --memory-swap 512m --cpus 0.5 \
             -e SPRING_PROFILES_ACTIVE=demo -e DB_HOST=localhost -e DB_NAME=crm_loja \
             -e DB_USER=crm -e DB_PASSWORD=crm -e JWT_SECRET=ci-segredo-com-mais-de-32-caracteres-0123 \
             crm-loja:ci
-          for i in $(seq 1 60); do curl -sf http://localhost:8080/login >/dev/null && break; sleep 2; done
+          for i in $(seq 1 120); do curl -sf http://localhost:8080/login >/dev/null && break; sleep 2; done
+          docker stats --no-stream crm
       - name: Telas, login e API respondem
         run: |
           curl -sf http://localhost:8080/login | grep -q "<title>CRM Loja de Roupas</title>"
