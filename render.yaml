@@ -38,3 +38,11 @@ services:
       # Opcional: liga o assistente de IA. O Render pede o valor na criação (não fica no Git).
       - key: ANTHROPIC_API_KEY
         sync: false
+      # Só para chave do OpenRouter (sk-or-...): https://openrouter.ai/api e anthropic/claude-haiku-5.5.
+      # Com chave da Anthropic, deixe os dois em branco.
+      - key: ANTHROPIC_BASE_URL
+        sync: false
+      - key: ASSISTANT_MODEL
+        sync: false
+      - key: ASSISTANT_MAX_TOKENS
+        value: "4000"
