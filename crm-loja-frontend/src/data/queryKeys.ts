@@ -14,6 +14,8 @@ export const qk = {
   users: ['users'] as const,
   myPanel: ['myPanel'] as const,
   targets: ['targets'] as const,
+  forecast: ['forecast'] as const,
+  targetSuggestions: ['targetSuggestions'] as const,
   demoAgent: ['demoAgent'] as const,
   requests: ['requests'] as const,
   planning: ['planning'] as const,

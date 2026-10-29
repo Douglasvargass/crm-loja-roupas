@@ -71,15 +71,15 @@ public class AssistantService {
         String role = user.superAdmin() && user.role() == null ? "MANAGER" : user.role();
         if (role == null) throw new BusinessRuleException("no_role", "Sua conta não tem papel no CRM.");
 
-        // "oi" e "quem é você?": a Talita se apresenta sem chamar a IA (rápido e não gasta a cota do provedor).
-        if (TalitaPersona.isIntroductionRequest(question)) {
+        // "oi" e "quem é você?": a Thalita se apresenta sem chamar a IA (rápido e não gasta a cota do provedor).
+        if (ThalitaPersona.isIntroductionRequest(question)) {
             String id = conversationId != null ? conversationId : UUID.randomUUID().toString();
-            return new Reply(id, TalitaPersona.introduction(user.fullName(), role), List.of());
+            return new Reply(id, ThalitaPersona.introduction(user.fullName(), role), List.of());
         }
         // A história da Orden também sai pronta: é sempre a mesma e não gasta a cota do provedor.
-        if (TalitaPersona.isStoryRequest(question)) {
+        if (ThalitaPersona.isStoryRequest(question)) {
             String id = conversationId != null ? conversationId : UUID.randomUUID().toString();
-            return new Reply(id, TalitaPersona.story(user.fullName()), List.of());
+            return new Reply(id, ThalitaPersona.story(user.fullName()), List.of());
         }
 
         evictIdle();
@@ -120,7 +120,7 @@ public class AssistantService {
 
     /**
      * Uma pergunta avulsa, sem ferramentas e sem conversa guardada, usando o mesmo provedor configurado para a
-     * Talita (inclusive os grátis: Groq, Gemini). Serve ao agente de demonstração (spec crm/08). Nunca lança: sem
+     * Thalita (inclusive os grátis: Groq, Gemini). Serve ao agente de demonstração (spec crm/08). Nunca lança: sem
      * provedor, sem cota ou com erro, devolve vazio e quem chamou segue o caminho sem IA.
      */
     public java.util.Optional<String> completeOnce(String system, String prompt) {
@@ -140,11 +140,11 @@ public class AssistantService {
         if ("CUSTOMER".equals(role)) {
             return AssistantPrompt.CUSTOMER
                     + "\n\n<contexto>\nHoje: " + LocalDate.now(app.zone()) + ".\n"
-                    + "Cliente: " + user.fullName() + " (trate por " + TalitaPersona.firstName(user.fullName()) + ").\n</contexto>";
+                    + "Cliente: " + user.fullName() + " (trate por " + ThalitaPersona.firstName(user.fullName()) + ").\n</contexto>";
         }
         return AssistantPrompt.SYSTEM
                 + "\n\n<contexto>\nHoje: " + LocalDate.now(app.zone()) + " (fuso " + app.timeZone() + ").\n"
-                + "Quem pergunta: " + user.fullName() + " (trate por " + TalitaPersona.firstName(user.fullName())
+                + "Quem pergunta: " + user.fullName() + " (trate por " + ThalitaPersona.firstName(user.fullName())
                 + "), papel " + role + ".\n</contexto>";
     }
 

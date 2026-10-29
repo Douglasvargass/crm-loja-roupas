@@ -1,29 +1,30 @@
-/* Paleta da loja: Creme #F6F1E9, Areia #D8C7B0, Caramelo #6B4F3A, Café #29231F.
+/* MODO TESTE PRETO E BRANCO (30/10/2026, só local, não commitar). Para voltar: git checkout -- este arquivo e global.css.
+   Paleta da loja: Creme #F6F1E9, Areia #D8C7B0, Caramelo #6B4F3A, Café #29231F.
    Num projeto novo só estes valores mudam; os componentes usam as classes do @theme.
    29/10/2026: a pedido do Douglas, o site fica sempre na paleta clara da marca (antes ele trocava sozinho para o
    escuro quando o computador estava no modo escuro, e a tela ficava toda café). O fundo puxa para a Areia, os
    cartões ficam quase brancos e a moldura (menu e barra de cima) fica Creme. */
 :root {
-  --bg: #ece2d4;            /* Areia clareada: fundo da página */
-  --surface: #fffcf7;       /* cartões, quase branco */
-  --surface-2: #f3ece1;
-  --border: #d8c7b0;        /* Areia */
-  --text: #29231f;          /* Café */
-  --text-muted: #6e6156;    /* Café suavizado */
-  --primary: #6b4f3a;       /* Caramelo */
-  --primary-hover: #573f2e;
-  --primary-soft: #e6d7c3;
-  --on-primary: #f6f1e9;    /* Creme */
-  --success: #3f6b35;
-  --success-soft: #e4ecd9;
-  --warning: #87500f;
-  --warning-soft: #f6e6cc;
-  --error: #a63a2b;
-  --error-soft: #f5dcd6;
-  --info: #4a5f73;
-  --info-soft: #e1e6ea;
-  --chart: #6b4f3a;         /* Caramelo */
-  --chart-2: #d8c7b0;       /* Areia */
+  --bg: #f6f6f6;            /* fundo quase branco (pedido de 30/10/2026) */            /* creme bem clarinho (pedido do Douglas, 30/10/2026) */
+  --surface: #ffffff;
+  --surface-2: #f0f0f0;
+  --border: #e3e3e3;
+  --text: #111111;
+  --text-muted: #5c5c5c;
+  --primary: #111111;
+  --primary-hover: #333333;
+  --primary-soft: #e4e4e4;
+  --on-primary: #ffffff;
+  --success: #1f1f1f;
+  --success-soft: #e8e8e8;
+  --warning: #3d3d3d;
+  --warning-soft: #ededed;
+  --error: #000000;
+  --error-soft: #dcdcdc;
+  --info: #4a4a4a;
+  --info-soft: #eeeeee;
+  --chart: #111111;
+  --chart-2: #9a9a9a;
   --logo-plate: transparent;   /* a logo é marrom: no escuro ela precisa de uma placa creme */
   color-scheme: light;
 }
@@ -59,24 +60,51 @@
    escuro: a moldura fica com a cor da marca e só o conteúdo segue o tema. A classe redefine as cores dentro
    dela, então ícones, sino, "Ver como" e a logo (sem placa) acompanham sozinhos. */
 .chrome-light {
-  --surface: #f8f2e8;       /* bege claro, um tom acima do Creme */
-  --surface-2: #efe6d9;
-  --border: #d8c7b0;
-  --text: #29231f;
-  --text-muted: #6e6156;
-  --primary: #6b4f3a;
-  --primary-hover: #573f2e;
-  --primary-soft: #e6d7c3;
-  --on-primary: #f6f1e9;
-  --success: #3f6b35;
-  --success-soft: #e4ecd9;
-  --warning: #87500f;
-  --warning-soft: #f6e6cc;
-  --error: #a63a2b;
-  --error-soft: #f5dcd6;
-  --info: #4a5f73;
-  --info-soft: #e1e6ea;
+  --surface: #ffffff;
+  --surface-2: #f0f0f0;
+  --border: #e3e3e3;
+  --text: #111111;
+  --text-muted: #5c5c5c;
+  --primary: #111111;
+  --primary-hover: #333333;
+  --primary-soft: #e4e4e4;
+  --on-primary: #ffffff;
+  --success: #1f1f1f;
+  --success-soft: #e8e8e8;
+  --warning: #3d3d3d;
+  --warning-soft: #ededed;
+  --error: #000000;
+  --error-soft: #dcdcdc;
+  --info: #4a4a4a;
+  --info-soft: #eeeeee;
   --logo-plate: transparent;
   color: var(--text);
   color-scheme: light;
 }
+
+/* MODO TESTE: o Dashboard (gráficos, indicadores e filtros) volta a ter cor sobre o resto em preto e branco. */
+.cores-dashboard {
+  /* TESTE 2 de 2 · paleta "Ice" (30/10/2026): marinho #00183d, azul-petróleo #0c4a6e, petróleo #217e8f, #4aaeb3, água #86e5d8. Teste 1 (Ice gray): #252541, #4e4b73, #5ccfc0, #d6d9e4. */
+  --chart: #0c4a6e;         /* blue600: barras de ranking */
+  --chart-2: #86e5d8;       /* blue200 */
+  --chart-soft: #4aaeb3;    /* blue400 */
+  --g1: #86e5d8;            /* rampa: blue200 (menor) */
+  --g2: #217e8f;            /* blue500 */
+  --g3: #00183d;            /* blue800 (maior) */
+  --primary: #0c4a6e;
+  --primary-hover: #00183d;
+  --primary-soft: #e3f4f6;  /* blue100 */
+  --on-primary: #ffffff;
+  --success: #259948;       /* lime500 (Codex) */
+  --success-soft: #e3f1e6;
+  --warning: #ab7f2a;       /* yellow500 (Codex) */
+  --warning-soft: #f7efdc;
+  --error: #b9463a;
+  --error-soft: #f6e2df;
+  --info: #217e8f;
+  --info-soft: #e3f4f6;
+}
+.cores-dashboard svg, .cores-dashboard img { filter: none; }
+
+/* Dashboard limpo: sem sombras, bordas leves, cartões de indicador sem moldura pesada. */
+.cores-dashboard * { box-shadow: none; }

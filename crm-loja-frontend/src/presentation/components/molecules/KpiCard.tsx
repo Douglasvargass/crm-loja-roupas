@@ -16,13 +16,12 @@ interface Props {
 export function KpiCard({ label, value, change, hint, tone = 'default', to }: Props) {
   const body = (
     <>
-      <span className="flex items-center justify-between gap-2 text-sm text-muted">
+      <span className="flex items-center justify-between gap-2 text-xs font-medium tracking-wide text-muted uppercase">
         {label}
-        {to && <span aria-hidden className="text-base leading-none text-muted/70 transition-transform group-hover:translate-x-0.5">›</span>}
       </span>
       <span
         className={cn(
-          'tabular text-2xl font-semibold tracking-tight',
+          'tabular text-2xl font-medium tracking-tight',
           tone === 'warning' && 'text-warning',
           tone === 'error' && 'text-error',
         )}

@@ -7,7 +7,7 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 
 // Conta do ritmo de vendas do mês (spec crm/06, REQ-05 a REQ-08). Funções puras, sem banco: o painel do vendedor,
-// o quadro do gerente e a Talita usam exatamente a mesma conta, e ela é testada sozinha (PaceTest).
+// o quadro do gerente e a Thalita usam exatamente a mesma conta, e ela é testada sozinha (PaceTest).
 public final class Pace {
 
     private Pace() {}

@@ -34,7 +34,7 @@ const fits = (v: View, i: PlanningItemDto) =>
         : i.status === 'OUT' || i.status === 'CRITICAL' || i.status === 'ATTENTION';
 
 // Spec crm/11: painel "O que vai faltar". A conta é do back-end (Coverage); a tela só filtra e mostra.
-export function ReplenishmentPage() {
+function ReplenishmentPageBody() {
   const { role } = useSession();
   const navigate = useNavigate();
   const [horizon, setHorizon] = useState(30);
@@ -217,4 +217,9 @@ export function ReplenishmentPage() {
       </Card>
     </>
   );
+}
+
+// MODO TESTE: cores do Dashboard também nesta tela.
+export function ReplenishmentPage() {
+  return <div className="cores-dashboard"><ReplenishmentPageBody /></div>;
 }

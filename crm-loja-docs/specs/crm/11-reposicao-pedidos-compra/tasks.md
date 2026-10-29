@@ -4,7 +4,7 @@
 - [x] Coverage (conta pura) + CoverageTest
 - [x] StockPlanningService e controller (`/crm/stock/planning`)
 - [x] PurchaseOrderService e controller (registrar, listar, receber, mudar data, cancelar), com auditoria
-- [x] Talita: previsao_estoque, pedidos_compra, prompt
+- [x] Thalita: previsao_estoque, pedidos_compra, prompt
 - [x] PedidosCompraDemoSeeder (3 pedidos, um atrasado)
 - [x] Front: ReplenishmentPage, PurchaseOrdersPage, menu, rotas, permissões, hooks, tela inicial de Operações e Compras, pendências ao entrar
 - [x] Testes: ReplenishmentIT (6), AssistantIT (contagem)

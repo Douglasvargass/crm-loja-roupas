@@ -11,7 +11,7 @@ import { MenuToggle } from '../atoms/MenuToggle';
 import { AlertBell } from '../organisms/AlertBell';
 import { PendingOnLogin } from '../organisms/PendingOnLogin';
 import { ViewAsBanner, ViewAsButton } from '../organisms/ViewAs';
-import { TalitaChat } from '../organisms/TalitaChat';
+import { ThalitaChat } from '../organisms/ThalitaChat';
 
 interface NavItem {
   to: string;
@@ -24,6 +24,7 @@ const NAV: NavItem[] = [
   { to: '/', label: 'Dashboard', icon: 'dashboard', allow: can.dashboardPage },
   { to: '/meu-painel', label: 'Meu painel', icon: 'dashboard', allow: can.myPanel },
   { to: '/metas', label: 'Metas', icon: 'target', allow: can.targets },
+  { to: '/previsao', label: 'Previsão de vendas', icon: 'forecast', allow: can.forecast },
   { to: '/vendas', label: 'Vendas', icon: 'sales', allow: can.sales },
   { to: '/clientes', label: 'Clientes', icon: 'customers', allow: can.customers },
   { to: '/produtos', label: 'Produtos', icon: 'products', allow: can.products },
@@ -206,7 +207,7 @@ export function AppShell() {
       </div>
 
       <PendingOnLogin />
-      <TalitaChat />
+      <ThalitaChat />
     </div>
   );
 }

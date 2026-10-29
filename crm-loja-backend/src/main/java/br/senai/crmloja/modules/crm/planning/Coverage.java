@@ -3,7 +3,7 @@ package br.senai.crmloja.modules.crm.planning;
 import java.time.LocalDate;
 
 // Conta do painel "O que vai faltar" para UMA peça (spec crm/11, regras RN43 a RN46). Sem banco e sem relógio: tudo
-// chega pronto, para o teste unitário cobrir cada caso e a Talita repetir a mesma conta que a tela mostra.
+// chega pronto, para o teste unitário cobrir cada caso e a Thalita repetir a mesma conta que a tela mostra.
 //
 // Em palavras simples:
 //  - média por dia = o que vendeu nos últimos `windowDays` dias ÷ `windowDays`;

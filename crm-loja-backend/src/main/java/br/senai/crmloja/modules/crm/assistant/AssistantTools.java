@@ -16,6 +16,7 @@ import br.senai.crmloja.modules.crm.stock.StockService;
 import br.senai.crmloja.modules.crm.request.StockRequest;
 import br.senai.crmloja.modules.crm.request.StockRequestService;
 import br.senai.crmloja.modules.crm.target.TargetService;
+import br.senai.crmloja.modules.crm.forecast.ForecastService;
 import br.senai.crmloja.modules.crm.planning.Coverage;
 import br.senai.crmloja.modules.crm.planning.StockPlanningService;
 import br.senai.crmloja.modules.crm.purchase.PurchaseOrderService;
@@ -50,7 +51,7 @@ public class AssistantTools {
     private static final Set<String> SALES = Set.of("MANAGER", "SELLER");
     private static final Set<String> STOCK = Set.of("MANAGER", "STOCK_KEEPER");
     private static final Set<String> SELLER_ONLY = Set.of("SELLER");
-    // Cliente da loja (Talita do cliente): nenhum papel da equipe recebe estas, e o cliente não recebe nenhuma da equipe.
+    // Cliente da loja (Thalita do cliente): nenhum papel da equipe recebe estas, e o cliente não recebe nenhuma da equipe.
     private static final Set<String> CUSTOMER = Set.of("CUSTOMER");
 
     private final Map<String, Def> defs = new LinkedHashMap<>();
@@ -59,7 +60,7 @@ public class AssistantTools {
     public AssistantTools(DashboardService dashboard, ProductService products, CategoryService categories,
                           CustomerService customers, SaleService sales, StockService stock, TargetService targets,
                           StockRequestService requests, StockPlanningService planning, PurchaseOrderService purchases,
-                          StoreService store, ObjectMapper json) {
+                          StoreService store, ForecastService forecast, ObjectMapper json) {
         this.json = json;
 
         add(new Def("consultar_dashboard",
@@ -171,6 +172,33 @@ public class AssistantTools {
                 MANAGER, Map.of("mes", str("Mês no formato aaaa-mm (ex.: 2026-10)")), List.of(),
                 (a, me, papel) -> targets.board(targets.parseMonth(strArg(a, "mes")))));
 
+        // Spec crm/12. A mesma conta da tela Previsão de vendas; os dias saem da resposta para caber na conversa.
+        add(new Def("previsao_vendas",
+                "Previsão de faturamento e de número de vendas da loja: próximos 7 e 30 dias, fechamento do mês atual "
+                        + "(realized = o que já vendeu até ontem) e os próximos `meses` meses, cada um com a faixa provável "
+                        + "(low a high, ~80%). model explica os fatores: weekday (dia da semana), payday (semana do salário), "
+                        + "holiday (feriado), events (datas comerciais; learned=false é estimativa padrão do varejo), "
+                        + "monthSeasonality (só com 1 ano de histórico) e accuracy (erro médio por semana nas últimas 4). "
+                        + "Diga sempre que é previsão, cite a faixa e o que pesou.",
+                MANAGER, Map.of("meses", integer("Quantos meses à frente, de 1 a 12 (padrão 3)")), List.of(),
+                (a, me, papel) -> {
+                    var f = forecast.forecast(a.get("meses") == null ? null : intArg(a, "meses", 3));
+                    return Map.of("hoje", f.today(), "historicoDesde", f.historyFrom(), "diasDeHistorico", f.historyDays(),
+                            "periodos", f.periods(), "modelo", f.model());
+                }));
+
+        add(new Def("sugestao_metas",
+                "Meta sugerida para cada vendedor num mês: previsão do mês da loja × parte do vendedor no faturamento da "
+                        + "loja nos últimos 90 dias × (1 + crescimento%), arredondada para a centena. suggested=null quando o "
+                        + "vendedor não vendeu nos 90 dias (reason explica). currentTarget é a meta já definida. Você NÃO "
+                        + "grava metas: oriente o gerente a usar o botão Usar ou Aplicar a todos na tela Metas.",
+                MANAGER,
+                Map.of("mes", str("Mês no formato aaaa-mm (padrão: mês atual)"),
+                        "crescimento", integer("Crescimento em %, de -20 a 50 (padrão 0)")),
+                List.of(),
+                (a, me, papel) -> forecast.suggestTargets(targets.parseMonth(strArg(a, "mes")),
+                        a.get("crescimento") == null ? null : intArg(a, "crescimento", 0))));
+
         // Spec crm/09. A ÚNICA ferramenta que grava: só cria um chamado (que pode ser cancelado), e só depois de a
         // pessoa confirmar o resumo. Sem confirmado=true, devolve erro e nada é gravado.
         add(new Def("abrir_chamado",
@@ -243,7 +271,7 @@ public class AssistantTools {
                 (a, me, papel) -> purchases.search(enumArg(a, "status", PurchaseOrderService.Status.class),
                         Boolean.TRUE.equals(boolArg(a, "atrasados")), intArg(a, "pagina", 0), 20)));
 
-        // ---------------------------------------------------------------------------- Talita do cliente
+        // ---------------------------------------------------------------------------- Thalita do cliente
         // Tudo pelo cliente da SESSÃO (me): nenhuma ferramenta aceita id de cliente vindo do modelo.
         add(new Def("vitrine",
                 "Peças à venda agora na loja online: nome, categoria, tamanho, cor, preço e se são as últimas unidades "

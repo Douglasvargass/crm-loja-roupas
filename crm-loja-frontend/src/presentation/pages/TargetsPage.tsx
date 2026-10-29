@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useToast } from '@/app/context/ToastContext';
 import { targetStatusLabel, targetStatusTone } from '@/data/adapters';
-import type { TargetBoardDto, TargetBoardRowDto } from '@/data/dto';
-import { useSetTarget, useTargets } from '@/data/hooks';
+import type { TargetBoardDto, TargetBoardRowDto, TargetSuggestionRowDto, TargetSuggestionsDto } from '@/data/dto';
+import { useSetTarget, useTargetSuggestions, useTargets } from '@/data/hooks';
 import { cn } from '@/lib/cn';
 import { formatMoney, toIsoDate } from '@/lib/format';
 import { Badge } from '../components/atoms/Badge';
@@ -22,7 +22,7 @@ function monthPlus(month: string, n: number) {
 }
 
 // Spec crm/06: o gerente define a meta de cada vendedor e acompanha a equipe. Ordem alfabética, sem ranking.
-export function TargetsPage() {
+function TargetsPageBody() {
   const [month, setMonth] = useState(currentMonth);
   const query = useTargets(month);
   return (
@@ -50,6 +50,9 @@ export function TargetsPage() {
 
 function Board({ b }: { b: TargetBoardDto }) {
   const pct = b.totalTarget > 0 ? Math.round((b.totalRevenue / b.totalTarget) * 1000) / 10 : null;
+  const [growth, setGrowth] = useState(0);
+  const sug = useTargetSuggestions(b.month, growth, b.editable);
+  const byId = new Map((sug.data?.rows ?? []).map((r) => [r.sellerId, r]));
   return (
     <div className="flex flex-col gap-4">
       <p className="text-sm text-muted">
@@ -64,8 +67,9 @@ function Board({ b }: { b: TargetBoardDto }) {
           Este mês já fechou: as metas dele ficam como estão, para o histórico não mudar.
         </p>
       )}
+      {b.editable && <SuggestionBar month={b.month} growth={growth} setGrowth={setGrowth} sug={sug.data} error={sug.error} />}
       <Card>
-        <BoardTable rows={b.rows} month={b.month} editable={b.editable} />
+        <BoardTable rows={b.rows} month={b.month} editable={b.editable} suggestions={byId} />
       </Card>
       <p className="text-xs text-muted">
         Conta a venda confirmada no mês por quem abriu a venda. "No ritmo": mantendo a média por dia útil (segunda a
@@ -76,7 +80,7 @@ function Board({ b }: { b: TargetBoardDto }) {
   );
 }
 
-function BoardTable({ rows, month, editable }: { rows: TargetBoardRowDto[]; month: string; editable: boolean }) {
+function BoardTable({ rows, month, editable, suggestions }: { rows: TargetBoardRowDto[]; month: string; editable: boolean; suggestions: Map<number, TargetSuggestionRowDto> }) {
   if (rows.length === 0) {
     return <p className="p-8 text-center text-sm text-muted">Nenhum vendedor ativo. Crie a conta em Usuários com o papel Vendedor(a).</p>;
   }
@@ -88,8 +92,11 @@ function BoardTable({ rows, month, editable }: { rows: TargetBoardRowDto[]; mont
         { header: 'Vendedor(a)', cell: (r) => <span className="font-medium">{r.sellerName}</span> },
         {
           header: 'Meta',
-          cell: (r) => (editable ? <TargetInput row={r} month={month} /> : r.target == null ? <span className="text-muted">sem meta</span> : <span className="tabular">{formatMoney(r.target)}</span>),
+          cell: (r) => (editable ? <TargetInput key={`${r.sellerId}-${r.target ?? ''}`} row={r} month={month} /> : r.target == null ? <span className="text-muted">sem meta</span> : <span className="tabular">{formatMoney(r.target)}</span>),
         },
+        ...(editable
+          ? [{ header: 'Sugestão pela previsão', cell: (r: TargetBoardRowDto) => <SuggestionCell row={r} month={month} s={suggestions.get(r.sellerId)} /> }]
+          : []),
         { header: 'Vendido', align: 'right', cell: (r) => <span className="tabular">{formatMoney(r.revenue)}</span> },
         { header: '% da meta', cell: (r) => <Progress percent={r.percent} /> },
         { header: 'Projeção', align: 'right', cell: (r) => <span className="tabular text-muted">{formatMoney(r.projection)}</span> },
@@ -159,4 +166,100 @@ function TargetInput({ row, month }: { row: TargetBoardRowDto; month: string }) 
       {error && <span className="text-xs text-error">{error}</span>}
     </form>
   );
+}
+
+// Spec crm/12, REQ-03: meta sugerida = previsão do mês × parte do vendedor nos últimos 90 dias × (1 + crescimento).
+function SuggestionBar({ month, growth, setGrowth, sug, error }: {
+  month: string; growth: number; setGrowth: (g: number) => void; sug?: TargetSuggestionsDto; error: unknown;
+}) {
+  const save = useSetTarget();
+  const toast = useToast();
+  const [confirming, setConfirming] = useState(false);
+  const toApply = (sug?.rows ?? []).filter((r) => r.suggested != null && r.suggested !== r.currentTarget);
+
+  async function applyAll() {
+    try {
+      for (const r of toApply) await save.mutateAsync({ sellerId: r.sellerId, month, amount: r.suggested! });
+      toast.success(`${toApply.length} meta(s) aplicada(s) pela previsão. Cada mudança foi registrada na auditoria.`);
+    } catch (err) {
+      toast.error(err);
+    } finally {
+      setConfirming(false);
+    }
+  }
+
+  return (
+    <div className="flex flex-col gap-3 rounded-xl border border-border bg-surface p-4 sm:flex-row sm:items-end sm:justify-between">
+      <div className="text-sm">
+        <p className="font-medium">Sugestão pela previsão de vendas</p>
+        {error ? (
+          <p className="text-muted">A previsão ainda não está disponível: {(error as Error).message}</p>
+        ) : sug ? (
+          <p className="text-muted">
+            Previsão da loja no mês: <strong className="text-text">{formatMoney(sug.monthForecast)}</strong>. Cada vendedor recebe a parte
+            dele no faturamento dos últimos 90 dias{growth !== 0 && <>, com {growth > 0 ? '+' : ''}{growth}% de crescimento</>}.
+          </p>
+        ) : (
+          <p className="text-muted">Calculando…</p>
+        )}
+      </div>
+      <div className="flex items-end gap-2">
+        <label className="flex flex-col gap-1 text-xs text-muted">
+          Crescimento (%)
+          <input
+            type="number" min={-20} max={50} step={5} value={growth}
+            onChange={(e) => setGrowth(Math.max(-20, Math.min(50, Number(e.target.value) || 0)))}
+            className="h-9 w-24 rounded-md border border-border bg-surface px-2 text-sm text-text tabular"
+          />
+        </label>
+        {confirming ? (
+          <>
+            <Button size="sm" onClick={() => void applyAll()} loading={save.isPending}>Confirmar {toApply.length} meta(s)</Button>
+            <Button size="sm" variant="ghost" onClick={() => setConfirming(false)}>Voltar</Button>
+          </>
+        ) : (
+          <Button size="sm" variant="secondary" disabled={toApply.length === 0} onClick={() => setConfirming(true)}
+            title={toApply.length === 0 ? 'Todas as metas já estão iguais à sugestão (ou não há sugestão).' : undefined}>
+            Aplicar a todos
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function SuggestionCell({ row, month, s }: { row: TargetBoardRowDto; month: string; s?: TargetSuggestionRowDto }) {
+  const save = useSetTarget();
+  const toast = useToast();
+  if (!s) return <span className="text-muted">—</span>;
+  if (s.suggested == null) return <span className="text-xs text-muted">{s.reason}</span>;
+  const same = row.target != null && row.target === s.suggested;
+  return (
+    <span className="flex items-center gap-3">
+      <span className="flex flex-col leading-tight">
+        <span className="tabular whitespace-nowrap">{formatMoney(s.suggested)}</span>
+        <span className="text-xs whitespace-nowrap text-muted">{s.sharePercent.toLocaleString('pt-BR')}% da loja</span>
+      </span>
+      {same ? (
+        <span className="text-xs whitespace-nowrap text-muted">igual à meta</span>
+      ) : (
+        <Button size="sm" variant="secondary" loading={save.isPending}
+          onClick={async () => {
+            try {
+              await save.mutateAsync({ sellerId: row.sellerId, month, amount: s.suggested! });
+              toast.success(`Meta de ${row.sellerName} definida pela previsão. A mudança foi registrada na auditoria.`);
+            } catch (err) {
+              toast.error(err);
+            }
+          }}>
+          Usar
+        </Button>
+      )}
+    </span>
+  );
+}
+
+// MODO TESTE: cores do Dashboard também nesta tela.
+export function TargetsPage() {
+  return <div className="cores-dashboard"><TargetsPageBody /></div>;
 }

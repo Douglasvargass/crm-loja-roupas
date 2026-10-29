@@ -1,6 +1,6 @@
 # A história da Orden
 
-> Revisada em 29/10/2026 com a equipe. A Talita conta a versão curta (fim deste documento) quando alguém pergunta
+> Revisada em 29/10/2026 com a equipe. A Thalita conta a versão curta (fim deste documento) quando alguém pergunta
 > quem criou o sistema ou como ele surgiu.
 
 ## Como começou
@@ -23,7 +23,7 @@ das 10h às 22h e aos domingos e feriados das 14h às 21h.
 
 | Pessoa | Área no projeto | Papel no sistema |
 | --- | --- | --- |
-| Douglas Vargas | Engenharia de software: arquitetura, banco de dados, servidor e a Talita | Engenheiro de Software |
+| Douglas Vargas | Engenharia de software: arquitetura, banco de dados, servidor e a Thalita | Engenheiro de Software |
 | Julia Alcantara | Marketing e desenvolvimento: a marca, as cores e as telas | Marketing e Desenvolvimento |
 | Guilherme Dower | O olhar do gerente: regras do negócio, dashboard e metas | Gerente |
 | Vinicius Clemente | Gestão de operação e compras: recebe os chamados de peça em falta, no sistema ou direto no banco, e faz o pedido ao fornecedor | Operações e Compras |
@@ -34,7 +34,7 @@ das 10h às 22h e aos domingos e feriados das 14h às 21h.
 
 1. **O essencial do enunciado:** clientes, produtos, categorias, estoque com histórico que nunca se apaga, vendas
    que só baixam o estoque quando confirmadas, cancelamento que devolve as peças e um dashboard com os números reais.
-2. **O que a equipe quis a mais:** login com papéis, a **Talita** (assistente que responde com os dados da loja),
+2. **O que a equipe quis a mais:** login com papéis, a **Thalita** (assistente que responde com os dados da loja),
    publicação online, metas e o **Meu painel** de cada vendedor.
 3. **A loja que não para:** um agente que todo dia simula as vendas do dia anterior, e os **chamados de peça em
    falta**: o cliente quer uma peça que acabou, o vendedor abre o chamado, Operações e Compras recebe e faz o
@@ -49,11 +49,11 @@ A origem do nome **Orden** não foi registrada. A paleta saiu de uma arara de ro
 Os professores **Vitor Freitas e Matheus Carvalho** avaliam o projeto, e a equipe quer que eles entrem também
 como clientes da loja (spec crm/07, a fazer).
 
-## Versão curta (a que a Talita conta)
+## Versão curta (a que a Thalita conta)
 
 A Orden nasceu no segundo semestre de 2026, no curso Técnico em Desenvolvimento de Sistemas do SENAI de Tubarão.
 A ideia veio de uma dor que quem trabalha no comércio conhece: estoque sem controle faz a loja perder dinheiro,
 porque uma peça pequena e cara pode sumir sem que os donos percebam. Seis colegas se
-dividiram: Douglas na engenharia e na Talita; Julia no marketing, na marca e nas telas; Guilherme no olhar do
+dividiram: Douglas na engenharia e na Thalita; Julia no marketing, na marca e nas telas; Guilherme no olhar do
 gerente; Vinicius Clemente em operação e compras, recebendo os chamados de peça em falta e fazendo o pedido; Vitor
 e Vinicius Muniz no balcão, nos clientes e nos testes.

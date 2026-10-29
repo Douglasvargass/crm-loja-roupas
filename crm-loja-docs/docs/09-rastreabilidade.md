@@ -39,12 +39,12 @@ Situação em 27/10/2026. **Feito** = implementado e coberto por teste automáti
 | HU33 | Entrar no sistema | `/login` | `POST /auth/login` · `/refresh` · `/logout` | CT32, CT36, login inválido | Feito |
 | HU34 | Trocar a senha | `/trocar-senha` (obrigatória no 1º acesso; link no topo) | `POST /auth/change-password` | CT35 | Feito |
 | HU35 | Gerenciar usuários e papéis | `/usuarios` | `GET · POST · PATCH /admin/users` | CT37, criação com senha provisória, login curto `nome.sobrenome`, papéis técnicos (DashboardIT) | Feito |
-| HU36 | Tirar dúvidas com a Talita (assistente de IA) | botão flutuante (todas as telas) | `GET /crm/assistant/status` · `POST /crm/assistant/chat` | AssistantIT (sem chave); seção 9 do roteiro manual (com chave) | Feito |
+| HU36 | Tirar dúvidas com a Thalita (assistente de IA) | botão flutuante (todas as telas) | `GET /crm/assistant/status` · `POST /crm/assistant/chat` | AssistantIT (sem chave); seção 9 do roteiro manual (com chave) | Feito |
 | HU37 | Meu painel: minhas vendas e minha meta | `/meu-painel` (tela inicial do vendedor) | `GET /crm/my-panel` | TargetIT, PaceTest; seção 10 do roteiro | Feito (spec 06) |
 | HU38 | Definir a meta de cada vendedor | `/metas` | `PUT /crm/targets/{sellerId}` | TargetIT (validações, mês fechado, auditoria) | Feito (spec 06) |
 | HU39 | Quadro de metas da equipe | `/metas` | `GET /crm/targets` | TargetIT | Feito (spec 06) |
 | HU46 | Agente de vendas da demonstração (um dia por vez, clima pela IA) | Dashboard → Diário do agente | `GET /crm/demo-agent` | HumorDoDiaTest, DemoAgentIT | Feito (spec 08) |
-| HU47 | Abrir chamado de peça em falta (tela ou Talita) | `/chamados` → Novo chamado; ficha do produto zerado | `POST /crm/requests` | StockRequestIT | Feito (spec 09) |
+| HU47 | Abrir chamado de peça em falta (tela ou Thalita) | `/chamados` → Novo chamado; ficha do produto zerado | `POST /crm/requests` | StockRequestIT | Feito (spec 09) |
 | HU48 | Resolver ou cancelar chamado; peça que chega resolve sozinha | `/chamados` | `POST /crm/requests/{id}/resolve` · `/cancel`; `POST /crm/stock/entries` | StockRequestIT | Feito (spec 09) |
 | HU49 | Sino de avisos | topo de todas as telas | `GET /crm/requests/alerts` | StockRequestIT | Feito (spec 09) |
 | HU50 | "Ver como" (só leitura) | botão no topo; faixa "Vendo como…" | `/auth/view-as` | ViewAsIT | Feito (spec 10) |
@@ -53,7 +53,9 @@ Situação em 27/10/2026. **Feito** = implementado e coberto por teste automáti
 | HU53 | Receber o pedido (entrada + fecha chamados) | `/pedidos-compra` → Receber | `POST /crm/purchase-orders/{id}/receive` | ReplenishmentIT | Feito (spec 11) |
 | HU55 | Etapas do pedido e nota fiscal | `/pedidos-compra` → Saiu do fornecedor / Chegou na loja / Dar entrada | `/ship` · `/arrive` · `/receive` | ReplenishmentIT (`etapasDoPedidoAteAEntrada`) | Feito (spec 11) |
 | HU56 | Estoque no Dashboard | `/` (bloco Estoque) | `GET /crm/stock/planning`, `GET /crm/purchase-orders` | ReplenishmentIT; roteiro seção 18 | Feito (spec 11) |
-| HU57 | Talita do cliente e pedido de peça | Loja: Talita, "Não achou? Peça à loja", Meus pedidos | `/loja/assistant/**`, `/loja/requests` | StoreIT (`clientePedePeca…`) | Feito (spec 07) |
+| HU57 | Thalita do cliente e pedido de peça | Loja: Thalita, "Não achou? Peça à loja", Meus pedidos | `/loja/assistant/**`, `/loja/requests` | StoreIT (`clientePedePeca…`) | Feito (spec 07) |
+| HU58 | Previsão de vendas com sazonalidade | `/previsao` | `GET /crm/forecast?months=` | ForecastModelTest (8), ForecastIT (`gerenteVePrevisao…`, `mesesForaDoLimite…`) | Feito (spec 12) |
+| HU59 | Meta sugerida pela previsão | `/metas` (coluna Sugestão, Usar, Aplicar a todos) | `GET /crm/targets/suggestions?month=&growth=` | ForecastIT (`metaSugerida…`, `sugestaoRecusa…`) | Feito (spec 12) |
 | HU54 | Mudar data ou cancelar o pedido, com motivo | `/pedidos-compra` → Mudar data / Cancelar | `/reschedule` · `/cancel` | ReplenishmentIT | Feito (spec 11) |
 | HU40–HU45 | Espaço do cliente: conta e troca de senha, vitrine, carrinho, pagamento simulado, meus pedidos, meus dados | `/loja/...` | `/loja/**` | StoreIT | Feito (spec 07) |
 

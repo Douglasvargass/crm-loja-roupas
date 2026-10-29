@@ -18,6 +18,6 @@ Monorepo do Orden: `crm-loja-backend/` (Java 21, Spring Boot), `crm-loja-fronten
 - Nada se apaga: venda se cancela, cadastro com histórico se inativa, histórico de estoque e auditoria são imutáveis.
 - Tela e documentação em português simples; código em inglês.
 - Mudou rota ou DTO: `crm-loja-docs/specs/api-contract.md` e `crm-loja-frontend/src/data/dto.ts` juntos.
-- Mudou regra: `crm-loja-docs/docs/04-regras-de-negocio.md` e o prompt da Talita (`AssistantPrompt.java`).
+- Mudou regra: `crm-loja-docs/docs/04-regras-de-negocio.md` e o prompt da Thalita (`AssistantPrompt.java`).
 - Portões: `./mvnw verify` no back-end; `pnpm lint && pnpm typecheck && pnpm build` no front-end.
 - Toda tela nova tem o "?" de ajuda (`PageHeader help="..."`) e nenhum botão fica travado sem dizer por quê.

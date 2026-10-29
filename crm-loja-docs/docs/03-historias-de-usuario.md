@@ -43,7 +43,7 @@ São 57 histórias em 13 épicos (HU01 a HU35 são o MVP do enunciado; HU36 a HU
 | HU33 | Entrar no sistema | Todos | Must |
 | HU34 | Trocar a senha | Todos | Must |
 | HU35 | Gerenciar usuários e papéis | Gerente | Should |
-| HU36 | Tirar dúvidas com a Talita (assistente de IA) | Todos | Could |
+| HU36 | Tirar dúvidas com a Thalita (assistente de IA) | Todos | Could |
 | HU37 | Meu painel: minhas vendas e minha meta | Vendedor | Should |
 | HU38 | Definir a meta de cada vendedor | Gerente | Should |
 | HU39 | Quadro de metas da equipe | Gerente | Should |
@@ -64,7 +64,7 @@ São 57 histórias em 13 épicos (HU01 a HU35 são o MVP do enunciado; HU36 a HU
 | HU54 | Mudar a data ou cancelar o pedido de compra | Operações e Compras | Should |
 | HU55 | Acompanhar as etapas do pedido e a nota fiscal | Operações e Compras | Should |
 | HU56 | Ver o estoque no Dashboard | Operações e Compras | Should |
-| HU57 | Falar com a Talita e pedir uma peça (cliente) | Cliente | Could |
+| HU57 | Falar com a Thalita e pedir uma peça (cliente) | Cliente | Could |
 
 ### EP01 · Clientes
 
@@ -263,7 +263,7 @@ São 57 histórias em 13 épicos (HU01 a HU35 são o MVP do enunciado; HU36 a HU
 
 ### EP09 · Assistente de IA
 
-**HU36 · Tirar dúvidas com a Talita (extra).** Como membro da equipe, quero perguntar em linguagem natural sobre vendas, estoque, clientes e uso do sistema, para decidir sem procurar em várias telas.
+**HU36 · Tirar dúvidas com a Thalita (extra).** Como membro da equipe, quero perguntar em linguagem natural sobre vendas, estoque, clientes e uso do sistema, para decidir sem procurar em várias telas.
 
 - As respostas usam dados consultados no banco no momento; nada é inventado.
 - Cada perfil só obtém o que a tela já mostraria a ele.
@@ -334,7 +334,7 @@ São 57 histórias em 13 épicos (HU01 a HU35 são o MVP do enunciado; HU36 a HU
 
 - Descrição, tamanho, cor, quantidade (1 a 99), produto e cliente opcionais.
 - Peça com estoque suficiente não abre chamado: é para vender.
-- A Talita também abre, sempre mostrando o resumo e esperando o "sim".
+- A Thalita também abre, sempre mostrando o resumo e esperando o "sim".
 
 **HU48 · Resolver ou cancelar chamado.** Como estoquista ou gerente, quero fechar o chamado com uma nota, para registrar o que foi feito.
 
@@ -386,7 +386,19 @@ São 57 histórias em 13 épicos (HU01 a HU35 são o MVP do enunciado; HU36 a HU
 - Peças e valor em estoque, zerados, acabam em 7 dias, para pedir, pedidos feitos, em trânsito, em conferência e notas que deram entrada.
 - Eu não vejo vendas nem faturamento; o gerente vê vendas e estoque.
 
-**HU57 · Talita do cliente e pedido de peça.** Como cliente, quero perguntar sobre peças e meus pedidos e pedir uma peça que não está na vitrine, para comprar o que procuro.
+**HU57 · Thalita do cliente e pedido de peça.** Como cliente, quero perguntar sobre peças e meus pedidos e pedir uma peça que não está na vitrine, para comprar o que procuro.
 
-- A Talita do cliente só fala da vitrine, dos meus pedidos e das peças que pedi; nada da operação da loja.
-- Pedir peça (pela Talita, depois de confirmar, ou pelo botão da vitrine) avisa o gerente e o estoque; acompanho em Meus pedidos.
+- A Thalita do cliente só fala da vitrine, dos meus pedidos e das peças que pedi; nada da operação da loja.
+- Pedir peça (pela Thalita, depois de confirmar, ou pelo botão da vitrine) avisa o gerente e o estoque; acompanho em Meus pedidos.
+
+**HU58 · Previsão de vendas com sazonalidade.** Como gerente, quero ver quanto a loja deve vender nos próximos 7 e 30 dias, no fechamento do mês e nos próximos meses, para planejar equipe, compras e metas.
+
+- Cada valor vem com a faixa provável e o número de vendas esperado.
+- A conta leva em conta dia da semana, semana do salário, feriados, datas comerciais e, com 1 ano de histórico, o mês do ano; a tela explica cada fator e diz o que é aprendido e o que é estimativa padrão.
+- Com menos de 14 dias com venda, a tela avisa que ainda não dá para prever.
+
+**HU59 · Meta sugerida pela previsão.** Como gerente, quero que o sistema sugira a meta de cada vendedor a partir da previsão do mês, para a meta ser justa e alcançável.
+
+- Sugestão = previsão do mês × parte do vendedor nos últimos 90 dias × (1 + crescimento que eu escolho), arredondada para a centena.
+- Uso a sugestão de uma pessoa ou aplico a todos depois de confirmar; vale a mesma regra e auditoria da meta digitada.
+- Quem não vendeu nos últimos 90 dias não recebe sugestão: defino à mão.

@@ -8,7 +8,7 @@
 | Pedidos | `modules/crm/purchase/`: `PurchaseOrderService` (SQL direto, como os chamados) e `PurchaseOrderController`: `GET /crm/purchase-orders`, `GET /{id}`, `POST`, `POST /{id}/receive`, `/reschedule`, `/cancel` |
 | Receber | `PurchaseOrderService.receive` chama `StockService.entry` para cada peça na mesma transação (a entrada já fecha os chamados, spec crm/09) e grava a mudança antes de contar os chamados fechados (`em.flush()`) |
 | Permissões | Ver e receber: G E (Operações e Compras vale por E). Registrar, mudar data, cancelar: G e `PURCHASING`. Na tela: `can.replenishment`, `can.buy`, `can.receivePurchase` |
-| Talita | `previsao_estoque` e `pedidos_compra` (papéis G E); prompt com as regras e onde fica cada coisa |
+| Thalita | `previsao_estoque` e `pedidos_compra` (papéis G E); prompt com as regras e onde fica cada coisa |
 | Demonstração | `PedidosCompraDemoSeeder` (@Order 55, dev e demo, só com a tabela vazia): 3 pedidos do Vinicius Clemente com as peças que acabam primeiro; um chega em 3 dias, outro em 10, e um está 2 dias atrasado |
 | Telas | `ReplenishmentPage` (`/reposicao`, tela inicial de Operações e Compras): 6 cartões, filtros, busca, marcar peças e "Pedir marcadas". `PurchaseOrdersPage` (`/pedidos-compra`): abas, novo pedido (vem montado da Reposição pela URL `?novo=id:qtd,...`), receber, mudar data, cancelar |
 | Pendências ao entrar | Pedidos atrasados e peças que acabam em 7 dias (G e E) |
@@ -19,5 +19,5 @@ as tabelas novas.
 
 **Testes:** `CoverageTest` (7, a conta caso a caso) e `ReplenishmentIT` (6): painel calcula e desconta o que está a
 caminho; peça parada e dinheiro parado; registrar e validações; receber dá entrada, fecha o chamado e não recebe duas
-vezes; mudar data, cancelar, auditoria e filtro de atrasados; Talita. `AssistantIT` passa a contar 15 ferramentas
+vezes; mudar data, cancelar, auditoria e filtro de atrasados; Thalita. `AssistantIT` passa a contar 15 ferramentas
 para o gerente e 16 para a equipe técnica.

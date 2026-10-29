@@ -2,7 +2,7 @@
 
 > Épico: Estoque · Histórias: HU51, HU52, HU53, HU54 · Solicitante: Douglas Vargas (equipe) · Origem: conversa de 29/10/2026 ("o Vinicius Clemente poderia ter um dash do estoque: projeção do que pode faltar, pedidos a chegar") · Data: 29/10/2026
 > Depende de: crm/03-estoque, crm/04-vendas, crm/09-chamados-peca-em-falta
-> Prioridade (MoSCoW): Should have · Tamanho: G (2 tabelas, 6 regras, 2 telas, 2 ferramentas da Talita)
+> Prioridade (MoSCoW): Should have · Tamanho: G (2 tabelas, 6 regras, 2 telas, 2 ferramentas da Thalita)
 > Status: implementada em 29/10/2026
 
 ## Contexto
@@ -60,11 +60,11 @@ Quem compra (Operações e Compras, gerente e a equipe técnica) registra: forne
 - Quem compra cancela com motivo; o pedido não some, fica na aba Cancelados e deixa de contar como "a caminho" (RN47).
 - Pedido aberto com a data prevista vencida aparece como **Atrasado**, no filtro próprio, no cartão da Reposição e no aviso de pendências ao entrar (RN48).
 
-### REQ-05 — Talita
+### REQ-05 — Thalita
 
 - `previsao_estoque` (gerente, estoque, Operações e Compras, equipe técnica): resumo e peças que pedem atenção, ou uma peça só; a mesma conta da tela.
 - `pedidos_compra` (os mesmos): lista por situação ou só os atrasados.
-- A Talita **não** registra nem recebe pedido de compra: explica onde fazer na tela.
+- A Thalita **não** registra nem recebe pedido de compra: explica onde fazer na tela.
 
 ### REQ-06 — Etapas do pedido e nota fiscal (HU55, 29/10/2026, V11)
 

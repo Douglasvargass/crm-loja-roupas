@@ -57,7 +57,7 @@ O back-end expõe as rotas **sem** prefixo; o front chama `/api/...` e o proxy d
 | GET | `/auth/view-as/targets` | Pessoas que podem ser vistas (ativas, com papel, menos eu) | G | HU50 |
 | POST · DELETE | `/auth/view-as` | `{userId}` liga o "Ver como" (cookie `view_as`, 30 min); DELETE sai. Durante o modo, toda alteração recebe 403 `read_only_view_as` e `/auth/me` traz `viewAs` | G (sair: todos) | HU50 |
 | GET · POST | `/loja/requests` | Peças que o cliente pediu · pedir peça `{description, size?, color?, quantity}` (vira chamado ligado ao cliente; peça com estoque 409 `product_in_stock`) | C | HU57 |
-| GET · POST | `/loja/assistant/status` · `/loja/assistant/chat` | Talita do cliente: `{enabled}` · `{conversationId?, message}` | C | HU57 |
+| GET · POST | `/loja/assistant/status` · `/loja/assistant/chat` | Thalita do cliente: `{enabled}` · `{conversationId?, message}` | C | HU57 |
 | GET | `/crm/stock/planning?horizon=` | Reposição: `{today, windowDays, horizonDays, summary, items[]}`; cada item com `dailyAvg`, `daysLeft`, `runOutDate`, `incoming`, `nextArrival`, `openRequestsQty`, `suggestedQty`, `status` (OUT, CRITICAL, ATTENTION, OK, STALE, NEW), `needsOrder`, `covered`, `arrivesAfterRunOut`. `horizon` de 7 a 90 (padrão 30); fora disso 400 `invalid_horizon` | G E | HU51 |
 | GET | `/crm/purchase-orders?status=&late=&page=` · `/{id}` | Pedidos de compra com as peças; `late=true` só os abertos com a data vencida | G E | HU52 |
 | POST | `/crm/purchase-orders` | `{supplier, expectedDate, note?, items:[{productId, quantity}]}`; 400 `date_in_past`, `date_too_far`, `duplicated_product`, `too_many_items`; 409 `product_inactive` | G (`PURCHASING`) | HU52 |
@@ -74,6 +74,8 @@ O back-end expõe as rotas **sem** prefixo; o front chama `/api/...` e o proxy d
 | GET · PUT | `/loja/me` | Meus dados; nome e CPF não mudam | C | HU45 |
 | GET | `/crm/demo-agent` | Diário do agente de demonstração: `{enabled, aiEnabled, days[14]}`. Fora dos perfis dev/demo, `enabled=false` | G | HU46 |
 | PUT | `/crm/targets/{sellerId}?month=aaaa-mm` | `{amount}` define ou corrige a meta. 409 `month_closed` · `month_too_far` · `not_a_seller` · `target_conflict`; 400 valor ≤ 0 ou mais de 2 casas | G | HU38 |
+| GET | `/crm/forecast?months=` | Previsão de vendas: `{today, historyFrom, historyDays, model, periods[], days[]}`. `periods`: NEXT_7, NEXT_30, THIS_MONTH (com `realized`) e um por mês (`months` de 1 a 12, padrão 3), cada um com `revenue`, `low`, `high`, `sales`. `model`: `weekday[]`, `payday`, `holiday`, `monthSeasonality`, `events[]` (`learned`), `accuracy`. `days`: 28 realizados (`actual`) + 60 previstos. 400 `invalid_months`; 409 `not_enough_history` | G | HU58 |
+| GET | `/crm/targets/suggestions?month=aaaa-mm&growth=` | Metas sugeridas: `{month, monthForecast, growthPercent, basisFrom, basisTo, storeRevenue, rows[]}`; cada linha com `revenue` e `sharePercent` (90 dias), `currentTarget`, `suggested` (null + `reason` sem venda). 400 `invalid_growth` · `invalid_month`; 409 `month_closed` · `not_enough_history` | G | HU59 |
 
 ### Exemplo de resposta do dashboard
 

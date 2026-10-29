@@ -174,7 +174,7 @@ class StockRequestIT extends IntegrationTest {
         mvc.perform(get("/crm/stock/alerts").cookie(compras)).andExpect(status().isOk());
     }
 
-    @Test // REQ-08: a Talita só abre depois de confirmado, e só para quem atende
+    @Test // REQ-08: a Thalita só abre depois de confirmado, e só para quem atende
     void talitaAbreChamadoSoComConfirmacao() throws Exception {
         AppUser seller = newSeller();
         var semConfirmar = tools.execute("abrir_chamado", Map.of("descricao", "Vestido longo M"), "SELLER", seller.getId());

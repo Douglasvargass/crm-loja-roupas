@@ -35,7 +35,7 @@ Nunca use outra conta para enviar.
 | 7 | Processo de requisitos da equipe e modelos de issue do GitHub | doc 16, `.github/ISSUE_TEMPLATE/` | — |
 | 8 | **Agente de vendas da demonstração**: fecha cada dia que passou; a IA grátis só escolhe o clima do dia | specs/crm/08 | **V7** |
 | 9 | **Chamados de peça em falta** com sino de avisos; a entrada de estoque fecha o chamado sozinha | specs/crm/09 | **V8** |
-| 10 | **Talita**: abre chamado (com confirmação), conta a história da Orden, recusa assunto fora da loja, sabe dos pedidos online | doc 10, doc 17 | — |
+| 10 | **Thalita**: abre chamado (com confirmação), conta a história da Orden, recusa assunto fora da loja, sabe dos pedidos online | doc 10, doc 17 | — |
 | 11 | **"Ver como"** só leitura (gerente vê como outra pessoa) | specs/crm/10 | — |
 | 12 | **Exportar planilha** (CSV) de clientes, produtos e vendas (HU32) | api-contract | — |
 | 13 | **"?" de ajuda** em toda tela, aviso de **pendências ao entrar**, botão travado sempre com o motivo | roteiro seção 14 | — |
@@ -43,11 +43,12 @@ Nunca use outra conta para enviar.
 | 15 | **Reposição** (o que vai faltar, em quantos dias acaba, quanto pedir, dinheiro parado) e **Pedidos de compra** (registrar, receber com um clique, mudar data, cancelar). Tela inicial do Vinicius Clemente | specs/crm/11 | **V10** |
 | 16 | **Cores**: o site fica sempre na paleta clara da marca (Creme, Areia, Caramelo, Café), mesmo com o computador no modo escuro; menu e barra de cima em creme | `tokens.css` | — |
 | 17 | **Pix com QR code de mentira** (faixa "DEMONSTRAÇÃO") na tela de pagamento e **"Ver como"** visível também em tela estreita (só o ícone) | `FakePixQr.tsx`, `ViewAs.tsx` | — |
-| 18 | **Prévia da loja** ("Ver como" → Loja do cliente: o site como qualquer cliente vê, nada é gravado) e **Talita online em verde** (cinza quando desligada). Celular e tablet conferidos: menu, navegação e Talita | specs/crm/10 (REQ-06), roteiro seções 13 e 17 | — |
+| 18 | **Prévia da loja** ("Ver como" → Loja do cliente: o site como qualquer cliente vê, nada é gravado) e **Thalita online em verde** (cinza quando desligada). Celular e tablet conferidos: menu, navegação e Thalita | specs/crm/10 (REQ-06), roteiro seções 13 e 17 | — |
 | 19 | **Estoque no Dashboard** (gerente vê vendas + estoque; Clemente e estoquista só estoque, e o Clemente entra por ele) e **etapas do pedido de compra** (pedido feito → em trânsito → em conferência → entrada com a nota fiscal) | specs/crm/11 (REQ-06, REQ-07) | **V11** |
-| 20 | **Talita do cliente** (só vitrine, pedidos dele e pedir peça) e botão **"Não achou? Peça à loja"**; o cliente acompanha em Meus pedidos, o gerente vê no sino | specs/crm/07 (REQ-12) | — |
+| 20 | **Thalita do cliente** (só vitrine, pedidos dele e pedir peça) e botão **"Não achou? Peça à loja"**; o cliente acompanha em Meus pedidos, o gerente vê no sino | specs/crm/07 (REQ-12) | — |
 | 21 | **Conferência do pedido** (conta peça por peça: a menos → devolver a nota; a mais → nota de bonificação), produto novo não é "parado", **Resetar senha** pela tela (equipe e clientes) e cliente com login não se exclui | specs/crm/11 (REQ-08), RN52–RN54, roteiro seção 19 | **V12** |
 | 22 | **Sugestão de pedido no Dashboard** (lista com quantidades e botão que monta o pedido de compra) | roteiro seção 18 | — |
+| 23 | **Previsão de vendas** com sazonalidade (dia da semana, salário, feriados, datas comerciais, mês do ano) e **metas sugeridas pela previsão** na tela Metas; Thalita com `previsao_vendas` e `sugestao_metas` | specs/crm/12, RN55–RN60, roteiro seção 20 | — |
 
 O detalhe de cada passo está em `HISTORICO-DE-COMMITS.txt` (os commits feitos neste pacote) e no fim de
 `DOCUMENTACAO_COMPLETA.md` ("Histórico de revisões").
@@ -91,14 +92,14 @@ Os arquivos que **não** devem ir ao Git já estão no `.gitignore` (`node_modul
 1. O merge na `main` publica sozinho (`autoDeploy: true` no `render.yaml`). Acompanhe em render.com → serviço `crm-loja-roupas` → **Events**. Leva de 5 a 10 minutos.
 2. Na subida, o Flyway aplica **V6 a V12** sozinho. Nada é apagado; as vendas antigas ficam com canal "Loja física".
 3. Os seeds de demonstração **acertam tudo sozinhos** no banco que já existe: logins `nome.sobrenome`, papéis (Vinicius Clemente vira Operações e Compras), histórico redistribuído entre os vendedores, metas, 4 pedidos de compra de exemplo (em trânsito com nota fiscal, pedido feito, um atrasado e um em conferência), diário do agente e as contas dos professores (`vitor.freitas` e `matheus.carvalho`, senha `cliente12345`, troca obrigatória).
-4. **Ligar a IA grátis** (Talita e agente): Render → **Environment** → `ASSISTANT_PROVIDER=groq` e `ASSISTANT_API_KEY=<chave grátis de console.groq.com>`. Salvar reinicia o serviço.
+4. **Ligar a IA grátis** (Thalita e agente): Render → **Environment** → `ASSISTANT_PROVIDER=groq` e `ASSISTANT_API_KEY=<chave grátis de console.groq.com>`. Salvar reinicia o serviço.
 5. **Acordar todo dia:** GitHub → **Actions → acordar-demo → Run workflow** uma vez para testar. Depois ele roda sozinho às 03:10.
 6. **Atenção:** o PostgreSQL grátis do Render expira 30 dias depois de criado (perto de **25/11/2026**). Quando expirar, recrie pelo Blueprint (`crm-loja-docs/docs/13-publicar-online.md`); o histórico de demonstração volta sozinho.
 
 ## 6. Testar pela tela
 
 Roteiro: `crm-loja-docs/docs/12-roteiro-de-testes.md`. As seções novas são a 10 (Meu painel e Metas), 11 (agente),
-12 (chamados e Talita), 13 ("Ver como"), 14 (ajuda, pendências, exportar), 15 (espaço do cliente), 16 (reposição e pedidos de compra), 17 (celular, tablet e Talita), 18 (estoque no Dashboard, etapas do pedido, Talita do cliente e sugestão de pedido) e 19 (conferência, reset de senha e cliente com login).
+12 (chamados e Thalita), 13 ("Ver como"), 14 (ajuda, pendências, exportar), 15 (espaço do cliente), 16 (reposição e pedidos de compra), 17 (celular, tablet e Thalita), 18 (estoque no Dashboard, etapas do pedido, Thalita do cliente e sugestão de pedido) e 19 (conferência, reset de senha e cliente com login).
 
 ## 7. De onde continuar (backlog)
 
@@ -106,7 +107,7 @@ Tudo o que foi combinado está feito. Sobrou só o que depende de você ou é me
 
 1. **Publicação:** passos 4 e 5 acima (GitHub, Render, chave do Groq, workflow) e recriar o banco perto de 25/11.
 2. **Cofre de versões:** decidido em 29/10/2026 que **não** será feito. Não retomar.
-3. **Limites conhecidos**: o agente da demonstração não cria cancelamentos nos dias novos e não fecha chamados; no "Ver como" a Talita não responde (é só leitura); o cliente não cancela a própria solicitação de peça; a Talita não tem limite de perguntas por pessoa (decisão de 29/10: fica assim).
+3. **Limites conhecidos**: o agente da demonstração não cria cancelamentos nos dias novos e não fecha chamados; no "Ver como" a Thalita não responde (é só leitura); o cliente não cancela a própria solicitação de peça; a Thalita não tem limite de perguntas por pessoa (decisão de 29/10: fica assim).
 4. **Ideias que ficaram fora do escopo** (spec 11, "Não inclui"): cadastro de fornecedores, preço de custo, recebimento parcial, envio do pedido ao fornecedor, sazonalidade na previsão.
 5. **Ideias que ficaram fora do escopo** (spec 07, "Não inclui"): frete, cupom, vários endereços, auto-cadastro, cancelamento pelo próprio cliente, aviso ao cliente por WhatsApp ou e-mail quando a peça do chamado chega.
 

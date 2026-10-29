@@ -619,7 +619,7 @@ São 57 histórias em 13 épicos (HU01 a HU35 são o MVP do enunciado; HU36 a HU
 | HU33 | Entrar no sistema | Todos | Must |
 | HU34 | Trocar a senha | Todos | Must |
 | HU35 | Gerenciar usuários e papéis | Gerente | Should |
-| HU36 | Tirar dúvidas com a Talita (assistente de IA) | Todos | Could |
+| HU36 | Tirar dúvidas com a Thalita (assistente de IA) | Todos | Could |
 | HU37 | Meu painel: minhas vendas e minha meta | Vendedor | Should |
 | HU38 | Definir a meta de cada vendedor | Gerente | Should |
 | HU39 | Quadro de metas da equipe | Gerente | Should |
@@ -640,7 +640,7 @@ São 57 histórias em 13 épicos (HU01 a HU35 são o MVP do enunciado; HU36 a HU
 | HU54 | Mudar a data ou cancelar o pedido de compra | Operações e Compras | Should |
 | HU55 | Acompanhar as etapas do pedido e a nota fiscal | Operações e Compras | Should |
 | HU56 | Ver o estoque no Dashboard | Operações e Compras | Should |
-| HU57 | Falar com a Talita e pedir uma peça (cliente) | Cliente | Could |
+| HU57 | Falar com a Thalita e pedir uma peça (cliente) | Cliente | Could |
 
 ### EP01 · Clientes
 
@@ -839,7 +839,7 @@ São 57 histórias em 13 épicos (HU01 a HU35 são o MVP do enunciado; HU36 a HU
 
 ### EP09 · Assistente de IA
 
-**HU36 · Tirar dúvidas com a Talita (extra).** Como membro da equipe, quero perguntar em linguagem natural sobre vendas, estoque, clientes e uso do sistema, para decidir sem procurar em várias telas.
+**HU36 · Tirar dúvidas com a Thalita (extra).** Como membro da equipe, quero perguntar em linguagem natural sobre vendas, estoque, clientes e uso do sistema, para decidir sem procurar em várias telas.
 
 - As respostas usam dados consultados no banco no momento; nada é inventado.
 - Cada perfil só obtém o que a tela já mostraria a ele.
@@ -910,7 +910,7 @@ São 57 histórias em 13 épicos (HU01 a HU35 são o MVP do enunciado; HU36 a HU
 
 - Descrição, tamanho, cor, quantidade (1 a 99), produto e cliente opcionais.
 - Peça com estoque suficiente não abre chamado: é para vender.
-- A Talita também abre, sempre mostrando o resumo e esperando o "sim".
+- A Thalita também abre, sempre mostrando o resumo e esperando o "sim".
 
 **HU48 · Resolver ou cancelar chamado.** Como estoquista ou gerente, quero fechar o chamado com uma nota, para registrar o que foi feito.
 
@@ -962,10 +962,10 @@ São 57 histórias em 13 épicos (HU01 a HU35 são o MVP do enunciado; HU36 a HU
 - Peças e valor em estoque, zerados, acabam em 7 dias, para pedir, pedidos feitos, em trânsito, em conferência e notas que deram entrada.
 - Eu não vejo vendas nem faturamento; o gerente vê vendas e estoque.
 
-**HU57 · Talita do cliente e pedido de peça.** Como cliente, quero perguntar sobre peças e meus pedidos e pedir uma peça que não está na vitrine, para comprar o que procuro.
+**HU57 · Thalita do cliente e pedido de peça.** Como cliente, quero perguntar sobre peças e meus pedidos e pedir uma peça que não está na vitrine, para comprar o que procuro.
 
-- A Talita do cliente só fala da vitrine, dos meus pedidos e das peças que pedi; nada da operação da loja.
-- Pedir peça (pela Talita, depois de confirmar, ou pelo botão da vitrine) avisa o gerente e o estoque; acompanho em Meus pedidos.
+- A Thalita do cliente só fala da vitrine, dos meus pedidos e das peças que pedi; nada da operação da loja.
+- Pedir peça (pela Thalita, depois de confirmar, ou pelo botão da vitrine) avisa o gerente e o estoque; acompanho em Meus pedidos.
 
 ## 5. Regras de negócio
 
@@ -1008,7 +1008,7 @@ As regras ficam no Service e, sempre que possível, também no banco (CHECK, UNI
 | RN33 | Peça ativa com estoque suficiente não abre chamado | — | 409 `product_in_stock` |
 | RN34 | Resolver: estoque ou gerente; cancelar: esses ou quem abriu; sempre com nota; fechado não reabre | `ck_stock_request_closed` | 409 `request_closed` |
 | RN35 | Entrada de estoque resolve os chamados abertos da peça, do mais antigo ao mais novo, enquanto a quantidade cobrir | Mesma transação da entrada | — |
-| RN36 | A Talita só grava uma coisa: chamado, depois de a pessoa confirmar o resumo | — | — |
+| RN36 | A Thalita só grava uma coisa: chamado, depois de a pessoa confirmar o resumo | — | — |
 | RN37 | Cliente só acessa a loja (`/loja/**`), sempre resolvido pela sessão; pedido, carrinho ou dado de outro cliente: 404 | `ux_customer_user` | 403 · 404 |
 | RN38 | Pedido online = venda com canal ONLINE; pagar confirma pela mesma regra tudo-ou-nada do balcão | `ck_sale_channel`, `ux_payment_sale` | 409 `insufficient_stock` |
 | RN39 | Preço que mudou com a peça no carrinho: vale o novo; o carrinho é atualizado e o cliente confere antes de pagar | — | 409 `price_changed` |
@@ -1022,7 +1022,7 @@ As regras ficam no Service e, sempre que possível, também no banco (CHECK, UNI
 | RN47 | Pedido de compra: fornecedor, data de hoje a 180 dias, 1 a 30 peças de 1 a 9999 un.; registra, muda data e cancela só quem compra (G, Operações e Compras), sempre com motivo para mudar ou cancelar; nada se apaga | `ck_purchase_order_closed` | 400 · 403 · 409 `order_closed` |
 | RN49 | Pedido de compra: pedido feito → em trânsito (quem compra) → em conferência (quem recebe) → entrada feita com o nº da nota fiscal; data só muda antes de chegar; cancela até a entrada | `ck_purchase_order_steps` | 400 `invoice_required` · 409 `wrong_step` |
 | RN50 | Dashboard: o bloco Estoque é de gerente, Operações e Compras e estoquista; vendas e faturamento continuam só do gerente | `/crm/dashboard` G | 403 |
-| RN51 | Cliente pede peça que não está na vitrine (Talita com confirmação ou botão da vitrine); vira chamado ligado a ele; cada cliente vê só os seus | — | 409 `product_in_stock` |
+| RN51 | Cliente pede peça que não está na vitrine (Thalita com confirmação ou botão da vitrine); vira chamado ligado a ele; cada cliente vê só os seus | — | 409 `product_in_stock` |
 | RN52 | Conferência do pedido de compra: contado peça por peça; chegou a menos → a nota volta ao fornecedor (nada entra, pedido volta a feito); chegou a mais → o extra entra com a nota de bonificação; nunca entrada "mais ou menos" para ajustar depois | `ck_purchase_order_item_received` | 409 `short_delivery` · 400 `bonus_invoice_required` |
 | RN53 | Cliente com acesso à loja online não se exclui; inativa | `fk_customer_user` | 409 `customer_has_login` |
 | RN54 | Resetar senha (gerente): senha provisória, troca obrigatória, sessões encerradas; ninguém reseta a própria por aí | — | 409 `self_reset` |
@@ -1162,7 +1162,7 @@ O back-end expõe as rotas **sem** prefixo; o front chama `/api/...` e o proxy d
 | GET | `/auth/view-as/targets` | Pessoas que podem ser vistas (ativas, com papel, menos eu) | G | HU50 |
 | POST · DELETE | `/auth/view-as` | `{userId}` liga o "Ver como" (cookie `view_as`, 30 min); DELETE sai. Durante o modo, toda alteração recebe 403 `read_only_view_as` e `/auth/me` traz `viewAs` | G (sair: todos) | HU50 |
 | GET · POST | `/loja/requests` | Peças que o cliente pediu · pedir peça `{description, size?, color?, quantity}` (vira chamado ligado ao cliente; peça com estoque 409 `product_in_stock`) | C | HU57 |
-| GET · POST | `/loja/assistant/status` · `/loja/assistant/chat` | Talita do cliente: `{enabled}` · `{conversationId?, message}` | C | HU57 |
+| GET · POST | `/loja/assistant/status` · `/loja/assistant/chat` | Thalita do cliente: `{enabled}` · `{conversationId?, message}` | C | HU57 |
 | GET | `/crm/stock/planning?horizon=` | Reposição: `{today, windowDays, horizonDays, summary, items[]}`; cada item com `dailyAvg`, `daysLeft`, `runOutDate`, `incoming`, `nextArrival`, `openRequestsQty`, `suggestedQty`, `status` (OUT, CRITICAL, ATTENTION, OK, STALE, NEW), `needsOrder`, `covered`, `arrivesAfterRunOut`. `horizon` de 7 a 90 (padrão 30); fora disso 400 `invalid_horizon` | G E | HU51 |
 | GET | `/crm/purchase-orders?status=&late=&page=` · `/{id}` | Pedidos de compra com as peças; `late=true` só os abertos com a data vencida | G E | HU52 |
 | POST | `/crm/purchase-orders` | `{supplier, expectedDate, note?, items:[{productId, quantity}]}`; 400 `date_in_past`, `date_too_far`, `duplicated_product`, `too_many_items`; 409 `product_inactive` | G (`PURCHASING`) | HU52 |
@@ -1358,8 +1358,8 @@ Cobrir também a virada de período no dashboard: venda confirmada às 23:59 do 
 | CT50 | Inválido (auto) | Pedido de compra com data passada, peça repetida ou sem peças | 400, nada salvo | ReplenishmentIT |
 | CT51 | Exceção (auto) | Receber pedido duas vezes; receber dá entrada e fecha chamado | Segunda 409 `order_closed`; estoque sobe uma vez só | ReplenishmentIT |
 | CT52 | Acesso (auto) | Estoquista tenta registrar pedido; vendedor abre a Reposição | 403 | ReplenishmentIT |
-| CT53 | Válido (auto) | Talita: cada papel recebe só as ferramentas que a tela dele permite | Gerente 15, equipe técnica 16, vendedor sem estoque/faturamento | AssistantIT |
-| CT54 | Válido (auto) | Talita conta a história e recusa assunto fora da loja | Texto pronto, sem inventar | TalitaPersonaTest |
+| CT53 | Válido (auto) | Thalita: cada papel recebe só as ferramentas que a tela dele permite | Gerente 15, equipe técnica 16, vendedor sem estoque/faturamento | AssistantIT |
+| CT54 | Válido (auto) | Thalita conta a história e recusa assunto fora da loja | Texto pronto, sem inventar | ThalitaPersonaTest |
 
 ### Onde estão os testes automáticos
 
@@ -1374,16 +1374,16 @@ Rodada completa em 29/10/2026 com `./mvnw verify`: **106 testes unitários e 97 
 | `AuthIT` | 8 | Login, troca de senha, sessão, papéis |
 | `ViewAsIT` | 5 | "Ver como" só leitura |
 | `TargetIT` | 8 | Metas e Meu painel |
-| `StoreIT` | 12 | Espaço do cliente, Prévia da loja, Talita do cliente, pedido de peça, cliente com login e reset de senha |
+| `StoreIT` | 12 | Espaço do cliente, Prévia da loja, Thalita do cliente, pedido de peça, cliente com login e reset de senha |
 | `StockRequestIT` | 7 | Chamados de peça em falta |
 | `ReplenishmentIT` | 8 | Reposição, pedidos de compra, etapas e conferência (devolver a nota, bonificação) |
 | `DemoAgentIT` | 2 | Agente de vendas da demonstração |
-| `AssistantIT` | 4 | Ferramentas da Talita por papel |
+| `AssistantIT` | 4 | Ferramentas da Thalita por papel |
 | `CpfTest` | 12 | Dígito verificador do CPF |
 | `PaceTest` | 7 | Ritmo e projeção da meta |
 | `CoverageTest` | 8 | Conta da Reposição, caso a caso (inclui peça nova) |
 | `HumorDoDiaTest` | 6 | Clima do dia do agente |
-| `TalitaPersonaTest` | 63 | Apresentação, história e recusas da Talita |
+| `ThalitaPersonaTest` | 63 | Apresentação, história e recusas da Thalita |
 | `AssistantPropertiesTest` · `OpenAiCompatibleProviderTest` | 6 · 4 | Configuração e conexão com a IA |
 
 ## 9. Como executar
@@ -1586,13 +1586,14 @@ seção 4, as regras na seção 5, as rotas na seção 6 e os testes na seção 
 
 | Função | Spec | Histórias | Banco |
 | --- | --- | --- | --- |
-| Talita, assistente de IA que consulta os dados reais e só fala da loja | doc 10 | HU36 | — |
+| Thalita, assistente de IA que consulta os dados reais e só fala da loja | doc 10 | HU36 | — |
 | Meu painel do vendedor e metas | crm/06 | HU37–HU39 | V6 |
-| Espaço do cliente (vitrine, carrinho, Pix ou cartão simulados, meus pedidos, Talita do cliente e pedido de peça) | crm/07 | HU40–HU45, HU57 | V9 |
+| Espaço do cliente (vitrine, carrinho, Pix ou cartão simulados, meus pedidos, Thalita do cliente e pedido de peça) | crm/07 | HU40–HU45, HU57 | V9 |
 | Agente que gera as vendas de demonstração de cada dia | crm/08 | HU46 | V7 |
 | Chamados de peça em falta e sino de avisos | crm/09 | HU47–HU49 | V8 |
 | "Ver como" (o gerente vê o sistema como outra pessoa, só leitura) | crm/10 | HU50 | — |
 | Reposição (o que vai faltar e quanto pedir), pedidos de compra com etapas, nota fiscal e conferência (devolver a nota ou bonificação), estoque no Dashboard | crm/11 | HU51–HU56 | V10, V11, V12 |
+| Previsão de vendas com sazonalidade e metas sugeridas pela previsão | crm/12 | HU58–HU59 | — |
 | Exportar listas para planilha (CSV) | api-contract | HU32 | — |
 
 Outros documentos: rastreabilidade (doc 09), guia de comandos (doc 11), roteiro de testes manuais (doc 12), publicar
@@ -1602,16 +1603,16 @@ a história da Orden (doc 17).
 
 ## Histórico de revisões
 
-- **29/10/2026.** Logins passam a ser `nome.sobrenome` (sem @); a senha de demonstração continua `loja12345`. Papéis novos para a equipe técnica (`DEVELOPER` = Engenheiro(a) de Software, `MARKETING_DEV` = Marketing e Desenvolvimento), com acesso total; Vinicius Muniz passa a vendedor. Dashboard ganha o filtro **Vendedor(a)** (`sellerId`), e a Talita, o parâmetro `vendedor_id`. Texto alinhado ao código: Postgres embutido no lugar de Testcontainers, cookie `SameSite=Lax`, workflows reais do CI, seeds atuais, 70 testes, 36 histórias. Conferência do enunciado em `docs/15-conferencia-enunciado.md`.
+- **29/10/2026.** Logins passam a ser `nome.sobrenome` (sem @); a senha de demonstração continua `loja12345`. Papéis novos para a equipe técnica (`DEVELOPER` = Engenheiro(a) de Software, `MARKETING_DEV` = Marketing e Desenvolvimento), com acesso total; Vinicius Muniz passa a vendedor. Dashboard ganha o filtro **Vendedor(a)** (`sellerId`), e a Thalita, o parâmetro `vendedor_id`. Texto alinhado ao código: Postgres embutido no lugar de Testcontainers, cookie `SameSite=Lax`, workflows reais do CI, seeds atuais, 70 testes, 36 histórias. Conferência do enunciado em `docs/15-conferencia-enunciado.md`.
 - **29/10/2026 (tarde).** Painel do vendedor e metas de venda (spec 06, adendo na seção 11); espaço do cliente especificado (spec 07); processo de requisitos (doc 16) e modelos de issue do GitHub. 85 testes automáticos.
 - **29/10/2026 (noite).** Agente de vendas da demonstração (spec 08): fecha cada dia que passou com o modelo do histórico, a IA grátis escolhe só o clima do dia, diário no Dashboard, workflow `acordar-demo.yml`. Migration V7. 93 testes automáticos.
-- **29/10/2026 (noite, 2).** Chamados de peça em falta (spec 09, V8, regras RN32 a RN36), sino de avisos, Talita abre chamado com confirmação, conta a história da Orden (doc 17) e só fala da loja. 101 testes automáticos.
+- **29/10/2026 (noite, 2).** Chamados de peça em falta (spec 09, V8, regras RN32 a RN36), sino de avisos, Thalita abre chamado com confirmação, conta a história da Orden (doc 17) e só fala da loja. 101 testes automáticos.
 - **29/10/2026 (noite, 3).** História da Orden revisada com a equipe (doc 17): curso Técnico em Desenvolvimento de Sistemas, a dor do estoque sem controle no comércio (sem citar empresa), origem do nome não registrada. Papel novo **Operações e Compras** (`PURCHASING`, vale por estoquista): Vinicius Clemente recebe os chamados de peça em falta e faz o pedido. 102 testes automáticos.
 - **29/10/2026 (noite, 4).** "Ver como" só leitura (spec 10) e exportação CSV pela API (HU32). 107 testes automáticos.
 - **29/10/2026 (fechamento).** "?" de ajuda em todas as telas, aviso de pendências ao entrar, motivo ao lado de botão travado, botões Exportar planilha. Pacote preparado para o computador do curso: ver `PARA-CONTINUAR.md`.
 - **29/10/2026 (final).** Espaço do cliente (spec 07, V9, regras RN37 a RN42): professores como clientes, vitrine, carrinho, Pix ou cartão simulados, meus pedidos, meus dados; filtro de canal no dashboard. `./mvnw verify`: 98 testes unitários e 86 de integração, todos passando.
 - **29/10/2026 (reposição).** Reposição e pedidos de compra (spec 11, V10, regras RN43 a RN48): o que vai faltar, quanto pedir, pedidos a caminho e atrasados, receber com um clique (fecha os chamados); tela inicial de Operações e Compras. Site sempre na paleta clara da marca. `./mvnw verify`: 105 testes unitários e 92 de integração, todos passando.
 - **29/10/2026 (revisão final da documentação).** Este arquivo foi remontado a partir dos documentos de `crm-loja-docs/docs` e do contrato da API: histórias HU36 a HU54, casos CT39 a CT54, seeds novos, dica de porta bloqueada pelo Windows e a seção 11 com as funções que vieram depois do MVP. Comentários explicando o porquê em todos os arquivos de código. Corrigido o `.gitignore` do back-end, que escondia o pacote de Metas.
-- **29/10/2026 (prévia e celular).** Prévia da loja pelo "Ver como" (o site como qualquer cliente vê, nada é gravado), Talita online em verde, roteiro seção 17 (celular, tablet e Talita).
-- **29/10/2026 (estoque no dashboard e Talita do cliente).** Bloco Estoque no Dashboard (gerente, Operações e Compras e estoquista), etapas do pedido de compra com nota fiscal (V11), Talita do cliente e pedido de peça pela loja. `./mvnw verify`: 105 testes unitários e 95 de integração, todos passando.
+- **29/10/2026 (prévia e celular).** Prévia da loja pelo "Ver como" (o site como qualquer cliente vê, nada é gravado), Thalita online em verde, roteiro seção 17 (celular, tablet e Thalita).
+- **29/10/2026 (estoque no dashboard e Thalita do cliente).** Bloco Estoque no Dashboard (gerente, Operações e Compras e estoquista), etapas do pedido de compra com nota fiscal (V11), Thalita do cliente e pedido de peça pela loja. `./mvnw verify`: 105 testes unitários e 95 de integração, todos passando.
 - **29/10/2026 (revisão).** Conferência do pedido de compra contada peça por peça: a menos, a nota volta; a mais, nota de bonificação (V12). Produto novo não conta como parado. Resetar senha pela tela (equipe e clientes). Cliente com login não se exclui. `./mvnw verify`: 106 testes unitários e 97 de integração, todos passando.

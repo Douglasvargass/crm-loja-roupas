@@ -68,7 +68,7 @@ public class StoreController {
     }
 
     // Solicitação de peça que a loja não tem (pedido do Douglas, 29/10/2026): o cliente pede pela vitrine ou pela
-    // Talita; vira um chamado de peça em falta (spec crm/09) com o cliente já ligado, e o gerente e o estoque veem no
+    // Thalita; vira um chamado de peça em falta (spec crm/09) com o cliente já ligado, e o gerente e o estoque veem no
     // sino. O cliente acompanha as dele em Meus pedidos. Peça com estoque o sistema recusa: é para comprar na vitrine.
     public record PartRequest(
             Long productId,

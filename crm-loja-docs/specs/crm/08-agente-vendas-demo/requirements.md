@@ -32,7 +32,7 @@ feriados, datas comerciais, quinzena, peso de cada vendedor (5 : 4 : 3), reposi�
 
 ### REQ-03 — A IA só escolhe o "clima" do dia
 
-Se houver provedor de IA configurado (o mesmo da Talita; grátis no Groq ou no Gemini), o agente manda à IA só números
+Se houver provedor de IA configurado (o mesmo da Thalita; grátis no Groq ou no Gemini), o agente manda à IA só números
 agregados (vendas e faturamento dos últimos 14 dias, peças por categoria, dia da semana, feriado, data comercial) e
 recebe 3 números e uma frase: fator de movimento, categoria em destaque e motivo.
 

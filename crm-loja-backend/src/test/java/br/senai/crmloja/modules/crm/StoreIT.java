@@ -226,8 +226,8 @@ class StoreIT extends IntegrationTest {
         assertThat(jdbc.queryForObject("select status from payment where sale_id = ?", String.class, sale)).isEqualTo("REFUNDED");
     }
 
-    @Test // Talita do cliente e pedido de peça (29/10): o cliente pede, ele e o gerente veem; ninguém vê o do outro
-    void clientePedePecaETalitaDoClienteSoTemAsFerramentasDele() throws Exception {
+    @Test // Thalita do cliente e pedido de peça (29/10): o cliente pede, ele e o gerente veem; ninguém vê o do outro
+    void clientePedePecaEThalitaDoClienteSoTemAsFerramentasDele() throws Exception {
         Client a = newClient(false);
         Client b = newClient(false);
         long id = body(mvc.perform(post("/loja/requests").cookie(as(a)).contentType(APPLICATION_JSON)

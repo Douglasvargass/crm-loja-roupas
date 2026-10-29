@@ -5,12 +5,24 @@ import { cn } from '@/lib/cn';
 // Gráficos do dashboard. Cada barra é um botão: clicar seleciona (e o painel inteiro se filtra por aquilo),
 // clicar de novo na mesma barra remove o filtro. Quando há seleção, as outras barras ficam apagadas.
 
+// Escala de cor: t de 0 a 1 vai de bordô (baixo) a amarelo (meio) até azul (alto), sempre em tons suaves.
+function scale(t: number): string {
+  const x = Math.min(Math.max(t, 0), 1);
+  return x < 0.5
+    ? `color-mix(in oklab, var(--g1), var(--g2) ${Math.round(x * 200)}%)`
+    : `color-mix(in oklab, var(--g2), var(--g3) ${Math.round((x - 0.5) * 200)}%)`;
+}
+const GRADIENT = 'linear-gradient(90deg, var(--g1), var(--g2), var(--g3))';
+
 export interface DayPoint { date: string; sales: number; revenue: number }
 
 export function DayBars({ data, selected, onPick }: { data: DayPoint[]; selected?: string | null; onPick: (date: string) => void }) {
   const max = useMemo(() => Math.max(...data.map((x) => x.revenue), 0), [data]);
   if (max === 0) return <p className="p-6 text-center text-sm text-muted">Sem faturamento no período.</p>;
   const showEvery = Math.ceil(data.length / 8);
+  // Degradê suave do menor para o maior valor: bordô, passando por amarelo, até azul.
+  const min = Math.min(...data.map((x) => x.revenue));
+  const light = (v: number) => scale(max > min ? (v - min) / (max - min) : 0.5);
   return (
     <div className="px-3 pt-4 pb-2 sm:px-4">
       <div className="flex h-44 items-end gap-[2px]" role="group" aria-label="Faturamento por dia. Clique numa barra para filtrar o dia.">
@@ -31,8 +43,8 @@ export function DayBars({ data, selected, onPick }: { data: DayPoint[]; selected
               )}
             >
               <span
-                className={cn('block w-full rounded-t-sm bg-chart transition-opacity', dim ? 'opacity-30' : 'group-hover:opacity-80')}
-                style={{ height: `${Math.max((x.revenue / max) * 100, x.revenue > 0 ? 2 : 0)}%` }}
+                className={cn('block w-full rounded-t-sm transition-opacity', dim ? 'opacity-30' : 'group-hover:opacity-80')}
+                style={{ height: `${Math.max((x.revenue / max) * 100, x.revenue > 0 ? 2 : 0)}%`, background: light(x.revenue) }}
               />
               <span className={cn('pointer-events-none absolute bottom-full z-10 mb-1 hidden rounded-md border border-border bg-surface px-2 py-1 text-xs whitespace-nowrap shadow group-hover:block group-focus-visible:block', tip)}>
                 {formatDate(x.date)}: {formatMoney(x.revenue)} · {x.sales} venda(s)
@@ -41,6 +53,9 @@ export function DayBars({ data, selected, onPick }: { data: DayPoint[]; selected
           );
         })}
       </div>
+      <p className="mt-3 flex items-center gap-2 text-[11px] text-muted" aria-hidden>
+        menor <i className="h-1.5 w-20 rounded-full" style={{ background: GRADIENT }} /> maior
+      </p>
       <div className="mt-1 flex gap-[2px] text-[10px] text-muted" aria-hidden>
         {data.map((x, i) => (
           <div key={x.date} className="min-w-0 flex-1 truncate text-center">
@@ -81,7 +96,7 @@ export function ClickBars({ rows, selectedId, onPick, empty }: { rows: BarRow[];
                 <span className="tabular shrink-0 font-medium">{r.display}</span>
               </span>
               <span className="block h-2 rounded-full bg-surface-2">
-                <span className="block h-2 rounded-full bg-chart" style={{ width: `${(r.value / max) * 100}%` }} />
+<span className="block h-2 rounded-full bg-chart" style={{ width: `${(r.value / max) * 100}%` }} />
               </span>
             </button>
           </li>

@@ -45,10 +45,10 @@ class AssistantIT extends IntegrationTest {
 
         // 10 do MVP + metas_vendedores + abrir_chamado + listar_chamados + previsao_estoque + pedidos_compra.
         // meu_painel é só de vendedor.
-        assertThat(tools.definitionsFor("MANAGER")).hasSize(15);
+        assertThat(tools.definitionsFor("MANAGER")).hasSize(17);
         // Equipe técnica vale por gerente + vendedor + estoquista: recebe as 16.
-        assertThat(tools.definitionsFor("DEVELOPER")).hasSize(16);
-        assertThat(tools.definitionsFor("MARKETING_DEV")).hasSize(16);
+        assertThat(tools.definitionsFor("DEVELOPER")).hasSize(18);
+        assertThat(tools.definitionsFor("MARKETING_DEV")).hasSize(18);
         assertThat(tools.execute("consultar_dashboard", Map.of(), "DEVELOPER").error()).isFalse();
 
         // Mesmo se o modelo pedir uma ferramenta fora do papel, a execução recusa.

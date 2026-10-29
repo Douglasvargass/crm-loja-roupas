@@ -5,7 +5,7 @@ import { cn } from '@/lib/cn';
 import { Icon } from '../atoms/Icon';
 import { Logo } from '../atoms/Logo';
 import { useStorePreview } from '../../pages/store/previewContext';
-import { TalitaChat } from '../organisms/TalitaChat';
+import { ThalitaChat } from '../organisms/ThalitaChat';
 
 // Caminhos relativos à base: /loja para o cliente, /previa-loja para a Prévia da loja da equipe.
 const LINKS = [
@@ -14,7 +14,7 @@ const LINKS = [
   { to: '/meus-dados', label: 'Meus dados', end: true },
 ];
 
-// Espaço do cliente (spec crm/07): layout próprio, sem o menu da equipe e sem o sino. A Talita aparece na versão do
+// Espaço do cliente (spec crm/07): layout próprio, sem o menu da equipe e sem o sino. A Thalita aparece na versão do
 // cliente (só vitrine, os pedidos dele e pedir peça).
 export function StoreShell() {
   const { me, logout } = useSession();
@@ -92,8 +92,8 @@ export function StoreShell() {
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6">
         <Outlet />
       </main>
-      {/* Talita do cliente (29/10/2026). Na prévia da equipe ela não aparece: a conversa é do cliente logado. */}
-      {!pv && <TalitaChat />}
+      {/* Thalita do cliente (29/10/2026). Na prévia da equipe ela não aparece: a conversa é do cliente logado. */}
+      {!pv && <ThalitaChat />}
     </div>
   );
 }

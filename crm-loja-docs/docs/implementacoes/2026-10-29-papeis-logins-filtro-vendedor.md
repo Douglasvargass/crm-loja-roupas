@@ -12,7 +12,7 @@ Resumo do que mudou nesta entrega e por quê. (A entrega do MVP em 27/10/2026 es
 | Dois papéis técnicos: `DEVELOPER` (Engenheiro(a) de Software) e `MARKETING_DEV` (Marketing e Desenvolvimento) | `CrmModuleSeeder`, `RbacService.grantedRoles`, `JwtCookieFilter`, `AssistantTools`, `permissions.ts`, `adapters.ts` | A equipe que constrói o sistema precisa ver tudo; o rótulo na tela diz o que cada um faz. Na permissão valem por gerente + vendedor + estoquista. Não contam como "gerente ativo" na RN25 |
 | Equipe (atualizado no fim do dia: Vinicius Clemente passou a Operações e Compras, papel `PURCHASING`): Guilherme gerente; Douglas Engenheiro de Software (e super admin); Julia Marketing e Desenvolvimento; Vitor, Vinicius Clemente e Vinicius Muniz vendedores | `DevDataSeeder.EQUIPE` | Pedido do dono do projeto |
 | Filtro **Vendedor(a)** no dashboard (`sellerId`) | `DashboardService`, `DashboardController`, `DashboardResponse` (`sellers`, `selected.sellerId/sellerName`), `DashboardPage` | Saber quanto cada vendedor vendeu. O vendedor é quem abriu a venda (`sale.created_by`). Vale para cartões e para os três gráficos |
-| Talita consulta por vendedor (`vendedor_id`) | `AssistantTools`, `AssistantPrompt` | "Quanto o Vitor vendeu este mês?" |
+| Thalita consulta por vendedor (`vendedor_id`) | `AssistantTools`, `AssistantPrompt` | "Quanto o Vitor vendeu este mês?" |
 | Histórico de demonstração creditado aos 3 vendedores (pesos 5 : 4 : 3) | `HistoricoVendasSeeder` | Sorteio **separado** do principal, para a sequência de vendas continuar igual à documentada. Banco antigo (tudo num vendedor só) é redistribuído uma vez na subida |
 
 ## Decisões

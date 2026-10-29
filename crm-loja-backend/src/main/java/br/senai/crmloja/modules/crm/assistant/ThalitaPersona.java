@@ -4,24 +4,24 @@ import java.text.Normalizer;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-// Respostas fixas da Talita para o que não precisa de IA: "oi" e "quem é você?". Sai na hora, não gasta
+// Respostas fixas da Thalita para o que não precisa de IA: "oi" e "quem é você?". Sai na hora, não gasta
 // a cota do provedor (importante nos planos grátis) e continua funcionando quando o limite acaba.
-final class TalitaPersona {
+final class ThalitaPersona {
 
-    private TalitaPersona() {}
+    private ThalitaPersona() {}
 
     private static final Set<String> GREETING_WORDS = Set.of(
             "oi", "oie", "oii", "ola", "opa", "ei", "hey", "hello", "hi", "eai", "ai", "e", "salve", "fala",
-            "bom", "boa", "dia", "tarde", "noite", "tudo", "bem", "td", "certo", "talita", "pessoal", "gente", "voce", "vc");
+            "bom", "boa", "dia", "tarde", "noite", "tudo", "bem", "td", "certo", "talita", "thalita", "pessoal", "gente", "voce", "vc");
     // Pelo menos uma destas precisa aparecer, senão "tudo bem" sozinho ou "e" não contariam como cumprimento.
     private static final Set<String> GREETING_CORE = Set.of(
             "oi", "oie", "oii", "ola", "opa", "ei", "hey", "hello", "hi", "eai", "ai", "salve", "fala",
-            "dia", "tarde", "noite", "talita");
+            "dia", "tarde", "noite", "talita", "thalita");
 
     // Frase inteira (não trecho): "qual o nome do produto mais vendido?" NÃO é pergunta sobre ela.
     private static final Pattern WHO_ARE_YOU = Pattern.compile(
-            "^(?:(?:oi|ola) )?(?:talita )?(?:"
-                    + "quem (?:e|eh) (?:voce|vc|a talita)"
+            "^(?:(?:oi|ola) )?(?:th?alita )?(?:"
+                    + "quem (?:e|eh) (?:voce|vc|a th?alita)"
                     + "|qual (?:e )?(?:o )?(?:seu )?nome(?: dela)?"
                     + "|como (?:voce|vc) (?:se )?chama"
                     + "|se apresente|apresente se"
@@ -29,13 +29,13 @@ final class TalitaPersona {
                     + "|como (?:voce|vc) pode (?:me )?ajudar"
                     + "|(?:voce|vc) pode (?:me )?ajudar"
                     + "|voce e uma (?:ia|pessoa|robo)"
-                    + ")(?: talita)?$");
+                    + ")(?: th?alita)?$");
 
     // "Conta a história da Orden", "quem criou o sistema?": resposta fixa, igual à do prompt (docs/17-nossa-historia.md).
     private static final Pattern STORY = Pattern.compile(
-            "\\bhistoria (?:da|do|de) (?:orden|loja|sistema|projeto|app|aplicativo|voces|equipe|talita)\\b"
+            "\\bhistoria (?:da|do|de) (?:orden|loja|sistema|projeto|app|aplicativo|voces|equipe|th?alita)\\b"
                     + "|\\b(?:sua|tua) historia\\b"
-                    + "|\\bquem (?:criou|fez|desenvolveu|construiu|programou|inventou) (?:o sistema|a orden|o app|o aplicativo|voce|vc|a talita|isso)\\b"
+                    + "|\\bquem (?:criou|fez|desenvolveu|construiu|programou|inventou) (?:o sistema|a orden|o app|o aplicativo|voce|vc|a th?alita|isso)\\b"
                     + "|\\bcomo (?:surgiu|nasceu|comecou) (?:a orden|o sistema|o projeto|a loja|o app|voce|vc)\\b");
     // Palavras de dado: "história de vendas da loja" é pergunta de dados, não a história da Orden.
     private static final Pattern DATA_WORDS = Pattern.compile("\\b(?:vendas?|compras?|estoque|produtos?|clientes?|pedidos?|faturamento)\\b");
@@ -54,7 +54,7 @@ final class TalitaPersona {
                 + "dinheiro, porque uma peça pequena e cara pode sumir sem que os donos percebam. Quando o desafio do curso foi "
                 + "um sistema para uma loja de roupas, a turma quis resolver exatamente isso.\n\n"
                 + "Seis colegas se dividiram:\n"
-                + "- **Douglas Vargas**: engenharia do sistema e eu, a Talita;\n"
+                + "- **Douglas Vargas**: engenharia do sistema e eu, a Thalita;\n"
                 + "- **Julia Alcantara**: marketing, a marca e as telas;\n"
                 + "- **Guilherme Dower**: o olhar do gerente;\n"
                 + "- **Vinicius Clemente**: operação e compras, recebe os chamados de peça em falta e faz o pedido;\n"
@@ -81,7 +81,7 @@ final class TalitaPersona {
         String first = firstName(fullName);
         // Cliente da loja: apresentação própria, sem falar de "dados da loja" nem de telas internas.
         if ("CUSTOMER".equals(role)) {
-            return "Oi" + (first.isEmpty() ? "" : ", " + first) + "! Eu sou a **Talita**, da **Orden**.\n\n"
+            return "Oi" + (first.isEmpty() ? "" : ", " + first) + "! Eu sou a **Thalita**, da **Orden**.\n\n"
                     + "Posso te ajudar a encontrar peças, acompanhar os seus pedidos e, se você procura uma peça que não está "
                     + "na vitrine, pedir para a loja. Por exemplo:\n"
                     + "- \"Tem vestido tamanho M?\"\n"
@@ -107,7 +107,7 @@ final class TalitaPersona {
                     - "O que preciso repor com urgência?"
                     - "Qual categoria fatura mais?\"""";
         };
-        return "Oi" + (first.isEmpty() ? "" : ", " + first) + "! Eu sou a **Talita**, assistente virtual da **Orden**.\n\n"
+        return "Oi" + (first.isEmpty() ? "" : ", " + first) + "! Eu sou a **Thalita**, assistente virtual da **Orden**.\n\n"
                 + "Eu consulto os dados reais da loja na hora e também explico como usar o sistema. Você pode me perguntar, por exemplo:\n"
                 + examples + "\n\n"
                 + "Eu só consulto: para cadastrar ou alterar algo, te mostro o caminho na tela. Em que posso ajudar?";
@@ -118,7 +118,7 @@ final class TalitaPersona {
         return fullName.trim().split("\\s+")[0];
     }
 
-    // minúsculas, sem acento nem pontuação, espaços únicos: "Olá, Talita!!" → "ola talita".
+    // minúsculas, sem acento nem pontuação, espaços únicos: "Olá, Thalita!!" → "ola talita".
     static String normalize(String s) {
         if (s == null) return "";
         String noAccents = Normalizer.normalize(s, Normalizer.Form.NFD).replaceAll("\\p{M}", "");

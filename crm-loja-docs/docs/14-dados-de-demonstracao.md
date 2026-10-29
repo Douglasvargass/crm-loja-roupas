@@ -367,7 +367,7 @@ quebrar, loga o erro e a aplicação sobe assim mesmo, igual aos outros três se
 
 O histórico é criado uma vez. Dali em diante, o **agente de vendas** fecha cada dia que passou com o mesmo modelo
 desta página (horário, dia da semana, mês, feriados, datas comerciais, quinzena, peso dos vendedores, reposição de
-terça com o giro real da semana). Se houver IA configurada (a mesma da Talita, grátis no Groq ou no Gemini), ela
+terça com o giro real da semana). Se houver IA configurada (a mesma da Thalita, grátis no Groq ou no Gemini), ela
 escolhe só o "clima" do dia: fator de movimento entre 0,60 e 1,40, uma categoria em destaque e uma frase com o
 motivo ("sexta de pagamento, shopping cheio"). Sem IA, o dia sai no padrão.
 
