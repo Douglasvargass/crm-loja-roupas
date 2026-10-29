@@ -41,7 +41,7 @@ function rangeOf(p: Exclude<Preset, 'custom'>): [string, string] {
 // outros papéis com 403, então a tela nem chama).
 export function DashboardPage() {
   const { role } = useSession();
-  return role && can.dashboard(role) ? <SalesDashboard /> : <StockDashboard />;
+  return <div className="cores-dashboard">{role && can.dashboard(role) ? <SalesDashboard /> : <StockDashboard />}</div>;
 }
 
 function StockDashboard() {
@@ -189,7 +189,7 @@ function DashboardBody({ d, hasFilters, onCategory, onProduct, onDay, onSeller, 
   // Links dos cartões levam à lista de vendas já com o mesmo período.
   const salesLink = (status: string) => `/vendas?status=${status}&from=${d.period.from}&to=${d.period.to}`;
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-6">
       {hasFilters && (
         <div className="flex flex-wrap items-center gap-2" aria-label="Filtros ativos">
           <span className="text-sm text-muted">Filtrando por:</span>

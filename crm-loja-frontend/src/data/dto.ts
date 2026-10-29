@@ -440,3 +440,64 @@ export interface PurchaseReceivedDto {
   requestsResolved: number;
   bonusUnits: number;
 }
+
+// Spec crm/12: previsão de vendas (espelho de ForecastDtos.java).
+export interface ForecastFactorDto { factor: number; learned: boolean }
+export interface ForecastEventDto { name: string; date: string; rampDays: number; uplift: number; learned: boolean }
+export interface ForecastModelDto {
+  baselineRevenue: number;
+  baselineSales: number;
+  weekday: { day: 'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY'; factor: number }[];
+  payday: ForecastFactorDto;
+  holiday: ForecastFactorDto;
+  monthSeasonality: { active: boolean; factors: number[] | null };
+  events: ForecastEventDto[];
+  accuracy: { weeklyErrorPercent: number; weeks: number } | null;
+}
+export interface ForecastPeriodDto {
+  key: string;
+  label: string;
+  from: string;
+  to: string;
+  revenue: number;
+  low: number;
+  high: number;
+  sales: number;
+  realized: number | null;
+}
+export interface ForecastDayDto {
+  date: string;
+  actual: number | null;
+  revenue: number | null;
+  low: number | null;
+  high: number | null;
+  sales: number | null;
+  holiday: boolean;
+  events: string[];
+}
+export interface SalesForecastDto {
+  today: string;
+  historyFrom: string;
+  historyDays: number;
+  model: ForecastModelDto;
+  periods: ForecastPeriodDto[];
+  days: ForecastDayDto[];
+}
+export interface TargetSuggestionRowDto {
+  sellerId: number;
+  sellerName: string;
+  revenue: number;
+  sharePercent: number;
+  currentTarget: number | null;
+  suggested: number | null;
+  reason: string | null;
+}
+export interface TargetSuggestionsDto {
+  month: string;
+  monthForecast: number;
+  growthPercent: number;
+  basisFrom: string;
+  basisTo: string;
+  storeRevenue: number;
+  rows: TargetSuggestionRowDto[];
+}

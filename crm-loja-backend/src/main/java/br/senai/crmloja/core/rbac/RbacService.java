@@ -48,7 +48,7 @@ public class RbacService {
         return roleCodeOf(userId, "crm").or(() -> roleCodeOf(userId, "loja"));
     }
 
-    // Papéis que valem para quem tem este papel. É o que o @PreAuthorize e as ferramentas da Talita
+    // Papéis que valem para quem tem este papel. É o que o @PreAuthorize e as ferramentas da Thalita
     // conferem: um papel técnico "vale por" gerente, vendedor e estoquista ao mesmo tempo.
     public static Set<String> grantedRoles(String roleCode) {
         if (roleCode == null) return Set.of();

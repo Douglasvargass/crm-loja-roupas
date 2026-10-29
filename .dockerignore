@@ -1,6 +1,7 @@
+# Atenção: não use **/target aqui. Existe um pacote Java chamado modules/crm/target (metas) e ele precisa ir para a imagem.
 **/node_modules
 **/dist
-**/target
+crm-loja-backend/target
 **/.data
 **/.env
 .git

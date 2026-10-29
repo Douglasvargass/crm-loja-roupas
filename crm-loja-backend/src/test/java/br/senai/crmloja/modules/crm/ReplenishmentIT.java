@@ -265,7 +265,7 @@ class ReplenishmentIT extends IntegrationTest {
                 Integer.class, p)).isEqualTo(1);
     }
 
-    @Test // Talita: previsão e pedidos só para quem cuida do estoque; mesma conta da tela
+    @Test // Thalita: previsão e pedidos só para quem cuida do estoque; mesma conta da tela
     void talitaConsultaPrevisaoEPedidos() throws Exception {
         long p = createProduct(manager, category, "80.00", 10);
         sell(p, 9);

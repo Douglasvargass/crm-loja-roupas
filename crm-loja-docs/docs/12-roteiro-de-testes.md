@@ -108,14 +108,14 @@ semanas a loja deixa de repor essa categoria.
 - [ ] A logo da Orden aparece no topo do menu, na tela de login e (menu escondido) no cabeçalho. No tema escuro ela fica sobre uma placa creme.
 - [ ] Com o sistema em tema escuro, as telas continuam legíveis.
 
-## 9. Talita, a assistente de IA (precisa de um provedor de IA configurado)
+## 9. Thalita, a assistente de IA (precisa de um provedor de IA configurado)
 
-A Talita é o botão redondo no canto inferior direito, em todas as telas. Não existe mais "Assistente IA" no menu.
+A Thalita é o botão redondo no canto inferior direito, em todas as telas. Não existe mais "Assistente IA" no menu.
 
-- [ ] Sem provedor configurado → no painel da Talita aparece o aviso amarelo "desligada neste servidor" e o campo de mensagem fica bloqueado.
-- [ ] Ao entrar, aparece um balãozinho "Oi! Eu sou a Talita" por alguns segundos (uma vez por sessão do navegador).
-- [ ] Digitar **oi** (ou "bom dia", "olá, Talita") → ela se apresenta pelo seu primeiro nome, diz que é a assistente da Orden e sugere perguntas do seu perfil. A resposta é instantânea.
-- [ ] No computador, **arraste a janela pelo cabeçalho** (a parte marrom com o nome Talita) para qualquer lugar da tela; ela não sai da tela. Ao recarregar, ela fica onde você deixou. **Duplo clique** no cabeçalho devolve ao canto. No celular a janela é sempre em tela cheia.
+- [ ] Sem provedor configurado → no painel da Thalita aparece o aviso amarelo "desligada neste servidor" e o campo de mensagem fica bloqueado.
+- [ ] Ao entrar, aparece um balãozinho "Oi! Eu sou a Thalita" por alguns segundos (uma vez por sessão do navegador).
+- [ ] Digitar **oi** (ou "bom dia", "olá, Thalita") → ela se apresenta pelo seu primeiro nome, diz que é a assistente da Orden e sugere perguntas do seu perfil. A resposta é instantânea.
+- [ ] No computador, **arraste a janela pelo cabeçalho** (a parte marrom com o nome Thalita) para qualquer lugar da tela; ela não sai da tela. Ao recarregar, ela fica onde você deixou. **Duplo clique** no cabeçalho devolve ao canto. No celular a janela é sempre em tela cheia.
 - [ ] "Quem é você?" / "qual seu nome?" → a mesma apresentação.
 - [ ] "Oi, quanto vendemos hoje?" **não** é só um oi: ela consulta e responde com números.
 - [ ] Gerente: "Quanto vendemos este mês?" → o valor bate com o Dashboard (período "Este mês"); embaixo aparece "Consultei: indicadores". Ela cita as datas do período anterior.
@@ -127,8 +127,8 @@ A Talita é o botão redondo no canto inferior direito, em todas as telas. Não 
 - [ ] O ícone de setas no topo do painel começa uma **nova conversa**; dentro da mesma conversa, "e no mês passado?" entende o contexto.
 - [ ] A conversa continua ao trocar de tela (a janela só fecha no X ou na tecla Esc).
 - [ ] Celular: a conversa abre em tela cheia e o botão redondo some enquanto ela está aberta.
-- [ ] Com o menu do celular aberto, o botão da Talita fica **atrás** do menu.
-- [ ] Se o limite grátis do provedor acabar, a Talita avisa "limite gratuito atingido" (e o "oi" continua funcionando, pois não usa a IA).
+- [ ] Com o menu do celular aberto, o botão da Thalita fica **atrás** do menu.
+- [ ] Se o limite grátis do provedor acabar, a Thalita avisa "limite gratuito atingido" (e o "oi" continua funcionando, pois não usa a IA).
 
 ## 10. Meu painel e Metas (spec crm/06)
 
@@ -137,11 +137,11 @@ A Talita é o botão redondo no canto inferior direito, em todas as telas. Não 
 - [ ] Confirmar uma venda como esse vendedor e voltar ao painel → vendido, "Hoje" e "Minhas últimas vendas" mudam sozinhos.
 - [ ] Clicar num dia do gráfico → aparece o total daquele dia; clicar de novo some.
 - [ ] Trocar o mês para o anterior → "Mês fechado: …" e nada de ritmo.
-- [ ] Vendedor digita `/metas` ou `/` na barra de endereço → volta para Meu painel. A Talita, perguntada "quanto o Vinicius vendeu?", diz que o perfil não tem acesso.
+- [ ] Vendedor digita `/metas` ou `/` na barra de endereço → volta para Meu painel. A Thalita, perguntada "quanto o Vinicius vendeu?", diz que o perfil não tem acesso.
 - [ ] Entrar como gerente (`guilherme.dower`) → menu **Metas**. O quadro lista os 3 vendedores em ordem alfabética, com meta, vendido, %, projeção, falta e situação, e os totais da equipe.
 - [ ] Mudar a meta de um vendedor → o botão Salvar aparece só quando o valor muda; ao salvar, aviso verde e a % se atualiza. Valor 0 → erro ao lado do campo.
 - [ ] Escolher um mês passado → os campos viram texto e aparece "Este mês já fechou".
-- [ ] Gerente na Talita: "quem está mais longe da meta?" → responde com o quadro.
+- [ ] Gerente na Thalita: "quem está mais longe da meta?" → responde com o quadro.
 
 ## 11. Agente de vendas da demonstração (spec crm/08)
 
@@ -150,16 +150,16 @@ A Talita é o botão redondo no canto inferior direito, em todas as telas. Não 
 - [ ] Com `ASSISTANT_PROVIDER=groq` (chave grátis), os motivos variam ("chuva", "pagamento"…); sem chave, aparecem como "Padrão".
 - [ ] Vendedor e estoquista não veem o cartão.
 
-## 12. Chamados de peça em falta e a Talita (spec crm/09 e doc 17)
+## 12. Chamados de peça em falta e a Thalita (spec crm/09 e doc 17)
 
 - [ ] Vendedor → ficha de um produto **sem estoque** → **Cliente quer esta peça** → o chamado abre já preenchido.
 - [ ] Tentar abrir chamado de produto **com** estoque → "dá para vender agora, sem chamado".
 - [ ] Estoquista (ou gerente) → o **sino** no topo mostra o número de chamados abertos e os últimos.
 - [ ] Estoquista → Estoque → Registrar entrada da peça → o chamado vira "Resolvido" com "A peça chegou…"; o vendedor vê a novidade no sino e, ao abrir, o número zera.
 - [ ] Vendedor não vê chamados de outro vendedor; o botão Resolver não aparece para ele, só Cancelar nos dele.
-- [ ] Talita, como vendedor: "a cliente queria a jaqueta jeans G e acabou" → ela mostra o resumo e pergunta "Posso abrir o chamado?"; depois do "sim", o chamado aparece com "(pela Talita)".
-- [ ] Talita: "quem criou o sistema?" → conta a história da Orden (SENAI Tubarão, 2026, a equipe).
-- [ ] Talita: "me passa uma receita de bolo" → recusa com simpatia e sugere uma pergunta sobre a loja.
+- [ ] Thalita, como vendedor: "a cliente queria a jaqueta jeans G e acabou" → ela mostra o resumo e pergunta "Posso abrir o chamado?"; depois do "sim", o chamado aparece com "(pela Thalita)".
+- [ ] Thalita: "quem criou o sistema?" → conta a história da Orden (SENAI Tubarão, 2026, a equipe).
+- [ ] Thalita: "me passa uma receita de bolo" → recusa com simpatia e sugere uma pergunta sobre a loja.
 
 ## 13. "Ver como" (spec crm/10)
 
@@ -206,16 +206,16 @@ A Talita é o botão redondo no canto inferior direito, em todas as telas. Não 
 - [ ] **Cancelar** um pedido com motivo → vai para a aba Cancelados e as peças deixam de contar como a caminho.
 - [ ] Entrar como estoquista (crie um em Usuários) → vê as duas telas e Receber, mas não vê Novo pedido, Mudar data nem Cancelar.
 - [ ] Entrar como vendedor → o menu não mostra Reposição nem Pedidos de compra; digitar `/reposicao` não abre.
-- [ ] Talita (com a chave grátis ligada): "o que vai faltar essa semana?" e "tem pedido atrasado?" respondem com os números da tela.
+- [ ] Thalita (com a chave grátis ligada): "o que vai faltar essa semana?" e "tem pedido atrasado?" respondem com os números da tela.
 
-## 17. Celular, tablet e Talita online
+## 17. Celular, tablet e Thalita online
 
 - [ ] No celular (ou janela estreita): os 3 traços no topo abrem o menu; tocar num item troca de tela e o menu fecha sozinho.
 - [ ] No tablet em pé: o mesmo menu em gaveta; deitado (1024 px ou mais), o menu fica fixo do lado.
-- [ ] A Talita aparece no canto em todas as telas da equipe; no celular a conversa abre em tela cheia, com o fechar no topo.
-- [ ] Bolinha da Talita: **verde** quando a IA está ligada (o topo da conversa mostra "● Online"); **cinza** quando falta a chave.
+- [ ] A Thalita aparece no canto em todas as telas da equipe; no celular a conversa abre em tela cheia, com o fechar no topo.
+- [ ] Bolinha da Thalita: **verde** quando a IA está ligada (o topo da conversa mostra "● Online"); **cinza** quando falta a chave.
 
-## 18. Dashboard de estoque, etapas do pedido e Talita do cliente
+## 18. Dashboard de estoque, etapas do pedido e Thalita do cliente
 
 - [ ] Entrar como `vinicius.clemente` → a primeira tela é o **Dashboard**, só com o bloco Estoque (sem faturamento).
 - [ ] Gerente → Dashboard: as vendas de sempre e, abaixo, o mesmo bloco Estoque.
@@ -223,7 +223,7 @@ A Talita é o botão redondo no canto inferior direito, em todas as telas. Não 
 - [ ] Pedidos de compra → num pedido feito, **Saiu do fornecedor** (anotar a NF) → aba Em trânsito mostra a NF.
 - [ ] **Chegou na loja** → aba Em conferência; "Mudar data" some.
 - [ ] **Dar entrada** → a NF vem preenchida; sem NF o sistema recusa; confirmar → aba Entradas e o cartão "Notas que deram entrada" do Dashboard sobe.
-- [ ] Cliente (`vitor.freitas`): a Talita aparece no canto da loja; "Tem vestido M?" responde com a vitrine (com a chave da IA ligada).
+- [ ] Cliente (`vitor.freitas`): a Thalita aparece no canto da loja; "Tem vestido M?" responde com a vitrine (com a chave da IA ligada).
 - [ ] Vitrine → **Não achou? Peça à loja** → enviar → em Meus pedidos aparece em "Peças que pedi à loja" como "Aguardando a loja"; o gerente vê o chamado no sino; quando a peça entra no estoque, vira "Atendido".
 
 ## 19. Conferência do pedido, reset de senha e cliente com login (revisão de 29/10)
@@ -233,3 +233,17 @@ A Talita é o botão redondo no canto inferior direito, em todas as telas. Não 
 - [ ] Reposição: cadastrar um produto novo com estoque → aparece como "Novo, sem histórico", não como "Parado"; o cartão Dinheiro parado não sobe.
 - [ ] Usuários → **Resetar senha** de alguém → aparece a senha provisória; a pessoa entra com ela e é obrigada a trocar.
 - [ ] Clientes → ficha do `vitor.freitas` (Vitor Freitas) → "Acesso à loja online: Sim" → **Resetar senha da loja** → senha provisória; **Excluir** → "tem acesso à loja online" e oferece inativar.
+
+## 20. Previsão de vendas e metas pela previsão (spec 12)
+
+- [ ] Gerente (`guilherme.dower`) → menu **Previsão de vendas** → cartões Próximos 7 dias, Próximos 30 dias, Fechamento do mês (com "já vendido até ontem") e os próximos 3 meses, cada um com "entre … e …".
+- [ ] Trocar para 6 e 12 meses → aparecem mais cartões de mês.
+- [ ] Gráfico: barras claras (vendido) até a linha tracejada de hoje e escuras (previsto) depois; pontos sobre feriados e datas comerciais; passar o mouse mostra o dia e a faixa.
+- [ ] **Por que esse número**: nível atual, barras de Seg a Dom (sábado bem acima), semana do salário, feriado, mês do ano ("precisa de 1 ano de vendas") e o acerto das últimas 4 semanas.
+- [ ] **Datas comerciais**: Dia das Crianças e Dia dos Pais "aprendida"; Black Friday e Natal "estimativa padrão"; a semana da Black Friday aparece mais alta no gráfico.
+- [ ] Vendedor (`vitor.nunes`) e Operações e Compras (`vinicius.clemente`): o menu não tem Previsão de vendas; `/previsao` volta para a tela inicial.
+- [ ] **Metas** → mês seguinte → bloco "Sugestão pela previsão de vendas" com a previsão da loja no mês; cada vendedor com a sugestão e "% da loja".
+- [ ] Crescimento 10 → as sugestões sobem cerca de 10%; **Usar** num vendedor → a meta dele vira a sugestão e aparece "igual à meta".
+- [ ] **Aplicar a todos** → **Confirmar N meta(s)** → todas as metas ficam iguais às sugestões, cada mudança registrada na auditoria.
+- [ ] Mês que já fechou → o bloco de sugestão não aparece.
+- [ ] Thalita (gerente): "quanto vamos vender em novembro?" responde com a faixa e o que pesou; "qual meta você sugere para o Vitor com 10% de crescimento?" responde com a sugestão e orienta a aplicar na tela Metas.

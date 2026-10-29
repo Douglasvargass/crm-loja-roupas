@@ -25,6 +25,8 @@ export const can = {
   // Meu painel é de quem vende; a equipe técnica e o gerente acompanham pela tela Metas.
   myPanel: (r: Role) => r === 'SELLER',
   targets: asManager,
+  // Previsão de vendas (spec crm/12).
+  forecast: asManager,
   // HU32: baixar listas em planilha.
   export: asManager,
   // Chamados (spec crm/09): todos veem; quem atende abre; quem cuida do estoque resolve.

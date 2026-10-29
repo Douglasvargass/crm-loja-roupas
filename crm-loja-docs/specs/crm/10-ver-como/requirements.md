@@ -24,7 +24,7 @@ Menu, tela inicial, permissões e números passam a ser os da pessoa vista. O su
 - DADO o gerente vendo como Vitor, QUANDO abre o sistema, ENTÃO cai em Meu painel com os números do Vitor e **não** consegue abrir o Dashboard (403), como o Vitor.
 
 ### REQ-03 — Só para olhar
-- DADO o "Ver como" ligado, QUANDO qualquer alteração é tentada (vender, cadastrar, abrir chamado, perguntar à Talita), ENTÃO recebe "Você está vendo como X: é só para olhar…" (403 `read_only_view_as`).
+- DADO o "Ver como" ligado, QUANDO qualquer alteração é tentada (vender, cadastrar, abrir chamado, perguntar à Thalita), ENTÃO recebe "Você está vendo como X: é só para olhar…" (403 `read_only_view_as`).
 - Só passam: sair do "Ver como", sair do sistema e renovar a sessão.
 
 ### REQ-04 — Seguro

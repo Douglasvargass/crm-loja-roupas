@@ -98,12 +98,12 @@ os itens, ou de nenhum.
 - Pedido online **não** conta para a meta de nenhum vendedor (spec 06).
 - O gerente cancela pedido online pela regra atual (RN18, RN19): devolve o estoque e marca o pagamento como estornado.
 
-### REQ-12 — Talita do cliente e pedido de peça (HU57, 29/10/2026)
+### REQ-12 — Thalita do cliente e pedido de peça (HU57, 29/10/2026)
 
-- A Talita aparece no espaço do cliente (`/loja/assistant`), com instruções e ferramentas só do cliente: vitrine (sem estoque exato), categorias, meus pedidos, detalhe do meu pedido, minhas solicitações e pedir peça. Nenhuma ferramenta da equipe; a equipe não usa as do cliente.
-- Peça que não está na vitrine: o cliente pede pela Talita (com confirmação do resumo) ou pelo botão **"Não achou? Peça à loja"** da vitrine. Vira um chamado de peça em falta (spec crm/09) já ligado ao cliente: o gerente e o estoque veem no sino, e o cliente acompanha em **Meus pedidos → Peças que pedi à loja** (Aguardando a loja, Atendido, Cancelado, com a nota da loja).
+- A Thalita aparece no espaço do cliente (`/loja/assistant`), com instruções e ferramentas só do cliente: vitrine (sem estoque exato), categorias, meus pedidos, detalhe do meu pedido, minhas solicitações e pedir peça. Nenhuma ferramenta da equipe; a equipe não usa as do cliente.
+- Peça que não está na vitrine: o cliente pede pela Thalita (com confirmação do resumo) ou pelo botão **"Não achou? Peça à loja"** da vitrine. Vira um chamado de peça em falta (spec crm/09) já ligado ao cliente: o gerente e o estoque veem no sino, e o cliente acompanha em **Meus pedidos → Peças que pedi à loja** (Aguardando a loja, Atendido, Cancelado, com a nota da loja).
 - DADO o cliente A, QUANDO lista as solicitações, ENTÃO vê só as dele; o cliente B não vê as de A.
-- Na Prévia da loja da equipe, a Talita não aparece e o pedido de peça fica travado com o motivo.
+- Na Prévia da loja da equipe, a Thalita não aparece e o pedido de peça fica travado com o motivo.
 
 ### REQ-11 — Contas de demonstração dos professores
 

@@ -48,7 +48,7 @@ public class DashboardService {
         return build(from, to, null, null, null, null);
     }
 
-    // Usado pela Talita: período e, se pedido, um vendedor.
+    // Usado pela Thalita: período e, se pedido, um vendedor.
     public DashboardResponse build(LocalDate from, LocalDate to, Long sellerId) {
         return build(from, to, null, null, null, sellerId);
     }

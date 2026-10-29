@@ -2,6 +2,8 @@ import { keepPreviousData, useMutation, useQuery, useQueryClient, type QueryKey 
 import { http } from './http';
 import { qk } from './queryKeys';
 import type {
+  SalesForecastDto,
+  TargetSuggestionsDto,
   AvailabilityFilter,
   CategoryDto,
   CategoryInput,
@@ -49,7 +51,7 @@ function useInvalidate() {
 }
 
 // Tudo que mexe em estoque derruba o cache destes (CLAUDE.md do front). Venda também mexe no painel e nas metas.
-const STOCK_SENSITIVE = [qk.dashboard, qk.products, qk.stockAlerts, qk.stockMovements, qk.sales, qk.customers, qk.myPanel, qk.targets, qk.requests, qk.planning, qk.purchaseOrders];
+const STOCK_SENSITIVE = [qk.dashboard, qk.products, qk.stockAlerts, qk.stockMovements, qk.sales, qk.customers, qk.myPanel, qk.targets, qk.requests, qk.planning, qk.purchaseOrders, qk.forecast, qk.targetSuggestions];
 
 /* ---------- Acesso ---------- */
 
@@ -329,7 +331,7 @@ export function useSetTarget() {
     mutationFn: (p: { sellerId: number; month: string; amount: number }) =>
       http.put<{ sellerId: number; month: string; amount: number }>(
         `/crm/targets/${p.sellerId}?month=${encodeURIComponent(p.month)}`, { amount: p.amount }),
-    onSuccess: () => invalidate(qk.targets, qk.myPanel),
+    onSuccess: () => invalidate(qk.targets, qk.myPanel, qk.targetSuggestions),
   });
 }
 
@@ -519,4 +521,22 @@ export function useUserActions() {
       onSuccess: () => invalidate(qk.users, qk.customers),
     }),
   };
+}
+
+// Spec crm/12: previsão de vendas e metas sugeridas (só gerente).
+export function useForecast(months: number) {
+  return useQuery({
+    queryKey: [...qk.forecast, months],
+    queryFn: () => http.get<SalesForecastDto>('/crm/forecast', { months }),
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function useTargetSuggestions(month: string, growth: number, enabled: boolean) {
+  return useQuery({
+    queryKey: [...qk.targetSuggestions, month, growth],
+    queryFn: () => http.get<TargetSuggestionsDto>('/crm/targets/suggestions', { month, growth }),
+    placeholderData: keepPreviousData,
+    enabled,
+  });
 }

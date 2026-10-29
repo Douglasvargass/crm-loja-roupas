@@ -46,7 +46,7 @@ No perfil `dev` o `JWT_SECRET` tem um valor padrão de desenvolvimento; fora del
 ./mvnw verify
 ```
 
-116 testes: unitários (CPF, Talita, provedor de IA, ritmo da meta) e de integração (`*IT`) que sobem um Postgres 16 embutido, rodam **todas** as migrations do zero, fazem login de verdade e chamam a API com MockMvc. Cobrem os casos CT01–CT38 do plano de testes: venda tudo-ou-nada, duas confirmações simultâneas, reuso de refresh token, troca de senha obrigatória, virada de período do dashboard e os triggers que impedem alterar o histórico de estoque.
+116 testes: unitários (CPF, Thalita, provedor de IA, ritmo da meta) e de integração (`*IT`) que sobem um Postgres 16 embutido, rodam **todas** as migrations do zero, fazem login de verdade e chamam a API com MockMvc. Cobrem os casos CT01–CT38 do plano de testes: venda tudo-ou-nada, duas confirmações simultâneas, reuso de refresh token, troca de senha obrigatória, virada de período do dashboard e os triggers que impedem alterar o histórico de estoque.
 
 O Postgres embutido (zonky) substitui o Testcontainers: funciona sem Docker no Windows do laboratório e no runner do CI.
 

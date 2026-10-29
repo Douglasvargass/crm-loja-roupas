@@ -5,7 +5,7 @@ import { http } from '@/data/http';
 import type { Role } from '@/data/dto';
 import { cn } from '@/lib/cn';
 import { Icon } from '../atoms/Icon';
-import { TalitaAvatar } from '../atoms/TalitaAvatar';
+import { ThalitaAvatar } from '../atoms/ThalitaAvatar';
 import { Markdown } from '../molecules/Markdown';
 
 interface Status { enabled: boolean; provider: string | null; model: string | null }
@@ -35,7 +35,7 @@ const MANAGER_SUGGESTIONS = [
 ];
 
 const SUGGESTIONS: Record<Role, string[]> = {
-  // Talita do cliente (29/10/2026): só peças da vitrine, os pedidos dele e pedir uma peça que a loja não tem.
+  // Thalita do cliente (29/10/2026): só peças da vitrine, os pedidos dele e pedir uma peça que a loja não tem.
   CUSTOMER: [
     'Tem vestido tamanho M?',
     'Como está o meu último pedido?',
@@ -66,9 +66,7 @@ const SUGGESTIONS: Record<Role, string[]> = {
   ],
 };
 
-const HINT_KEY = 'orden.talita.hint';
-
-// Talita: assistente flutuante. Fica montada no AppShell, então a conversa continua ao trocar de tela.
+// Thalita: assistente flutuante. Fica montada no AppShell, então a conversa continua ao trocar de tela.
 const POS_KEY = 'orden.talita.pos';
 const WIDE = '(min-width: 640px)';   // mesmo ponto do `sm:` do Tailwind: abaixo disso a janela é tela cheia
 
@@ -87,9 +85,9 @@ function clampPos(x: number, y: number, w: number, h: number) {
   };
 }
 
-export function TalitaChat() {
+export function ThalitaChat() {
   const { role } = useSession();
-  // Cliente fala com a Talita da loja (/loja/assistant, outras instruções e ferramentas); a equipe, com a do sistema.
+  // Cliente fala com a Thalita da loja (/loja/assistant, outras instruções e ferramentas); a equipe, com a do sistema.
   const customer = role === 'CUSTOMER';
   const base = customer ? '/loja/assistant' : '/crm/assistant';
   const status = useQuery({ queryKey: ['assistantStatus', base], queryFn: () => http.get<Status>(`${base}/status`) });
@@ -105,11 +103,9 @@ export function TalitaChat() {
   const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  // Balãozinho de boas-vindas, uma vez por sessão do navegador (e sem insistir se o storage estiver bloqueado).
+  // Balãozinho de boas-vindas ao carregar a página.
   useEffect(() => {
-    let seen = true;
-    try { seen = sessionStorage.getItem(HINT_KEY) === '1'; } catch { /* sem storage: não mostra */ }
-    if (seen) return;
+    // MODO TESTE: o balãozinho aparece a cada carregamento da página (antes: uma vez por sessão).
     const show = setTimeout(() => setHint(true), 1500);
     const hide = setTimeout(() => setHint(false), 9000);
     return () => { clearTimeout(show); clearTimeout(hide); };
@@ -117,7 +113,6 @@ export function TalitaChat() {
 
   const dismissHint = useCallback(() => {
     setHint(false);
-    try { sessionStorage.setItem(HINT_KEY, '1'); } catch { /* ignora */ }
   }, []);
 
   // Chaves obrigatórias: scrollIntoView devolve Promise em navegadores novos e o React a trataria como
@@ -223,7 +218,7 @@ export function TalitaChat() {
   // Bolinha de status como nos apps de conversa: verde vivo = online, cinza = desligada (sem chave de IA no servidor).
   // Verde fixo de propósito, fora da paleta da marca: o "success" da paleta é escuro e parecia marrom (pedido do Douglas, 29/10).
   const dot = disabled ? 'bg-gray-400' : 'bg-green-500';
-  const statusText = disabled ? 'Talita desligada' : 'Talita online';
+  const statusText = disabled ? 'Thalita desligada' : 'Thalita online';
 
   return (
     <>
@@ -231,7 +226,7 @@ export function TalitaChat() {
         <section
           ref={panelRef}
           role="dialog"
-          aria-label="Conversa com a Talita"
+          aria-label="Conversa com a Thalita"
           className={cn(
             'talita-pop fixed z-50 flex flex-col overflow-hidden bg-surface text-text shadow-2xl',
             // celular: tela cheia; a partir de sm: janelinha no canto
@@ -248,11 +243,11 @@ export function TalitaChat() {
             className={cn('flex items-center gap-3 bg-primary px-4 py-3 text-on-primary sm:cursor-grab sm:touch-none', dragging && 'sm:cursor-grabbing')}
           >
             <span className="relative shrink-0">
-              <TalitaAvatar className="size-10 ring-2 ring-on-primary/40 rounded-full" />
+              <ThalitaAvatar className="size-10 ring-2 ring-on-primary/40 rounded-full" />
               <span title={statusText} aria-label={statusText} className={cn('absolute right-0 bottom-0 size-3 rounded-full ring-2 ring-primary', dot)} />
             </span>
             <div className="min-w-0 flex-1 leading-tight">
-              <div className="font-semibold">Talita</div>
+              <div className="font-semibold">Thalita</div>
               <div className="truncate text-xs opacity-80">
                 {disabled
                   ? (customer ? 'Fora do ar no momento' : 'Desligada neste servidor (falta a chave da IA)')
@@ -275,10 +270,10 @@ export function TalitaChat() {
             {disabled && (
               <div role="alert" className="rounded-lg border border-warning/40 bg-warning-soft px-3 py-2 text-sm text-warning">
                 {customer ? (
-                  <>A Talita está fora do ar agora. Você ainda pode procurar na vitrine e, se não achar a peça, usar o botão
+                  <>A Thalita está fora do ar agora. Você ainda pode procurar na vitrine e, se não achar a peça, usar o botão
                     {' '}<strong>"Não achou? Peça à loja"</strong>.</>
                 ) : (
-                  <>A Talita está desligada neste servidor. Quem administra o sistema liga configurando um provedor de IA
+                  <>A Thalita está desligada neste servidor. Quem administra o sistema liga configurando um provedor de IA
                     (<code>ASSISTANT_PROVIDER</code> e <code>ASSISTANT_API_KEY</code>); há opções grátis. Veja docs/10-assistente-ia.md.</>
                 )}
               </div>
@@ -286,9 +281,18 @@ export function TalitaChat() {
 
             {messages.length === 0 && role && (
               <div className="flex flex-col items-center px-2 py-4 text-center">
-                <TalitaAvatar className="size-20 rounded-full shadow-md" />
-                <h2 className="mt-3 text-base font-semibold">Oi! Eu sou a Talita</h2>
-                <p className="mt-1 max-w-[18rem] text-sm text-muted">
+                <ThalitaAvatar className="size-24 rounded-full shadow-md ring-4 ring-surface" />
+                <h2 className="mt-3 text-base font-semibold">Olá! Eu sou a Thalita</h2>
+                <p className="text-sm text-muted">{customer ? 'Sua atendente virtual da Orden.' : 'Sua assistente virtual da Orden.'}</p>
+                <ul className="mt-3 flex flex-wrap justify-center gap-x-3 gap-y-1 text-xs text-muted">
+                  {(customer
+                    ? ['Atendimento rápido e humanizado', 'Tire suas dúvidas', 'Acompanhe seu pedido']
+                    : ['Números reais da loja', 'Tire suas dúvidas', 'Respeito ao seu perfil']
+                  ).map((t) => (
+                    <li key={t} className="flex items-center gap-1"><span aria-hidden className="text-primary">♥</span>{t}</li>
+                  ))}
+                </ul>
+                <p className="mt-4 max-w-[18rem] text-sm text-muted">
                   Digite <strong>oi</strong> para me conhecer, ou escolha uma pergunta:
                 </p>
                 <div className="mt-4 flex flex-wrap justify-center gap-2">
@@ -304,7 +308,7 @@ export function TalitaChat() {
 
             {messages.map((m, i) => (
               <div key={i} className={cn('flex items-end gap-2', m.from === 'user' ? 'justify-end' : 'justify-start')}>
-                {m.from !== 'user' && <TalitaAvatar className="mb-0.5 size-7 shrink-0 rounded-full" />}
+                {m.from !== 'user' && <ThalitaAvatar className="mb-0.5 size-7 shrink-0 rounded-full" />}
                 <div
                   className={cn(
                     'max-w-[85%] rounded-2xl px-3.5 py-2.5',
@@ -323,8 +327,8 @@ export function TalitaChat() {
 
             {busy && (
               <div className="flex items-end gap-2">
-                <TalitaAvatar className="mb-0.5 size-7 shrink-0 rounded-full" />
-                <div className="flex items-center gap-1.5 rounded-2xl rounded-bl-md border border-border bg-surface px-4 py-3" aria-label="Talita está consultando os dados">
+                <ThalitaAvatar className="mb-0.5 size-7 shrink-0 rounded-full" />
+                <div className="flex items-center gap-1.5 rounded-2xl rounded-bl-md border border-border bg-surface px-4 py-3" aria-label="Thalita está consultando os dados">
                   <span className="talita-dot size-1.5 rounded-full bg-muted" />
                   <span className="talita-dot size-1.5 rounded-full bg-muted" />
                   <span className="talita-dot size-1.5 rounded-full bg-muted" />
@@ -336,7 +340,7 @@ export function TalitaChat() {
 
           <form onSubmit={submit} className="border-t border-border bg-surface p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
             <div className="flex items-end gap-2">
-              <label htmlFor="talita-input" className="sr-only">Mensagem para a Talita</label>
+              <label htmlFor="talita-input" className="sr-only">Mensagem para a Thalita</label>
               <textarea
                 id="talita-input"
                 ref={inputRef}
@@ -344,7 +348,7 @@ export function TalitaChat() {
                 value={input}
                 maxLength={2000}
                 disabled={disabled}
-                placeholder="Escreva para a Talita…"
+                placeholder="Escreva para a Thalita…"
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {
@@ -374,18 +378,18 @@ export function TalitaChat() {
         {hint && !open && (
           <button type="button" onClick={() => { dismissHint(); setOpen(true); }}
             className="talita-pop mb-2 max-w-[13rem] rounded-2xl rounded-br-sm border border-border bg-surface px-3.5 py-2.5 text-left text-sm shadow-lg">
-            <span className="font-semibold">Oi! Eu sou a Talita.</span>
+            <span className="font-semibold">Oi! Eu sou a Thalita.</span>
             <span className="block text-muted">Precisa de ajuda com a loja?</span>
           </button>
         )}
         <button
           type="button"
           onClick={() => { dismissHint(); setOpen((v) => !v); }}
-          aria-label={open ? 'Fechar conversa com a Talita' : 'Abrir conversa com a Talita'}
+          aria-label={open ? 'Fechar conversa com a Thalita' : 'Abrir conversa com a Thalita'}
           aria-expanded={open}
           className="group relative grid size-16 place-items-center rounded-full bg-primary shadow-xl ring-4 ring-surface transition-transform hover:scale-105 focus-visible:ring-primary/60 focus-visible:outline-none motion-reduce:transition-none"
         >
-          {open ? <Icon name="close" className="size-7 text-on-primary" /> : <TalitaAvatar className="size-14 rounded-full" />}
+          {open ? <Icon name="close" className="size-7 text-on-primary" /> : <ThalitaAvatar className="size-14 rounded-full" />}
           {!open && <span title={statusText} aria-label={statusText} className={cn('absolute right-0.5 bottom-0.5 size-4 rounded-full ring-2 ring-surface', dot)} />}
         </button>
       </div>

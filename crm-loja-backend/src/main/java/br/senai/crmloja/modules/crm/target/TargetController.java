@@ -1,6 +1,8 @@
 package br.senai.crmloja.modules.crm.target;
 
 import br.senai.crmloja.core.auth.CurrentUser;
+import br.senai.crmloja.modules.crm.forecast.ForecastService;
+import br.senai.crmloja.modules.crm.forecast.dto.ForecastDtos.TargetSuggestions;
 import br.senai.crmloja.modules.crm.target.dto.TargetDtos.SellerPanel;
 import br.senai.crmloja.modules.crm.target.dto.TargetDtos.TargetBoard;
 import br.senai.crmloja.modules.crm.target.dto.TargetDtos.TargetRequest;
@@ -23,8 +25,20 @@ import org.springframework.web.bind.annotation.RestController;
 public class TargetController {
 
     private final TargetService service;
+    private final ForecastService forecast;
 
-    public TargetController(TargetService service) { this.service = service; }
+    public TargetController(TargetService service, ForecastService forecast) {
+        this.service = service;
+        this.forecast = forecast;
+    }
+
+    // Spec crm/12, REQ-03: meta sugerida pela previsão. Só leitura; aplicar usa o PUT abaixo (mesma regra e auditoria).
+    @GetMapping("/targets/suggestions")
+    @PreAuthorize("hasRole('MANAGER')")
+    public TargetSuggestions suggestions(@RequestParam(required = false) String month,
+                                         @RequestParam(required = false) Integer growth) {
+        return forecast.suggestTargets(service.parseMonth(month), growth);
+    }
 
     @GetMapping("/targets")
     @PreAuthorize("hasRole('MANAGER')")

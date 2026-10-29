@@ -17,7 +17,7 @@ const currentMonth = () => toIsoDate(new Date()).slice(0, 7);
 
 // Spec crm/06: o painel do vendedor. Só os números dele (as vendas que ele abriu) e a meta dele. Sem ranking e
 // sem nada da loja inteira: quem compara a equipe é o gerente, na tela Metas.
-export function MyPanelPage() {
+function MyPanelPageBody() {
   const [month, setMonth] = useState(currentMonth);
   const query = useMyPanel(month);
   return (
@@ -203,4 +203,9 @@ function phrases(p: SellerPanelDto): string[] {
   }
   out.push('Dia útil = segunda a sábado. Venda de domingo também conta.');
   return out;
+}
+
+// MODO TESTE: cores do Dashboard também nesta tela.
+export function MyPanelPage() {
+  return <div className="cores-dashboard"><MyPanelPageBody /></div>;
 }

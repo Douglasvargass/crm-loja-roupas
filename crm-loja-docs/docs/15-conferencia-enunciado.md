@@ -115,7 +115,7 @@ filtros cruzados ao clicar nos gráficos e **filtro por vendedor(a)** (29/10/202
 
 ## O que vai além do enunciado
 
-Login com 3 papéis de balcão + 2 técnicos, troca de senha obrigatória, gestão de usuários, auditoria, Talita
+Login com 3 papéis de balcão + 2 técnicos, troca de senha obrigatória, gestão de usuários, auditoria, Thalita
 (assistente de IA com os dados reais), publicação online automática, **Meu painel do vendedor e metas** (spec 06)
 os chamados de peça em falta (spec 09), o agente de vendas da demonstração (spec 08), o espaço do cliente (spec 07), o "Ver como" (spec 10), a exportação para planilha (HU32) e a Reposição com pedidos de compra (spec 11). Nada disso substitui um item obrigatório;
 está tudo em cima dos módulos pedidos.

@@ -43,7 +43,7 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-/* Talita: janela do chat e indicador de "digitando". Sem movimento para quem pede menos animação. */
+/* Thalita: janela do chat e indicador de "digitando". Sem movimento para quem pede menos animação. */
 @keyframes talita-pop {
   from { opacity: 0; transform: translateY(12px) scale(0.98); }
   to { opacity: 1; transform: none; }
@@ -59,3 +59,7 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .talita-pop, .talita-dot { animation: none; }
 }
+
+/* MODO TESTE PRETO E BRANCO: logo e imagens em tons de cinza. */
+img, svg { filter: grayscale(1); }
+.thalita-photo { filter: none !important; }  /* a foto da Thalita fica sempre colorida */

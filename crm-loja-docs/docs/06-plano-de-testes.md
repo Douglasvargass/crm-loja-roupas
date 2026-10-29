@@ -90,8 +90,8 @@ Cobrir também a virada de período no dashboard: venda confirmada às 23:59 do 
 | CT50 | Inválido (auto) | Pedido de compra com data passada, peça repetida ou sem peças | 400, nada salvo | ReplenishmentIT |
 | CT51 | Exceção (auto) | Receber pedido duas vezes; receber dá entrada e fecha chamado | Segunda 409 `order_closed`; estoque sobe uma vez só | ReplenishmentIT |
 | CT52 | Acesso (auto) | Estoquista tenta registrar pedido; vendedor abre a Reposição | 403 | ReplenishmentIT |
-| CT53 | Válido (auto) | Talita: cada papel recebe só as ferramentas que a tela dele permite | Gerente 15, equipe técnica 16, vendedor sem estoque/faturamento | AssistantIT |
-| CT54 | Válido (auto) | Talita conta a história e recusa assunto fora da loja | Texto pronto, sem inventar | TalitaPersonaTest |
+| CT53 | Válido (auto) | Thalita: cada papel recebe só as ferramentas que a tela dele permite | Gerente 15, equipe técnica 16, vendedor sem estoque/faturamento | AssistantIT |
+| CT54 | Válido (auto) | Thalita conta a história e recusa assunto fora da loja | Texto pronto, sem inventar | ThalitaPersonaTest |
 
 ### Onde estão os testes automáticos
 
@@ -106,14 +106,14 @@ Rodada completa em 29/10/2026 com `./mvnw verify`: **106 testes unitários e 97 
 | `AuthIT` | 8 | Login, troca de senha, sessão, papéis |
 | `ViewAsIT` | 5 | "Ver como" só leitura |
 | `TargetIT` | 8 | Metas e Meu painel |
-| `StoreIT` | 12 | Espaço do cliente, Prévia da loja, Talita do cliente, pedido de peça, cliente com login e reset de senha |
+| `StoreIT` | 12 | Espaço do cliente, Prévia da loja, Thalita do cliente, pedido de peça, cliente com login e reset de senha |
 | `StockRequestIT` | 7 | Chamados de peça em falta |
 | `ReplenishmentIT` | 8 | Reposição, pedidos de compra, etapas e conferência (devolver a nota, bonificação) |
 | `DemoAgentIT` | 2 | Agente de vendas da demonstração |
-| `AssistantIT` | 4 | Ferramentas da Talita por papel |
+| `AssistantIT` | 4 | Ferramentas da Thalita por papel |
 | `CpfTest` | 12 | Dígito verificador do CPF |
 | `PaceTest` | 7 | Ritmo e projeção da meta |
 | `CoverageTest` | 8 | Conta da Reposição, caso a caso (inclui peça nova) |
 | `HumorDoDiaTest` | 6 | Clima do dia do agente |
-| `TalitaPersonaTest` | 63 | Apresentação, história e recusas da Talita |
+| `ThalitaPersonaTest` | 63 | Apresentação, história e recusas da Thalita |
 | `AssistantPropertiesTest` · `OpenAiCompatibleProviderTest` | 6 · 4 | Configuração e conexão com a IA |

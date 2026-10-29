@@ -1,7 +1,7 @@
 # Requisitos — Chamados de peça em falta (crm/09)
 
 > Épico: Estoque · Histórias: HU47, HU48, HU49 · Solicitante: Douglas Vargas (equipe) · Origem: conversa de 29/10/2026 · Data: 29/10/2026
-> Depende de: crm/03-estoque, crm/04-vendas · Altera: a Talita deixa de ser só consulta (uma exceção: abrir chamado)
+> Depende de: crm/03-estoque, crm/04-vendas · Altera: a Thalita deixa de ser só consulta (uma exceção: abrir chamado)
 > Prioridade (MoSCoW): Should have · Tamanho: G (tabela nova, 6 regras, 2 telas e o sino, ferramenta que grava)
 > Status: implementada em 29/10/2026
 
@@ -57,11 +57,11 @@ A entrada de estoque do produto resolve os chamados abertos dele, do mais antigo
 
 - DADO que o chamado do vendedor foi resolvido ou cancelado, QUANDO ele olha o sino, ENTÃO vê a novidade com a nota; ao abrir o sino, a novidade conta como vista e o número zera.
 
-### REQ-08 — A Talita abre chamado, só com confirmação
+### REQ-08 — A Thalita abre chamado, só com confirmação
 
-- DADO o vendedor dizendo "a cliente queria a jaqueta jeans G e acabou", QUANDO a Talita entende, ENTÃO mostra o resumo e pergunta "Posso abrir o chamado?"; só com o "sim" ela abre (ferramenta `abrir_chamado`, `confirmado=true`).
-- DADO a Talita chamando a ferramenta sem confirmação, QUANDO executa, ENTÃO nada é gravado.
-- É a **única** ação que a Talita faz; o chamado aberto por ela aparece como "(pela Talita)".
+- DADO o vendedor dizendo "a cliente queria a jaqueta jeans G e acabou", QUANDO a Thalita entende, ENTÃO mostra o resumo e pergunta "Posso abrir o chamado?"; só com o "sim" ela abre (ferramenta `abrir_chamado`, `confirmado=true`).
+- DADO a Thalita chamando a ferramenta sem confirmação, QUANDO executa, ENTÃO nada é gravado.
+- É a **única** ação que a Thalita faz; o chamado aberto por ela aparece como "(pela Thalita)".
 
 ## Não inclui
 
@@ -69,9 +69,9 @@ Avisar o cliente por WhatsApp ou e-mail, pedido de compra ao fornecedor, prazo d
 
 ## Riscos
 
-- **A Talita grava algo:** limitado a criar chamado, que pode ser cancelado; exige confirmação; não aceita id de quem abre vindo do modelo.
+- **A Thalita grava algo:** limitado a criar chamado, que pode ser cancelado; exige confirmação; não aceita id de quem abre vindo do modelo.
 - **Vendedor vendo chamado de colega:** a lista e o cancelamento usam o id da sessão; teste negativo em StockRequestIT.
 
 ## Métrica de sucesso
 
-Na demonstração: o vendedor abre o chamado pela Talita, o estoquista vê no sino, registra a entrada da peça e o vendedor recebe o aviso, tudo em menos de 2 minutos.
+Na demonstração: o vendedor abre o chamado pela Thalita, o estoquista vê no sino, registra a entrada da peça e o vendedor recebe o aviso, tudo em menos de 2 minutos.

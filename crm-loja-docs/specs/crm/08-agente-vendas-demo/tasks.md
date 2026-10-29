@@ -2,7 +2,7 @@
 
 - [x] V7__crm_demo_agent_day.sql + U7
 - [x] AgenteVendasDemo, HumorDoDia, AgendamentoDemoConfig; motor do histórico aberto ao pacote
-- [x] AssistantService.completeOnce (pergunta avulsa no provedor da Talita)
+- [x] AssistantService.completeOnce (pergunta avulsa no provedor da Thalita)
 - [x] DemoAgentController + cartão DemoAgentDiary no Dashboard
 - [x] Workflow acordar-demo.yml
 - [x] Testes: HumorDoDiaTest (6), DemoAgentIT (2)

@@ -39,7 +39,7 @@ As regras ficam no Service e, sempre que possível, também no banco (CHECK, UNI
 | RN33 | Peça ativa com estoque suficiente não abre chamado | — | 409 `product_in_stock` |
 | RN34 | Resolver: estoque ou gerente; cancelar: esses ou quem abriu; sempre com nota; fechado não reabre | `ck_stock_request_closed` | 409 `request_closed` |
 | RN35 | Entrada de estoque resolve os chamados abertos da peça, do mais antigo ao mais novo, enquanto a quantidade cobrir | Mesma transação da entrada | — |
-| RN36 | A Talita só grava uma coisa: chamado, depois de a pessoa confirmar o resumo | — | — |
+| RN36 | A Thalita só grava uma coisa: chamado, depois de a pessoa confirmar o resumo | — | — |
 | RN37 | Cliente só acessa a loja (`/loja/**`), sempre resolvido pela sessão; pedido, carrinho ou dado de outro cliente: 404 | `ux_customer_user` | 403 · 404 |
 | RN38 | Pedido online = venda com canal ONLINE; pagar confirma pela mesma regra tudo-ou-nada do balcão | `ck_sale_channel`, `ux_payment_sale` | 409 `insufficient_stock` |
 | RN39 | Preço que mudou com a peça no carrinho: vale o novo; o carrinho é atualizado e o cliente confere antes de pagar | — | 409 `price_changed` |
@@ -53,10 +53,16 @@ As regras ficam no Service e, sempre que possível, também no banco (CHECK, UNI
 | RN47 | Pedido de compra: fornecedor, data de hoje a 180 dias, 1 a 30 peças de 1 a 9999 un.; registra, muda data e cancela só quem compra (G, Operações e Compras), sempre com motivo para mudar ou cancelar; nada se apaga | `ck_purchase_order_closed` | 400 · 403 · 409 `order_closed` |
 | RN49 | Pedido de compra: pedido feito → em trânsito (quem compra) → em conferência (quem recebe) → entrada feita com o nº da nota fiscal; data só muda antes de chegar; cancela até a entrada | `ck_purchase_order_steps` | 400 `invoice_required` · 409 `wrong_step` |
 | RN50 | Dashboard: o bloco Estoque é de gerente, Operações e Compras e estoquista; vendas e faturamento continuam só do gerente | `/crm/dashboard` G | 403 |
-| RN51 | Cliente pede peça que não está na vitrine (Talita com confirmação ou botão da vitrine); vira chamado ligado a ele; cada cliente vê só os seus | — | 409 `product_in_stock` |
+| RN51 | Cliente pede peça que não está na vitrine (Thalita com confirmação ou botão da vitrine); vira chamado ligado a ele; cada cliente vê só os seus | — | 409 `product_in_stock` |
 | RN52 | Conferência do pedido de compra: contado peça por peça; chegou a menos → a nota volta ao fornecedor (nada entra, pedido volta a feito); chegou a mais → o extra entra com a nota de bonificação; nunca entrada "mais ou menos" para ajustar depois | `ck_purchase_order_item_received` | 409 `short_delivery` · 400 `bonus_invoice_required` |
 | RN53 | Cliente com acesso à loja online não se exclui; inativa | `fk_customer_user` | 409 `customer_has_login` |
 | RN54 | Resetar senha (gerente): senha provisória, troca obrigatória, sessões encerradas; ninguém reseta a própria por aí | — | 409 `self_reset` |
+| RN55 | Previsão de vendas: só vendas confirmadas, pela data da confirmação no fuso da loja, dos dois canais; o dia de hoje entra pela previsão, não pelo parcial; precisa de pelo menos 14 dias com venda | — | 409 `not_enough_history` |
+| RN56 | Previsão do dia = nível atual (média dos últimos 28 dias sem os outros efeitos) × dia da semana (ou feriado) × semana do salário × data comercial × mês do ano | — | — |
+| RN57 | Dia da semana aprendido nas últimas 12 semanas sem feriados e datas comerciais; salário (dias 5–9 e 20–24) aprendido contra os outros dias, de 0,8 a 1,4; feriado aprendido com 2 ou mais feriados, senão vale como domingo | — | — |
+| RN58 | Datas comerciais (Mães, Namorados, Pais, Cliente, Crianças, Black Friday, Natal) sobem aos poucos nos dias antes; aumento aprendido quando o histórico tem a janela inteira, senão estimativa padrão marcada; mês do ano só com 1 ano de histórico | — | — |
+| RN59 | Faixa provável (~80%) pelo erro diário dos últimos 56 dias; acerto = erro médio por semana refazendo a previsão 28 dias atrás (precisa de 56 dias) | — | — |
+| RN60 | Meta sugerida = previsão do mês da loja (mês atual: vendido até ontem + previsão) × parte do vendedor no faturamento da loja nos últimos 90 dias × (1 + crescimento de −20% a +50%), arredondada para a centena; sem venda em 90 dias, sem sugestão; aplicar passa pela regra e auditoria da meta | `/crm/targets/suggestions` G | 400 `invalid_growth` · 409 `month_closed` |
 | RN48 | Receber dá entrada de todas as peças na mesma transação (tudo ou nada) e fecha os chamados que a entrada cobre (RN35); aberto com data vencida = atrasado | Mesma transação da entrada | 409 `order_closed` |
 
 ### Ciclo de vida da venda

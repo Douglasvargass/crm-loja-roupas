@@ -20,7 +20,7 @@ Documentação do CRM da loja de roupas.
 | [docs/13-publicar-online.md](docs/13-publicar-online.md) | GitHub Pages, Render, custos e atualizações |
 | [docs/14-dados-de-demonstracao.md](docs/14-dados-de-demonstracao.md) | Como os 3 meses de vendas de demonstração são gerados |
 | [docs/15-conferencia-enunciado.md](docs/15-conferencia-enunciado.md) | Cada critério do enunciado do SENAI → onde está atendido |
-| [docs/17-nossa-historia.md](docs/17-nossa-historia.md) | A história da Orden (a Talita conta a versão curta) |
+| [docs/17-nossa-historia.md](docs/17-nossa-historia.md) | A história da Orden (a Thalita conta a versão curta) |
 | [docs/16-processo-de-requisitos.md](docs/16-processo-de-requisitos.md) | Como escrever um pedido: história, critérios, regras, etiquetas e revisão |
 | [docs/decisions/](docs/decisions/) | ADRs (registros de decisão) |
 | [specs/](specs/) | Contrato da API, ERD e specs por entrega (requirements, design, tasks) |

@@ -18,9 +18,8 @@ interface Item { text: string; to: string }
 export function PendingOnLogin() {
   const { me, role } = useSession();
   const key = me ? `orden.pendencias.${me.id}` : '';
-  const [dismissed, setDismissed] = useState(() => {
-    try { return !key || sessionStorage.getItem(key) === '1'; } catch { return false; }
-  });
+  // MODO TESTE: o aviso volta a cada carregamento da página (antes: uma vez por sessão do navegador).
+  const [dismissed, setDismissed] = useState(() => !key);
   const active = !!me && !me.viewAs && !dismissed && !!role;
   const isManager = !!role && (MANAGER_LIKE.includes(role) || !!me?.superAdmin);
   const isStock = !!role && STOCK_LIKE.includes(role);
@@ -66,7 +65,6 @@ export function PendingOnLogin() {
   const show = active && !loading && items.length > 0;
 
   function close() {
-    try { sessionStorage.setItem(key, '1'); } catch { /* sem storage: aparece de novo na próxima tela */ }
     setDismissed(true);
   }
 

@@ -106,11 +106,11 @@ Tela **Metas**: escolhe o mês, vê cada vendedor ativo em ordem alfabética (se
 - DADO o gerente em Metas, QUANDO troca o mês para um mês fechado, ENTÃO os campos viram texto e aparece o aviso de mês fechado.
 - DADO um vendedor, QUANDO tenta abrir Metas pela URL, ENTÃO volta para Meu painel.
 
-### REQ-12 — A Talita responde sobre metas
+### REQ-12 — A Thalita responde sobre metas
 
-- DADO Vitor, QUANDO pergunta "quanto falta para a minha meta?", ENTÃO a Talita responde com os números dele (ferramenta `meu_painel`).
-- DADO Vitor, QUANDO pergunta quanto o Vinicius vendeu, ENTÃO a Talita diz que o perfil dele não tem acesso.
-- DADO o gerente, QUANDO pergunta "quem está mais longe da meta?", ENTÃO a Talita usa o quadro (`metas_vendedores`).
+- DADO Vitor, QUANDO pergunta "quanto falta para a minha meta?", ENTÃO a Thalita responde com os números dele (ferramenta `meu_painel`).
+- DADO Vitor, QUANDO pergunta quanto o Vinicius vendeu, ENTÃO a Thalita diz que o perfil dele não tem acesso.
+- DADO o gerente, QUANDO pergunta "quem está mais longe da meta?", ENTÃO a Thalita usa o quadro (`metas_vendedores`).
 
 ## Não inclui
 
@@ -130,7 +130,7 @@ Papéis: Vendedor(a) vê Meu painel. Gerente, Engenheiro(a) de Software e Market
 
 ## Métrica de sucesso
 
-- **Como saberemos que funcionou:** na demonstração, um vendedor responde sozinho "quanto falta para a meta e quanto preciso por dia" em menos de 10 segundos, pelo painel ou pela Talita.
+- **Como saberemos que funcionou:** na demonstração, um vendedor responde sozinho "quanto falta para a meta e quanto preciso por dia" em menos de 10 segundos, pelo painel ou pela Thalita.
 
 ## Decisões pendentes antes de implementar
 

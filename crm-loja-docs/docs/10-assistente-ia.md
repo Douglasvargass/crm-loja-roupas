@@ -1,6 +1,6 @@
-# Talita, a assistente de IA
+# Thalita, a assistente de IA
 
-A **Talita** é a assistente virtual da Orden. Ela fica num botão redondo no canto inferior direito de **todas as telas** (no celular, a conversa abre em tela cheia). Qualquer pessoa da equipe pergunta sobre a loja em linguagem natural:
+A **Thalita** é a assistente virtual da Orden. Ela fica num botão redondo no canto inferior direito de **todas as telas** (no celular, a conversa abre em tela cheia). Qualquer pessoa da equipe pergunta sobre a loja em linguagem natural:
 
 - "Quanto vendemos este mês? E comparado com o mês passado?"
 - "Quais produtos preciso repor com urgência?"
@@ -52,7 +52,7 @@ ASSISTANT_PROVIDER=groq ASSISTANT_API_KEY=gsk_... ./mvnw spring-boot:test-run
 | `ASSISTANT_PROVIDER` | `groq` |
 | `ASSISTANT_API_KEY` | a chave `gsk_...` |
 
-Clique em **Save Changes**; o serviço reinicia em alguns minutos. Depois clique no botão da Talita: o aviso amarelo some e, no rodapé do chat, aparece "IA: Groq (openai/gpt-oss-120b)".
+Clique em **Save Changes**; o serviço reinicia em alguns minutos. Depois clique no botão da Thalita: o aviso amarelo some e, no rodapé do chat, aparece "IA: Groq (openai/gpt-oss-120b)".
 
 Para trocar de provedor, mude as duas variáveis. Para outro modelo do mesmo provedor, acrescente `ASSISTANT_MODEL`.
 
@@ -60,7 +60,7 @@ Para trocar de provedor, mude as duas variáveis. Para outro modelo do mesmo pro
 
 ## Apresentação ("oi")
 
-Ao receber um cumprimento ("oi", "olá, Talita", "bom dia") ou "quem é você?", "qual seu nome?", "o que você faz?", a Talita se apresenta pelo primeiro nome da pessoa e sugere perguntas do perfil dela. Essa resposta é **local**: sai na hora, não gasta a cota do provedor e funciona mesmo quando o limite grátis acabou. Qualquer outra frase vai para a IA ("oi, quanto vendemos hoje?" **não** é só um oi). A regra está em `TalitaPersona.java`, com testes em `TalitaPersonaTest.java`.
+Ao receber um cumprimento ("oi", "olá, Thalita", "bom dia") ou "quem é você?", "qual seu nome?", "o que você faz?", a Thalita se apresenta pelo primeiro nome da pessoa e sugere perguntas do perfil dela. Essa resposta é **local**: sai na hora, não gasta a cota do provedor e funciona mesmo quando o limite grátis acabou. Qualquer outra frase vai para a IA ("oi, quanto vendemos hoje?" **não** é só um oi). A regra está em `ThalitaPersona.java`, com testes em `ThalitaPersonaTest.java`.
 
 ## O que ela sabe
 
@@ -69,7 +69,7 @@ Ao receber um cumprimento ("oi", "olá, Talita", "bom dia") ou "quem é você?",
 | Instruções fixas (`AssistantPrompt.java`) | Regras da loja (CPF, estoque, ciclo da venda, cancelamento…), o que cada papel faz e onde fica cada função na tela |
 | Consultas ao banco (`AssistantTools.java`) | Dados vivos: vendas, produtos, estoque, clientes, indicadores |
 
-Talita do cliente (29/10/2026): no espaço do cliente ela usa outras instruções (`AssistantPrompt.CUSTOMER`) e outras 6 ferramentas, só de cliente: `vitrine`, `categorias_loja`, `meus_pedidos`, `detalhe_meu_pedido`, `minhas_solicitacoes` e `pedir_peca` (grava, só depois de o cliente confirmar). Nenhuma ferramenta da equipe chega ao cliente, nem o contrário.
+Thalita do cliente (29/10/2026): no espaço do cliente ela usa outras instruções (`AssistantPrompt.CUSTOMER`) e outras 6 ferramentas, só de cliente: `vitrine`, `categorias_loja`, `meus_pedidos`, `detalhe_meu_pedido`, `minhas_solicitacoes` e `pedir_peca` (grava, só depois de o cliente confirmar). Nenhuma ferramenta da equipe chega ao cliente, nem o contrário.
 
 As 16 ferramentas da equipe (as regras de conferência e de reset de senha estão no texto de instruções). Todas só leem, **menos uma**: `abrir_chamado`, que só grava depois de a pessoa confirmar o resumo.
 
@@ -94,7 +94,7 @@ Perfis técnicos (Engenheiro de Software, Marketing e Desenvolvimento) recebem a
 | `previsao_estoque` | O que vai faltar: média por dia, dias até acabar, a caminho, quanto pedir (spec crm/11) | Gerente, Estoquista, Operações e Compras |
 | `pedidos_compra` | Pedidos de compra por situação ou só os atrasados | Gerente, Estoquista, Operações e Compras |
 
-**Só assuntos da loja.** A Talita recusa com simpatia o que não é da Orden (receita, notícia, lição de casa…) e sugere uma pergunta sobre a loja. **A história da Orden** (doc 17) sai pronta, sem gastar a IA, quando perguntam "quem criou o sistema?" ou "conta a história da Orden".
+**Só assuntos da loja.** A Thalita recusa com simpatia o que não é da Orden (receita, notícia, lição de casa…) e sugere uma pergunta sobre a loja. **A história da Orden** (doc 17) sai pronta, sem gastar a IA, quando perguntam "quem criou o sistema?" ou "conta a história da Orden".
 
 ## Segurança
 
@@ -132,9 +132,9 @@ Tela (AssistantPage)  --POST /api/crm/assistant/chat-->  AssistantController
 | `crm-loja-backend/.../assistant/AssistantTools.java` | As consultas, com descrição, parâmetros e papéis |
 | `crm-loja-backend/.../assistant/AssistantPrompt.java` | O "conhecimento da empresa": regras e funcionamento |
 | `crm-loja-backend/.../assistant/AssistantController.java` | `GET /crm/assistant/status` e `POST /crm/assistant/chat` |
-| `crm-loja-backend/.../assistant/TalitaPersona.java` | Respostas fixas para "oi" e "quem é você?" (apresentação da Talita, sem chamar a IA) |
-| `crm-loja-frontend/src/presentation/components/organisms/TalitaChat.tsx` | O chat flutuante |
-| `crm-loja-frontend/src/presentation/components/atoms/TalitaAvatar.tsx` | O rosto da Talita (SVG) |
+| `crm-loja-backend/.../assistant/ThalitaPersona.java` | Respostas fixas para "oi" e "quem é você?" (apresentação da Thalita, sem chamar a IA) |
+| `crm-loja-frontend/src/presentation/components/organisms/ThalitaChat.tsx` | O chat flutuante |
+| `crm-loja-frontend/src/presentation/components/atoms/ThalitaAvatar.tsx` | O rosto da Thalita (SVG) |
 
 Configurações (variáveis de ambiente):
 
@@ -189,7 +189,7 @@ Para gastar menos em qualquer provedor: `ASSISTANT_MAX_TOKENS=4000` e perguntas 
    - os parâmetros (`str`, `integer`, `date`, `enumOf`) e quais são obrigatórios;
    - a função que chama o Service.
 3. Em `AssistantIT.java`, ajuste a contagem (`hasSize(10)`) e teste a consulta nova.
-4. Em `TalitaChat.tsx`, adicione o nome amigável em `TOOL_LABEL`.
+4. Em `ThalitaChat.tsx`, adicione o nome amigável em `TOOL_LABEL`.
 
 ## Testar
 

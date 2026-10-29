@@ -28,9 +28,9 @@ Sistema web para uma loja de roupas organizar clientes, produtos, estoque e vend
 - **Meu painel e metas:** cada vendedor entra no próprio painel, com a meta do mês, quanto falta por dia útil e a projeção; o gerente define as metas e vê a equipe na tela Metas.
 - **Espaço do cliente:** o cliente entra com a própria conta, vê a vitrine, monta o carrinho, paga (Pix ou cartão simulados) e acompanha os pedidos; a loja vê os pedidos online junto das vendas.
 - **"Ver como":** o gerente vê o sistema exatamente como um vendedor ou o estoque vê, só para olhar, com tudo registrado.
-- **Chamados de peça em falta:** o cliente quis uma peça que acabou; o vendedor (ou a Talita) abre o chamado, o estoque e o gerente veem no sino, e quando a peça chega o chamado se resolve e o vendedor é avisado.
+- **Chamados de peça em falta:** o cliente quis uma peça que acabou; o vendedor (ou a Thalita) abre o chamado, o estoque e o gerente veem no sino, e quando a peça chega o chamado se resolve e o vendedor é avisado.
 - **Agente de vendas da demonstração:** todo dia que passa, o sistema cria vendas de demonstração parecidas com as reais; a IA grátis só escolhe o clima do dia, e o gerente vê tudo num diário.
-- **Talita, a assistente virtual:** botão flutuante em todas as telas; perguntas como "quanto vendemos este mês?" ou "o que preciso repor?", respondidas com dados do banco e respeitando o perfil de quem pergunta.
+- **Thalita, a assistente virtual:** botão flutuante em todas as telas; perguntas como "quanto vendemos este mês?" ou "o que preciso repor?", respondidas com dados do banco e respeitando o perfil de quem pergunta.
 
 ## Rodar em 5 minutos (sem Docker)
 

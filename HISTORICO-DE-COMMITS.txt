@@ -13,7 +13,7 @@ Papéis da equipe técnica, login nome.sobrenome e filtro por vendedor no dashbo
   com acesso total por implicação no JwtCookieFilter (valem por gerente + vendedor + estoquista).
 - Equipe: Guilherme gerente; Douglas engenheiro (super admin); Julia marketing e desenvolvimento;
   Vitor, Vinicius Clemente e Vinicius Muniz vendedores.
-- Dashboard ganha o filtro Vendedor(a) (sellerId, lista sellers na resposta); Talita ganha vendedor_id.
+- Dashboard ganha o filtro Vendedor(a) (sellerId, lista sellers na resposta); Thalita ganha vendedor_id.
 - Histórico de demonstração creditado aos 3 vendedores (sorteio separado, dados inalterados);
   banco antigo é redistribuído uma vez na subida.
 - Documentação alinhada ao código: Postgres embutido (não Testcontainers), SameSite=Lax, workflows
@@ -37,7 +37,7 @@ Meu painel do vendedor, metas de venda e processo de requisitos
   a rota não aceita id de outro vendedor.
 - Metas (/metas) para gerente e equipe técnica: meta editável na linha e quadro da equipe.
 - Pace: conta pura de dias úteis (segunda a sábado), ritmo, projeção e situação.
-- Talita: meu_painel e metas_vendedores; as ferramentas recebem o id de quem pergunta.
+- Thalita: meu_painel e metas_vendedores; as ferramentas recebem o id de quem pergunta.
 - MetasSeeder: metas de demonstração a partir do histórico (um bate, um perto, um abaixo).
 - Specs no padrão do processo de requisitos: crm/06 (implementada) e crm/07 espaço do cliente
   (pronta para implementar); doc 16 e modelos de issue do GitHub.
@@ -50,7 +50,7 @@ Agente de vendas da demonstração: um dia por vez, com o clima escolhido pela I
 
 - AgenteVendasDemo (perfis dev/demo): fecha cada dia que passou, até ontem, com o mesmo motor do
   histórico (horário do shopping, feriados, peso dos vendedores, reposição de terça com o giro real).
-- A IA (provedor da Talita; grátis no Groq/Gemini) só escolhe fator de movimento, categoria em
+- A IA (provedor da Thalita; grátis no Groq/Gemini) só escolhe fator de movimento, categoria em
   destaque e motivo; HumorDoDia limita tudo e, sem resposta, o dia sai no padrão. A IA não recebe
   dado pessoal nem grava nada.
 - Pula o dia se o sistema foi usado depois dele, para não contradizer o estoque real; trava o
@@ -62,26 +62,26 @@ Agente de vendas da demonstração: um dia por vez, com o clima escolhido pela I
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 == d11afe4 · 29/10/2026 11:06
-Chamados de peça em falta, a história da Orden e a Talita só sobre a loja
+Chamados de peça em falta, a história da Orden e a Thalita só sobre a loja
 
 - Chamado de peça em falta (V8, spec crm/09): vendedor ou gerente registra a peça que o cliente
   queria; peça com estoque não abre chamado; estoque e gerente resolvem ou cancelam com nota;
   a entrada de estoque resolve sozinha os chamados mais antigos que cobre; tudo na auditoria.
 - Sino no topo: abertos para estoque e gerente; novidades dos próprios chamados para o vendedor.
 - Tela Chamados e botão "Cliente quer esta peça" na ficha do produto zerado.
-- Talita: abrir_chamado (única ferramenta que grava, só com confirmação) e listar_chamados;
+- Thalita: abrir_chamado (única ferramenta que grava, só com confirmação) e listar_chamados;
   conta a história da Orden pronta, sem gastar IA; recusa assunto fora da loja.
 - doc 17: a história da Orden (SENAI Tubarão, 2º semestre de 2026), com os pontos a confirmar marcados.
-- Testes: StockRequestIT (6), história na TalitaPersonaTest, contagem no AssistantIT; 101 no total.
+- Testes: StockRequestIT (6), história na ThalitaPersonaTest, contagem no AssistantIT; 101 no total.
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 == b5c82f8 · 29/10/2026 11:16
 História da Orden revisada e papel Operações e Compras para o Vinicius Clemente
 
-- História (doc 17, Talita e prompt): curso Técnico em Desenvolvimento de Sistemas do SENAI
+- História (doc 17, Thalita e prompt): curso Técnico em Desenvolvimento de Sistemas do SENAI
   Tubarão; a ideia nasceu da dor do estoque sem controle no comércio, contada sem citar empresa
-  nem pessoa; a origem do nome Orden não foi registrada e a Talita diz isso se perguntarem.
+  nem pessoa; a origem do nome Orden não foi registrada e a Thalita diz isso se perguntarem.
 - Papel PURCHASING (Operações e Compras): vale por estoquista, recebe os chamados de peça em falta
   no sino e faz o pedido; tela inicial Chamados. Vinicius Clemente deixa de ser vendedor.
 - Metas de demonstração: dois vendedores (Vitor bate, Vinicius Muniz fica abaixo).
@@ -141,12 +141,12 @@ Espaço do cliente no back-end: vitrine, carrinho, pagamento simulado, pedidos e
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 == d33569d · 29/10/2026 11:52
-Espaço do cliente nas telas, Talita sabe dos pedidos online e pacote final documentado
+Espaço do cliente nas telas, Thalita sabe dos pedidos online e pacote final documentado
 
 - Front: StoreShell (layout próprio do cliente) e 5 telas (vitrine, carrinho com Pix ou cartão
   simulado, meus pedidos, pedido, meus dados); RequireStaff/RequireCustomer separam cliente e equipe;
   canal Online nas vendas e filtro Canal no dashboard.
-- Talita: regra dos pedidos online no prompt.
+- Thalita: regra dos pedidos online no prompt.
 - Docs: spec 07 implementada (design e tasks), RN37 a RN42, contrato da API, telas, modelo de dados,
   roteiro seção 15, README com os logins dos professores, PARA-CONTINUAR.md e CLAUDE.md atualizados.
 - ./mvnw verify: 98 testes unitários e 86 de integração passando.
@@ -164,7 +164,7 @@ Reposição (o que vai faltar) e pedidos de compra; site na paleta clara da marc
 - Banco: V10 (+U10) com purchase_order e purchase_order_item; nada se apaga (recebido ou cancelado com motivo).
 - Back-end: Coverage (conta pura de cada peça), StockPlanningService (/crm/stock/planning) e PurchaseOrderService
   (registrar, receber com entrada no estoque e fechamento dos chamados, mudar data, cancelar), com auditoria.
-- Talita: previsao_estoque e pedidos_compra (só consulta); prompt com as regras RN43 a RN48.
+- Thalita: previsao_estoque e pedidos_compra (só consulta); prompt com as regras RN43 a RN48.
 - Demonstração: PedidosCompraDemoSeeder cria 3 pedidos do Vinicius Clemente (um atrasado).
 - Front: telas Reposição (tela inicial de Operações e Compras) e Pedidos de compra, aviso de pendências com
   pedidos atrasados e peças que acabam em 7 dias.
@@ -217,13 +217,13 @@ Histórico dos commits atualizado (documentação final)
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 == 08cf5a5 · 29/10/2026 14:50
-Prévia da loja pelo Ver como, Talita online em verde e conferência em celular e tablet
+Prévia da loja pelo Ver como, Thalita online em verde e conferência em celular e tablet
 
 - Ver como -> "Loja do cliente": abre /previa-loja, o site como qualquer cliente vê (vitrine de verdade, carrinho
   só na tela, Pix de demonstração, pedidos e dados de exemplo); nada é gravado. Back-end: vitrine e categorias
   legíveis também pelo gerente; carrinho e pedidos continuam só do cliente (StoreIT com teste novo).
-- Talita: bolinha verde viva quando online, cinza quando desligada, e "Online" no topo da conversa.
-- Celular (390 px) e tablet (820 px) conferidos: menu abre, navega e fecha; Talita abre; nada vaza para o lado.
+- Thalita: bolinha verde viva quando online, cinza quando desligada, e "Online" no topo da conversa.
+- Celular (390 px) e tablet (820 px) conferidos: menu abre, navega e fecha; Thalita abre; nada vaza para o lado.
 - Docs: spec 10 REQ-06, contrato da API, telas, roteiro (seções 13 e 17), PARA-CONTINUAR, documento único.
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
@@ -262,17 +262,17 @@ Histórico dos commits atualizado (faixa azul)
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 == 4afde2a · 29/10/2026 15:26
-Estoque no Dashboard, etapas do pedido de compra com nota fiscal e Talita do cliente
+Estoque no Dashboard, etapas do pedido de compra com nota fiscal e Thalita do cliente
 
 - Dashboard: bloco Estoque (peças e valor em estoque, zerados, acabam em 7 dias, para pedir, chamados, dinheiro
   parado, pedidos feitos, em trânsito, em conferência, notas que deram entrada e as listas). O gerente vê vendas +
   estoque; Operações e Compras e o estoquista veem só o estoque. O Clemente entra pelo Dashboard.
 - V11: pedido de compra com etapas OPEN → IN_TRANSIT → CHECKING → RECEIVED, nº da nota fiscal (obrigatório na
   entrada), datas de envio e chegada; rotas /ship e /arrive; a NF vai para o motivo da movimentação de estoque.
-- Talita do cliente: /loja/assistant com instruções próprias e 6 ferramentas só do cliente (vitrine, categorias,
+- Thalita do cliente: /loja/assistant com instruções próprias e 6 ferramentas só do cliente (vitrine, categorias,
   meus pedidos, detalhe, minhas solicitações, pedir peça com confirmação). Botão "Não achou? Peça à loja" na
   vitrine e "Peças que pedi à loja" em Meus pedidos; o pedido vira chamado ligado ao cliente.
-- Testes: ReplenishmentIT (etapas), StoreIT (Talita do cliente e pedido de peça).
+- Testes: ReplenishmentIT (etapas), StoreIT (Thalita do cliente e pedido de peça).
 - ./mvnw verify: 105 testes unitários e 95 de integração passando; front lint, typecheck e build passando.
 - Docs: specs 07 e 11, contrato da API, RN49 a RN51, HU55 a HU57, modelo de dados, telas, rastreabilidade,
   assistente, roteiro seção 18, plano de testes, PARA-CONTINUAR (próxima migration V12), documento único.

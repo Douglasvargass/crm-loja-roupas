@@ -97,7 +97,7 @@ export function RequestsPage() {
                     cell: (r) => (
                       <span className="text-sm">
                         {r.openedByName ?? '—'}
-                        {r.openedVia === 'ASSISTANT' && <span className="text-xs text-muted"> (pela Talita)</span>}
+                        {r.openedVia === 'ASSISTANT' && <span className="text-xs text-muted"> (pela Thalita)</span>}
                         <span className="block text-xs text-muted">{formatDateTime(r.createdAt)}</span>
                       </span>
                     ),

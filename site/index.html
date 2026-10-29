@@ -86,6 +86,9 @@
     .ai { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: center; }
     @media (max-width: 880px) { .ai { grid-template-columns: 1fr; } }
     .chat { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+    .chat-head { display: flex; align-items: center; gap: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+    .chat-head img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+    .chat-head small { color: var(--muted); font-size: 12px; }
     .msg { max-width: 88%; padding: 10px 14px; border-radius: 16px; font-size: 14px; }
     .msg.u { align-self: flex-end; background: var(--primary); color: var(--on-primary); }
     .msg.a { align-self: flex-start; background: var(--surface-2); border: 1px solid var(--border); }
@@ -124,7 +127,7 @@
       <a class="brand" href="#"><img src="favicon.png" alt="" />Orden</a>
       <nav class="links">
         <a href="#funcionalidades">Funcionalidades</a>
-        <a href="#assistente">Talita (IA)</a>
+        <a href="#assistente">Thalita (IA)</a>
         <a href="#tecnologia">Tecnologia</a>
         <a href="#qualidade">Qualidade</a>
         <a href="#rodar">Como rodar</a>
@@ -195,8 +198,8 @@
   <section id="assistente">
     <div class="wrap ai">
       <div>
-        <h2>Talita, a assistente da Orden</h2>
-        <p class="sub">Pergunte em português, como perguntaria a um colega. A Talita aparece como um botão no canto da tela, em qualquer página, e consulta o banco de dados na hora e responde com os números reais.</p>
+        <h2>Thalita, a assistente da Orden</h2>
+        <p class="sub">Pergunte em português, como perguntaria a um colega. A Thalita aparece como um botão no canto da tela, em qualquer página, e consulta o banco de dados na hora e responde com os números reais.</p>
         <ul class="check">
           <li><b>Dados de verdade:</b> cada resposta vem de consultas ao sistema, nada inventado.</li>
           <li><b>Respeita o perfil:</b> o vendedor não vê faturamento pelo assistente, assim como na tela.</li>
@@ -205,8 +208,9 @@
         </ul>
       </div>
       <div class="chat" role="img" aria-label="Exemplo de conversa com o assistente">
+        <div class="chat-head"><img src="thalita.jpg" alt="" width="40" height="40" /><span><b>Thalita</b><br /><small>Atendente virtual da Orden · online</small></span></div>
         <div class="msg u">Oi</div>
-        <div class="msg a">Oi, Douglas! Eu sou a <b>Talita</b>, assistente virtual da <b>Orden</b>. Eu consulto os dados reais da loja e também explico como usar o sistema. Em que posso ajudar?</div>
+        <div class="msg a">Oi, Douglas! Eu sou a <b>Thalita</b>, assistente virtual da <b>Orden</b>. Eu consulto os dados reais da loja e também explico como usar o sistema. Em que posso ajudar?</div>
         <div class="msg u">O que preciso repor com urgência?</div>
         <div class="msg a">Três produtos precisam de atenção:<br />• <b>Jaqueta Couro Sintético M</b>: sem estoque<br />• <b>Calça Jeans Skinny 40</b>: 2 un. (mínimo 4)<br />• <b>Camiseta Básica Branca G</b>: 3 un. (mínimo 5)<br />Para repor, use Estoque → Registrar entrada.<small>Consultei: alertas de estoque</small></div>
         <div class="msg u">E quanto vendemos este mês?</div>
