@@ -61,6 +61,7 @@ O assistente de IA precisa da chave de um provedor de IA; há opções grátis (
 | --- | --- |
 | [Guia de comandos](crm-loja-docs/docs/11-guia-de-comandos.md) | **Todos os comandos**: instalar, rodar, testar, banco, build, Docker, problemas comuns |
 | [Roteiro de testes manuais](crm-loja-docs/docs/12-roteiro-de-testes.md) | Checklist para testar cada funcionalidade pela tela |
+| [Dados de demonstração](crm-loja-docs/docs/14-dados-de-demonstracao.md) | Como são gerados os 3 meses de vendas: horário do shopping, feriados, sazonalidade e calibragem |
 | [Como contribuir](CONTRIBUTING.md) | Fluxo de Git, onde mexer em cada tipo de mudança, receitas passo a passo |
 | [Assistente de IA](crm-loja-docs/docs/10-assistente-ia.md) | Como ligar, como funciona, custo, como adicionar consultas |
 | [Publicar online](crm-loja-docs/docs/13-publicar-online.md) | GitHub Pages, Render, custos, como funcionam as atualizações |

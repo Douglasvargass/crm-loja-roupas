@@ -140,7 +140,7 @@ O que acontece, na ordem:
 1. Na primeira vez, o `mvnw` baixa o Maven e as bibliotecas (pode levar alguns minutos).
 2. Sobe um **PostgreSQL 16 de verdade**, embutido, na porta **54329**, gravando em `crm-loja-backend/.data/postgres`.
 3. O Flyway cria as tabelas (migrations `V1` a `V5`).
-4. Os *seeds* criam o módulo, os papéis, o super admin e, no perfil `dev`, os **dados de demonstração**: 5 categorias, 6 clientes, 12 produtos, 5 vendas e os 3 logins.
+4. Os *seeds* criam o módulo, os papéis, o super admin e, no perfil `dev`, os **dados de demonstração**: 5 categorias, 12 produtos, 51 clientes, os 3 logins e cerca de **2.000 vendas distribuídas pelos últimos 3 meses** (ver [14-dados-de-demonstracao.md](14-dados-de-demonstracao.md)). A primeira execução leva alguns segundos a mais por causa disso.
 5. A API fica no ar em **http://localhost:8080**.
 
 Deu certo quando aparecer no terminal:

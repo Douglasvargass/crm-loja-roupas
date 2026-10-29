@@ -13,7 +13,6 @@ import br.senai.crmloja.modules.crm.customer.CustomerService;
 import br.senai.crmloja.modules.crm.customer.dto.CustomerRequest;
 import br.senai.crmloja.modules.crm.product.ProductService;
 import br.senai.crmloja.modules.crm.product.dto.ProductRequest;
-import br.senai.crmloja.modules.crm.sale.SaleService;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
@@ -28,8 +27,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionTemplate;
 
-// Dados de demonstração (perfis dev e demo, só com o catálogo vazio). Tudo passa pelos Services para gerar
-// as movimentações ENTRY e SALE corretas, como aconteceria pela tela.
+// Cadastros de demonstração (perfis dev e demo, só com o catálogo vazio): usuários, categorias, clientes e
+// produtos. Tudo passa pelos Services, como aconteceria pela tela.
+// Os produtos nascem com estoque zero de propósito: quem abre o estoque é o HistoricoVendasSeeder, que grava a
+// carga inicial com data retrodatada. Se a entrada fosse criada aqui, ficaria com a data do boot — e o trigger
+// trg_stock_movement_immutable não deixa corrigir depois.
 // CPFs são números de teste válidos, não de pessoas reais.
 @Component
 @Profile({"dev", "demo"})
@@ -44,7 +46,6 @@ public class DevDataSeeder implements ApplicationRunner {
     private final CategoryService categories;
     private final CustomerService customers;
     private final ProductService products;
-    private final SaleService sales;
     private final AppUserRepository users;
     private final ModuleRepository modules;
     private final ModuleRoleRepository roles;
@@ -53,14 +54,13 @@ public class DevDataSeeder implements ApplicationRunner {
     private final TransactionTemplate tx;
 
     public DevDataSeeder(CategoryRepository categoryRepo, CategoryService categories, CustomerService customers,
-                         ProductService products, SaleService sales, AppUserRepository users,
+                         ProductService products, AppUserRepository users,
                          ModuleRepository modules, ModuleRoleRepository roles, UserModuleAccessRepository accesses,
                          PasswordEncoder encoder, TransactionTemplate tx) {
         this.categoryRepo = categoryRepo;
         this.categories = categories;
         this.customers = customers;
         this.products = products;
-        this.sales = sales;
         this.users = users;
         this.modules = modules;
         this.roles = roles;
@@ -84,7 +84,7 @@ public class DevDataSeeder implements ApplicationRunner {
     }
 
     private void seed() {
-        Long manager = user("gerente@loja.local", "Gabriela Gerente", "MANAGER");
+        user("gerente@loja.local", "Gabriela Gerente", "MANAGER");
         user("vendedor@loja.local", "Vitor Vendedor", "SELLER");
         user("estoquista@loja.local", "Elisa Estoquista", "STOCK_KEEPER");
 
@@ -98,7 +98,7 @@ public class DevDataSeeder implements ApplicationRunner {
             cat.put(c[0], categories.create(new CategoryRequest(c[0], c[1], true)).id());
         }
 
-        List<Long> cust = List.of(
+        List.of(
                 customer("Ana Paula Souza", "52998224725", "48991234567", "ana.souza@email.com",
                         "88010000", "Rua Felipe Schmidt", "120", "Centro"),
                 customer("João Pedro Lima", "11144477735", "48998765432", "joao.lima@email.com",
@@ -112,26 +112,18 @@ public class DevDataSeeder implements ApplicationRunner {
                 customer("Lucas Martins", "34608514300", "48991112233", "lucas.martins@email.com",
                         "88058000", "Rua das Gaivotas", "33", "Ingleses"));
 
-        Map<String, Long> p = new HashMap<>();
-        p.put("CAM-001", product("CAM-001-M-BR", "Camiseta Básica Branca M", cat.get("Camisetas"), "M", "Branco", "49.90", 30, 5));
-        product("CAM-002-G-BR", "Camiseta Básica Branca G", cat.get("Camisetas"), "G", "Branco", "49.90", 3, 5);
-        p.put("CAM-003", product("CAM-003-P-PT", "Camiseta Estampada Preta P", cat.get("Camisetas"), "P", "Preto", "69.90", 20, 5));
-        product("CAL-001-40-AZ", "Calça Jeans Skinny 40", cat.get("Calças"), "40", "Azul", "189.90", 2, 4);
-        p.put("CAL-002", product("CAL-002-42-PT", "Calça Sarja Preta 42", cat.get("Calças"), "42", "Preto", "159.90", 15, 4));
-        p.put("VES-001", product("VES-001-M-VM", "Vestido Midi Floral M", cat.get("Vestidos"), "M", "Vermelho", "219.90", 10, 3));
-        product("VES-002-P-AZ", "Vestido Curto de Linho P", cat.get("Vestidos"), "P", "Azul", "179.90", 8, 3);
-        product("JAQ-001-M-PT", "Jaqueta Couro Sintético M", cat.get("Jaquetas"), "M", "Preto", "299.90", 0, 2);
-        p.put("JAQ-002", product("JAQ-002-G-AZ", "Jaqueta Jeans G", cat.get("Jaquetas"), "G", "Azul", "249.90", 6, 2));
-        p.put("ACE-001", product("ACE-001-U-MR", "Cinto de Couro", cat.get("Acessórios"), "U", "Marrom", "79.90", 25, 5));
-        p.put("ACE-002", product("ACE-002-U-PT", "Boné Aba Curva", cat.get("Acessórios"), "U", "Preto", "59.90", 18, 5));
-        p.put("ACE-003", product("ACE-003-U-CZ", "Kit Meias 3 Pares", cat.get("Acessórios"), "U", "Cinza", "29.90", 40, 10));
-
-        sale(cust.get(0), manager, Map.of(p.get("CAM-001"), 2, p.get("CAL-002"), 1));
-        sale(cust.get(1), manager, Map.of(p.get("VES-001"), 1, p.get("ACE-001"), 1));
-        sale(null, manager, Map.of(p.get("ACE-003"), 3));
-        sale(cust.get(2), manager, Map.of(p.get("CAM-003"), 2, p.get("ACE-002"), 1));
-        Long cancelled = sale(cust.get(0), manager, Map.of(p.get("JAQ-002"), 1));
-        sales.cancel(cancelled, "Cliente desistiu da compra", manager);
+        product("CAM-001-M-BR", "Camiseta Básica Branca M", cat.get("Camisetas"), "M", "Branco", "49.90", 5);
+        product("CAM-002-G-BR", "Camiseta Básica Branca G", cat.get("Camisetas"), "G", "Branco", "49.90", 5);
+        product("CAM-003-P-PT", "Camiseta Estampada Preta P", cat.get("Camisetas"), "P", "Preto", "69.90", 5);
+        product("CAL-001-40-AZ", "Calça Jeans Skinny 40", cat.get("Calças"), "40", "Azul", "189.90", 4);
+        product("CAL-002-42-PT", "Calça Sarja Preta 42", cat.get("Calças"), "42", "Preto", "159.90", 4);
+        product("VES-001-M-VM", "Vestido Midi Floral M", cat.get("Vestidos"), "M", "Vermelho", "219.90", 3);
+        product("VES-002-P-AZ", "Vestido Curto de Linho P", cat.get("Vestidos"), "P", "Azul", "179.90", 3);
+        product("JAQ-001-M-PT", "Jaqueta Couro Sintético M", cat.get("Jaquetas"), "M", "Preto", "299.90", 2);
+        product("JAQ-002-G-AZ", "Jaqueta Jeans G", cat.get("Jaquetas"), "G", "Azul", "249.90", 2);
+        product("ACE-001-U-MR", "Cinto de Couro", cat.get("Acessórios"), "U", "Marrom", "79.90", 5);
+        product("ACE-002-U-PT", "Boné Aba Curva", cat.get("Acessórios"), "U", "Preto", "59.90", 5);
+        product("ACE-003-U-CZ", "Kit Meias 3 Pares", cat.get("Acessórios"), "U", "Cinza", "29.90", 10);
     }
 
     private Long user(String login, String name, String roleCode) {
@@ -150,16 +142,10 @@ public class DevDataSeeder implements ApplicationRunner {
                 "Florianópolis", "SC"), null).id();
     }
 
+    // Estoque inicial zero: a carga de abertura é gravada retrodatada pelo HistoricoVendasSeeder.
     private Long product(String code, String name, Long categoryId, String size, String color, String price,
-                         int stock, int min) {
+                         int min) {
         return products.create(new ProductRequest(code, name, null, categoryId, size, color, new BigDecimal(price),
-                stock, min), null).id();
-    }
-
-    private Long sale(Long customerId, Long actor, Map<Long, Integer> items) {
-        Long id = sales.open(customerId, actor).id();
-        items.forEach((productId, qty) -> sales.addItem(id, productId, qty));
-        sales.confirm(id, actor);
-        return id;
+                0, min), null).id();
     }
 }

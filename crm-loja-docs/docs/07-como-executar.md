@@ -101,7 +101,16 @@ server: {
 
 Os seeds rodam dentro de `try/catch`: falha de seed é logada e a aplicação continua no ar.
 
-Dados do `DevDataSeeder`: os 6 clientes usam CPFs válidos de teste, não de pessoas reais (529.982.247-25, 111.444.777-35, 390.533.447-05, 877.482.488-00, 714.287.938-60, 346.085.143-00). Os produtos `CAM-002-G-BR` (3 de mínimo 5) e `CAL-001-40-AZ` (2 de mínimo 4) aparecem como estoque baixo, e `JAQ-001-M-PT` (0) como sem estoque.
+Dados do `DevDataSeeder`: os 6 clientes iniciais usam CPFs válidos de teste, não de pessoas reais
+(529.982.247-25, 111.444.777-35, 390.533.447-05, 877.482.488-00, 714.287.938-60, 346.085.143-00). Os produtos
+nascem com **estoque zero**: quem abre o estoque é o `HistoricoVendasSeeder`, com a carga retrodatada.
+
+| `HistoricoVendasSeeder` | Só nos perfis `dev`/`demo`, se não houver venda anterior a hoje | 3 meses de vendas, mais 45 clientes da região de Tubarão, inseridos por SQL com data retroativa |
+
+Esse seeder gera cerca de 2.000 vendas nos últimos 3 meses, respeitando o horário do shopping (10h–22h de
+segunda a sábado, 14h–21h domingo e feriado), a sazonalidade e o calendário de feriados. O modelo completo está
+em [14-dados-de-demonstracao.md](14-dados-de-demonstracao.md). Os alertas de estoque aparecem nas jaquetas, por
+causa da saída de estação simulada.
 
 ### CI (.github/workflows/ci.yml do back-end)
 

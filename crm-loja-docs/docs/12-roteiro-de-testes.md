@@ -4,7 +4,12 @@ Checklist para testar o sistema pela tela. Comece com o banco zerado (apague `cr
 
 Marque `[x]` em cada item que funcionou. Quando algo falhar, abra uma *Issue* no GitHub com: o passo, o que esperava, o que aconteceu, o perfil usado e um print.
 
-**Dados de partida (seed):** 6 clientes, 12 produtos, 5 categorias, 4 vendas confirmadas e 1 cancelada. Estoque baixo: `CAM-002-G-BR` (3/5) e `CAL-001-40-AZ` (2/4). Sem estoque: `JAQ-001-M-PT`.
+**Dados de partida (seed):** 5 categorias, 12 produtos, 51 clientes e cerca de 2.000 vendas distribuídas pelos
+últimos 3 meses — uma por dia, no horário real do shopping. Os números exatos variam com a data de execução,
+porque a janela é relativa a hoje; o [estudo dos dados](14-dados-de-demonstracao.md) explica o modelo.
+
+Os alertas de estoque aparecem nas **jaquetas**, porque o seeder simula a saída de estação: nas duas últimas
+semanas a loja deixa de repor essa categoria.
 
 ## 1. Acesso
 
@@ -43,7 +48,9 @@ Marque `[x]` em cada item que funcionou. Quando algo falhar, abra uma *Issue* no
 - [ ] Gerente ou estoquista: **Novo produto** na categoria Shorts, preço `89,90`, estoque inicial `10`, mínimo `3` → salvo e com situação **Disponível**.
 - [ ] Preço `0` → "O preço deve ser maior que zero". Código repetido → "Código já utilizado".
 - [ ] Filtros combinados: categoria **Calças** + tamanho **40** → só `CAL-001-40-AZ`.
-- [ ] Situação **Estoque baixo** → `CAM-002-G-BR` e `CAL-001-40-AZ`. **Sem estoque** → `JAQ-001-M-PT`.
+- [ ] Situação **Estoque baixo** e **Sem estoque** → os filtros trazem as jaquetas (`JAQ-001-M-PT` e/ou
+      `JAQ-002-G-AZ`), que é onde a saída de estação simulada deixa o estoque cair. Confira contra o quadro
+      **Precisa repor** do Dashboard: as duas telas têm de listar os mesmos produtos.
 - [ ] Abrir o produto novo → movimentação "Entrada · Estoque inicial · +10".
 - [ ] **Editar** o preço → a ficha mostra o novo preço; o estoque não é editável ali.
 - [ ] Gerente: **Excluir** o produto novo (só tem estoque inicial) → removido.
@@ -62,7 +69,8 @@ Marque `[x]` em cada item que funcionou. Quando algo falhar, abra uma *Issue* no
 ## 6. Vendas
 
 - [ ] Vendedor: **Nova venda → escolher cliente → Abrir venda**.
-- [ ] Buscar um produto: só aparecem os ativos com estoque (`JAQ-001-M-PT` não aparece).
+- [ ] Buscar um produto: só aparecem os ativos com estoque — os que o Dashboard lista como **sem estoque** não
+      podem aparecer aqui.
 - [ ] Adicionar 2 produtos diferentes → subtotal de cada um e o total somam certo.
 - [ ] Adicionar de novo o mesmo produto → soma na mesma linha.
 - [ ] Pedir mais do que o estoque → aviso imediato e o botão Adicionar fica bloqueado.
