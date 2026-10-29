@@ -18,7 +18,7 @@ O assistente precisa de um **provedor de IA** e de uma **chave de API** dele. Vo
 
 | Provedor | `ASSISTANT_PROVIDER` | Onde pegar a chave | Modelo padrão | Limite grátis (aprox.) | Observações |
 | --- | --- | --- | --- | --- | --- |
-| **Groq** (recomendado) | `groq` | https://console.groq.com → *API Keys* → *Create API Key* (começa com `gsk_`) | `llama-3.3-70b-versatile` | Dezenas de perguntas por dia; o teto é de tokens por dia e por minuto, veja https://console.groq.com/settings/limits | Rápido, bom com as consultas. Se bater o limite, a tela avisa "limite gratuito atingido"; espere um minuto ou troque para `llama-3.1-8b-instant` (mais fraco, limite maior) |
+| **Groq** (recomendado) | `groq` | https://console.groq.com → *API Keys* → *Create API Key* (começa com `gsk_`) | `openai/gpt-oss-120b` | Dezenas de perguntas por dia; o teto é de tokens por dia e por minuto, veja https://console.groq.com/settings/limits | Rápido, bom com as consultas. Se bater o limite, a tela avisa "limite gratuito atingido"; espere um minuto ou troque `ASSISTANT_MODEL` para `openai/gpt-oss-20b` (mais leve) ou `qwen/qwen3.8-27b`. O catálogo do Groq muda: se aparecer "modelo não existe", liste os atuais com `curl https://api.groq.com/openai/v1/models -H "Authorization: Bearer $CHAVE"` |
 | **Google Gemini** | `gemini` | https://aistudio.google.com/apikey → *Create API key* | `gemini-2.5-flash` | ~250 perguntas por dia | Ótima qualidade. No plano grátis, o Google pode usar as conversas para treinar modelos |
 | **OpenRouter** | `openrouter` | https://openrouter.ai/keys (começa com `sk-or-`) | `meta-llama/llama-3.3-70b-instruct:free` | ~50 pedidos por dia nos modelos `:free` | Modelos grátis mudam e às vezes ficam fora do ar; só os com sufixo `:free` são grátis |
 | **Ollama** (na sua máquina) | `ollama` | não precisa de chave | `llama3.1` | Sem limite | Precisa do [Ollama](https://ollama.com) instalado e `ollama pull llama3.1`. Não serve para o Render (sem GPU, pouca memória) |
@@ -52,7 +52,7 @@ ASSISTANT_PROVIDER=groq ASSISTANT_API_KEY=gsk_... ./mvnw spring-boot:test-run
 | `ASSISTANT_PROVIDER` | `groq` |
 | `ASSISTANT_API_KEY` | a chave `gsk_...` |
 
-Clique em **Save Changes**; o serviço reinicia em alguns minutos. Depois abra **Assistente IA** no menu: o aviso amarelo some e, no rodapé do chat, aparece "IA: Groq (llama-3.3-70b-versatile)".
+Clique em **Save Changes**; o serviço reinicia em alguns minutos. Depois abra **Assistente IA** no menu: o aviso amarelo some e, no rodapé do chat, aparece "IA: Groq (openai/gpt-oss-120b)".
 
 Para trocar de provedor, mude as duas variáveis. Para outro modelo do mesmo provedor, acrescente `ASSISTANT_MODEL`.
 
@@ -124,7 +124,7 @@ Configurações (variáveis de ambiente):
 | --- | --- | --- |
 | `ASSISTANT_PROVIDER` | `anthropic` | `anthropic`, `groq`, `gemini`, `openrouter`, `ollama` ou `openai` (outro provedor OpenAI-compatível) |
 | `ASSISTANT_API_KEY` | vazio | Liga o assistente (menos no `ollama`). `ANTHROPIC_API_KEY` continua aceita como sinônimo |
-| `ASSISTANT_MODEL` | padrão do provedor | `claude-opus-5-5`, `llama-3.3-70b-versatile`, `gemini-2.5-flash`, `meta-llama/llama-3.3-70b-instruct:free`, `llama3.1` |
+| `ASSISTANT_MODEL` | padrão do provedor | `claude-opus-5-5`, `openai/gpt-oss-120b`, `gemini-2.5-flash`, `meta-llama/llama-3.3-70b-instruct:free`, `llama3.1` |
 | `ASSISTANT_BASE_URL` | padrão do provedor | Obrigatória só no `openai`. No `anthropic`, aponta para um provedor compatível com a API da Anthropic (ex.: `https://openrouter.ai/api`) |
 | `ASSISTANT_EFFORT` | `medium` | Só na Anthropic: `low` responde mais rápido e gasta menos; `high` pensa mais |
 | `ASSISTANT_MAX_TOKENS` | `16000` | Teto de tokens por resposta. Abaixe (ex.: `4000`) nos planos grátis ou se o provedor recusar por falta de créditos (erro 402) |

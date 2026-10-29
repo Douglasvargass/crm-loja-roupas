@@ -28,7 +28,7 @@ public record AssistantProperties(String provider, String apiKey, String baseUrl
             case "anthropic" -> { if (model == null) model = "claude-opus-5-5"; }
             case "groq" -> {
                 if (baseUrl == null) baseUrl = "https://api.groq.com/openai/v1";
-                if (model == null) model = "llama-3.3-70b-versatile";
+                if (model == null) model = "openai/gpt-oss-120b";
             }
             case "gemini" -> {
                 if (baseUrl == null) baseUrl = "https://generativelanguage.googleapis.com/v1beta/openai";

@@ -43,7 +43,7 @@ app:
     api-key: ${ASSISTANT_API_KEY:${ANTHROPIC_API_KEY:}}
     # Vazio = padrão do provedor. Ex.: https://openrouter.ai/api (anthropic) ou http://localhost:11434/v1 (ollama).
     base-url: ${ASSISTANT_BASE_URL:${ANTHROPIC_BASE_URL:}}
-    # Vazio = padrão do provedor (claude-opus-5-5, llama-3.3-70b-versatile, gemini-2.5-flash…).
+    # Vazio = padrão do provedor (claude-opus-5-5, openai/gpt-oss-120b, gemini-2.5-flash…).
     model: ${ASSISTANT_MODEL:}
     effort: ${ASSISTANT_EFFORT:medium}          # só na Anthropic
     # Teto de tokens por resposta. Abaixe se o provedor recusar por falta de créditos (erro 402).
