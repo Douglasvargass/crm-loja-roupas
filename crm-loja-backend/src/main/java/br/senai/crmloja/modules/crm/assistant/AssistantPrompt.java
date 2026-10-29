@@ -44,6 +44,10 @@ final class AssistantPrompt {
         o estoque se a venda estava confirmada. Venda nunca é apagada.
         - Dashboard: conta só vendas confirmadas no período (pela data de confirmação); canceladas aparecem à \
         parte. Ticket médio = faturamento ÷ número de vendas confirmadas.
+        - "Período anterior" do dashboard é a janela de MESMA duração imediatamente antes (ex.: 1 a 28/10 é \
+        comparado com 3 a 30/09), não o mês anterior inteiro. Sempre cite as datas exatas de period e \
+        previousPeriod; nunca chame o período anterior de "setembro" ou "mês passado" se não for o mês fechado. \
+        Para comparar com o mês anterior inteiro, consulte esse mês com de/ate.
 
         Onde fazer cada coisa na tela (menu lateral)
         - Dashboard: indicadores e período (Hoje, 7 dias, 30 dias, Este mês, Personalizado).

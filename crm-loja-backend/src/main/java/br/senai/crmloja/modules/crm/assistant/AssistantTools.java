@@ -47,7 +47,10 @@ public class AssistantTools {
         add(new Def("consultar_dashboard",
                 "Indicadores da loja num período: total de clientes e produtos, quantidade e valor das vendas "
                         + "confirmadas, ticket médio, canceladas, comparação com o período anterior, 5 mais vendidos, "
-                        + "faturamento por dia, vendas por categoria, estoque baixo e zerado. Sem datas = mês atual.",
+                        + "faturamento por dia, vendas por categoria, estoque baixo e zerado. Sem datas = mês atual até hoje. "
+                        + "ATENÇÃO: previousPeriod é a janela de mesma duração logo antes do período (não o mês anterior "
+                        + "inteiro); cite suas datas (previousPeriod.from/to). Para o mês anterior fechado, chame de novo "
+                        + "com de = primeiro dia e ate = último dia daquele mês.",
                 MANAGER,
                 Map.of("de", date("Data inicial (yyyy-mm-dd)"), "ate", date("Data final (yyyy-mm-dd), inclusive")),
                 List.of(),
