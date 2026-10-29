@@ -64,6 +64,8 @@ public class AppUser {
 
     public Long getId() { return id; }
     public String getLogin() { return login; }
+    // Só o seed de demonstração renomeia login (nome.sobrenome@loja.local -> nome.sobrenome); a tela não.
+    public void setLogin(String login) { this.login = login; }
     public String getFullName() { return fullName; }
     public void setFullName(String fullName) { this.fullName = fullName; }
     public String getPasswordHash() { return passwordHash; }

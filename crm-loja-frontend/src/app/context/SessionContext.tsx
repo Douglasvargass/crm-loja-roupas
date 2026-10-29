@@ -15,6 +15,8 @@ interface SessionValue {
   login: (login: string, password: string) => Promise<MeDto>;
   logout: () => Promise<void>;
   setMe: (me: MeDto) => void;
+  // Recarrega quem está logado e limpa o cache: usado ao entrar e sair do "Ver como" (a identidade muda).
+  reloadMe: () => Promise<MeDto | null>;
 }
 
 const SessionContext = createContext<SessionValue | null>(null);
@@ -73,9 +75,16 @@ export function SessionProvider({ children }: { children: ReactNode }) {
 
   const setMe = useCallback((me: MeDto) => setState({ status: 'authenticated', me }), []);
 
+  const reloadMe = useCallback(async () => {
+    qc.clear();
+    const me = await authApi.me().catch(() => null);
+    setState(me ? { status: 'authenticated', me } : { status: 'anonymous' });
+    return me;
+  }, [qc]);
+
   const me = state.status === 'authenticated' ? state.me : null;
   return (
-    <SessionContext.Provider value={{ state, me, role: me?.role ?? null, login, logout, setMe }}>
+    <SessionContext.Provider value={{ state, me, role: me?.role ?? null, login, logout, setMe, reloadMe }}>
       {children}
     </SessionContext.Provider>
   );

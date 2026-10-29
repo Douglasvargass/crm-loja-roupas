@@ -8,7 +8,7 @@ O projeto usa Java/Spring Boot no back-end. É um **monólito modular**: um núc
 | Banco | PostgreSQL 16 | Persistência, CHECKs, triggers |
 | Migrations | Flyway (SQL versionado) | Único caminho para mudar o schema; `ddl-auto=validate` |
 | Autenticação | Spring Security + JWT (jjwt) em cookie httpOnly | Access 10 min, refresh rotativo 24 h |
-| Testes | JUnit 5 + MockMvc + Testcontainers (Postgres real) | Integração contra banco de verdade |
+| Testes | JUnit 5 + MockMvc + Postgres 16 embutido (zonky, sem Docker) | Integração contra banco de verdade |
 | Front-end | React 19 + Vite + TypeScript estrito | SPA |
 | Estado de servidor | TanStack Query 5 | Cache, invalidação após mutações |
 | Estilo | Tailwind CSS 4 + tokens CSS | Tema claro/escuro por variáveis |
@@ -30,7 +30,7 @@ O projeto usa Java/Spring Boot no back-end. É um **monólito modular**: um núc
 | Congelar valor da época | `sale_item` copia código, nome e preço do produto |
 | Log imutável por trigger | `stock_movement` e `audit_event` recusam UPDATE/DELETE no banco |
 | Seed reconciliador no boot | `ApplicationRunner` idempotente para módulo, papéis e super admin |
-| Testes Vitest + Supertest em Postgres real | JUnit + MockMvc + Testcontainers, rodando as migrations do zero |
+| Testes Vitest + Supertest em Postgres real | JUnit + MockMvc + Postgres embutido, rodando as migrations do zero |
 | RBAC por módulo | Tabelas `module`, `module_role`, `user_module_access` + `@PreAuthorize` |
 | Front: http.ts, hooks, adapters | Igual, em React (seção 7) |
 
@@ -73,7 +73,7 @@ Se a turma preferir um só repositório, as três pastas ficam na raiz (`backend
 crm-loja-backend/
 ├── pom.xml · mvnw · docker-compose.yml · .env.example
 ├── CLAUDE.md · README.md · MIGRATIONS_RUNBOOK.md
-├── .github/workflows/ci.yml
+├── (workflows de CI ficam na raiz do repositório: .github/workflows/backend.yml, frontend.yml, docker.yml, pages.yml)
 └── src/
     ├── main/java/br/senai/crmloja/
     │   ├── CrmApplication.java          composition root
@@ -100,8 +100,8 @@ crm-loja-backend/
     │   └── db/migration/                V1__core_identity_rbac.sql, V2__core_audit.sql,
     │                                    V3__crm_catalog.sql, V4__crm_sales_stock.sql
     └── test/java/br/senai/crmloja/
-        ├── support/IntegrationTest.java base com Testcontainers + login
-        └── modules/crm/                 SaleFlowIT, StockIT, CustomerIT, DashboardIT, AuthIT
+        ├── support/IntegrationTest.java base com Postgres embutido + login
+        └── modules/crm/                 SaleIT, CatalogStockIT, CustomerIT, DashboardIT, AssistantIT (AuthIT em core/)
 ```
 
 ### Estrutura do front-end

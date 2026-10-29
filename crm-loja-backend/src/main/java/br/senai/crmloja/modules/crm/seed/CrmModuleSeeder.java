@@ -23,10 +23,15 @@ public class CrmModuleSeeder implements ApplicationRunner {
 
     private record RoleDef(String code, String name, boolean admin) {}
 
+    // Os dois últimos são a equipe técnica: têm acesso total (RbacService.FULL_ACCESS_ROLES), mas não
+    // contam como "gerente ativo" na regra RN25, que continua falando do gerente de verdade.
     private static final List<RoleDef> ROLES = List.of(
             new RoleDef("MANAGER", "Gerente", true),
             new RoleDef("SELLER", "Vendedor(a)", false),
-            new RoleDef("STOCK_KEEPER", "Estoquista", false));
+            new RoleDef("STOCK_KEEPER", "Estoquista", false),
+            new RoleDef("PURCHASING", "Operações e Compras", false),
+            new RoleDef("DEVELOPER", "Engenheiro(a) de Software", false),
+            new RoleDef("MARKETING_DEV", "Marketing e Desenvolvimento", false));
 
     private final ModuleRepository modules;
     private final ModuleRoleRepository roles;

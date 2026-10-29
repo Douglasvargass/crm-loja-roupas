@@ -34,7 +34,7 @@ export function StockPage() {
   return (
     <>
       <PageHeader
-        title="Estoque"
+        title="Estoque" help="Entrada: chegou mercadoria. Ajuste: perda, avaria ou contagem, sempre com motivo. Tudo fica no histórico e não pode ser apagado."
         subtitle="Saldo, entradas, ajustes e histórico de movimentações."
         actions={
           <>

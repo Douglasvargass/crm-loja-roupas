@@ -12,6 +12,8 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import java.time.OffsetDateTime;
 
+// Cliente da loja (HU01). CPF guardado só com os 11 números (CHAR(11)) e único; CEP com 8 e UF com 2.
+// Cliente com venda não se exclui, só inativa (RN02): o histórico de compras continua inteiro.
 @Entity
 @Table(name = "customer")
 public class Customer {
@@ -58,6 +60,10 @@ public class Customer {
     @Column(name = "is_active", nullable = false)
     private boolean active = true;
 
+    // Conta de acesso à loja online (V9). Só leitura aqui: quem liga é o StoreService/seeder, por SQL.
+    @Column(name = "user_id", insertable = false, updatable = false)
+    private Long userId;
+
     @Column(name = "created_by", updatable = false)
     private Long createdBy;
 
@@ -103,6 +109,7 @@ public class Customer {
     public void setCity(String city) { this.city = city; }
     public String getState() { return state; }
     public void setState(String state) { this.state = state; }
+    public Long getUserId() { return userId; }
     public boolean isActive() { return active; }
     public void setActive(boolean active) { this.active = active; }
     public void setUpdatedBy(Long updatedBy) { this.updatedBy = updatedBy; }

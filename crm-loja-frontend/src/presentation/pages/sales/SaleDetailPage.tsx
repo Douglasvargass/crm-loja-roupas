@@ -61,8 +61,8 @@ function SaleView({ sale }: { sale: SaleDto }) {
   return (
     <>
       <PageHeader
-        title={`Venda #${sale.id}`}
-        subtitle={`Aberta em ${formatDateTime(sale.createdAt)}`}
+        title={`Venda #${sale.id}`} help="Aberta: dá para mudar os itens. Confirmar baixa o estoque de todos os itens, ou de nenhum se faltar algum. Venda nunca é apagada: cancela-se com motivo."
+        subtitle={`${sale.channel === 'ONLINE' ? 'Pedido online · ' : ''}Aberta em ${formatDateTime(sale.createdAt)}`}
         actions={
           <>
             <Button variant="secondary" onClick={() => navigate('/vendas')}>Voltar</Button>
@@ -77,6 +77,14 @@ function SaleView({ sale }: { sale: SaleDto }) {
           </>
         }
       />
+      {/* Nunca um botão travado sem explicar: diz o que falta para confirmar. */}
+      {draft && (sale.items.length === 0 || overStock.length > 0) && (
+        <p className="mb-4 rounded-lg border border-warning/30 bg-warning-soft px-3 py-2 text-sm text-warning">
+          Para confirmar, ainda falta: {sale.items.length === 0
+            ? 'adicionar ao menos um produto.'
+            : `ajustar a quantidade de ${overStock.map((i) => i.productName).join(', ')} (acima do estoque).`}
+        </p>
+      )}
 
       <div className="grid gap-4 lg:grid-cols-3">
         <div className="flex flex-col gap-4 lg:col-span-2">
@@ -224,7 +232,8 @@ function ItemRow({ saleId, item, editable }: { saleId: number; item: SaleItemDto
           <Button size="sm" variant="secondary" aria-label="Diminuir" disabled={item.quantity <= 1 || updateItem.isPending}
             onClick={() => void change(item.quantity - 1)}>−</Button>
           <span className="tabular w-8 text-center">{item.quantity}</span>
-          <Button size="sm" variant="secondary" aria-label="Aumentar" disabled={item.quantity >= item.availableStock || updateItem.isPending}
+          <Button size="sm" variant="secondary" aria-label="Aumentar"
+            title={item.quantity >= item.availableStock ? `Só há ${item.availableStock} em estoque` : undefined} disabled={item.quantity >= item.availableStock || updateItem.isPending}
             onClick={() => void change(item.quantity + 1)}>+</Button>
         </div>
       ) : (

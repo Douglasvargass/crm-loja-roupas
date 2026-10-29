@@ -1,12 +1,18 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router';
-import { useDashboard } from '@/data/hooks';
+import { useSession } from '@/app/context/SessionContext';
+import { can } from '@/domain/permissions';
+import { useDashboard, type DashboardFilters } from '@/data/hooks';
 import type { DashboardDto, StockAlertDto } from '@/data/dto';
 import { formatDate, formatMoney, percentChange, toIsoDate } from '@/lib/format';
 import { cn } from '@/lib/cn';
 import { Badge } from '../components/atoms/Badge';
-import { Input } from '../components/atoms/Field';
+import { Icon } from '../components/atoms/Icon';
+import { Input, Select } from '../components/atoms/Field';
 import { Skeleton } from '../components/atoms/Skeleton';
+import { ClickBars, DayBars } from '../components/molecules/ClickableCharts';
+import { DemoAgentDiary } from '../components/organisms/DemoAgentDiary';
+import { StockOverview } from '../components/organisms/StockOverview';
 import { KpiCard } from '../components/molecules/KpiCard';
 import { QueryState } from '../components/molecules/QueryState';
 import { Card, PageHeader } from '../components/templates/Page';
@@ -30,18 +36,60 @@ function rangeOf(p: Exclude<Preset, 'custom'>): [string, string] {
   return [toIsoDate(from), toIsoDate(today)];
 }
 
+// Dashboard (pedido do Douglas, 29/10/2026): o gerente e a equipe técnica veem vendas + estoque; Operações e Compras e o
+// estoquista veem só o bloco de estoque, porque faturamento e vendas são só do gerente (a API /crm/dashboard recusa os
+// outros papéis com 403, então a tela nem chama).
 export function DashboardPage() {
+  const { role } = useSession();
+  return role && can.dashboard(role) ? <SalesDashboard /> : <StockDashboard />;
+}
+
+function StockDashboard() {
+  return (
+    <>
+      <PageHeader
+        title="Dashboard"
+        help="Situação do estoque agora: quantas peças e quanto vale, o que está zerado ou acaba em 7 dias, o que pedir, os pedidos de compra a caminho e o dinheiro parado. Clique num cartão para ir à tela certa."
+        subtitle="Como está o estoque hoje e o que precisa de atenção."
+      />
+      <StockOverview />
+    </>
+  );
+}
+
+function SalesDashboard() {
   const [preset, setPreset] = useState<Preset>('month');   // padrão da HU28
   const [custom, setCustom] = useState(() => rangeOf('month'));
+  const [filters, setFilters] = useState<DashboardFilters>({});
   const [from, to] = preset === 'custom' ? custom : rangeOf(preset);
-  const query = useDashboard(from, to);
+
+  // Um dia escolhido que ficou fora do período novo deixa de valer (não precisa de efeito: só não é enviado).
+  const day = filters.day && filters.day >= from && filters.day <= to ? filters.day : undefined;
+  const active: DashboardFilters = { categoryId: filters.categoryId, productId: filters.productId, day, sellerId: filters.sellerId, channel: filters.channel };
+  const query = useDashboard(from, to, active);
+  // A lista de vendedores vem na própria resposta; com placeholderData ela não some enquanto recarrega.
+  const sellers = query.data?.sellers ?? [];
+
+  // Clicar escolhe; clicar de novo no mesmo item tira o filtro.
+  const toggleCategory = (id: number) =>
+    // Trocar a categoria limpa o produto: ele pode nem pertencer à categoria nova.
+    setFilters((f) => ({ ...f, categoryId: f.categoryId === id ? undefined : id, productId: undefined }));
+  const toggleProduct = (id: number) => setFilters((f) => ({ ...f, productId: f.productId === id ? undefined : id }));
+  const toggleDay = (date: string) => setFilters((f) => ({ ...f, day: f.day === date ? undefined : date }));
+  const pickSeller = (id?: number) => setFilters((f) => ({ ...f, sellerId: id }));
+  const clearFilters = () => setFilters({});
+  const hasFilters = active.categoryId != null || active.productId != null || active.day != null || active.sellerId != null;
+  const pickChannel = (c?: 'STORE' | 'ONLINE') => setFilters((f) => ({ ...f, channel: c }));
 
   return (
     <>
-      <PageHeader title="Dashboard" subtitle="Indicadores calculados a partir dos dados reais da loja." />
+      <PageHeader
+        title="Dashboard" help="Números da loja no período escolhido. Só vendas confirmadas contam; as canceladas aparecem à parte. Clique num gráfico para filtrar o painel."
+        subtitle="Clique nos gráficos para filtrar o painel inteiro. Clique de novo para remover o filtro."
+      />
 
-      <div className="mb-5 flex flex-wrap items-end gap-2">
-        <div className="flex flex-wrap gap-1 rounded-lg border border-border bg-surface p-1" role="group" aria-label="Período">
+      <div className="mb-4 flex flex-wrap items-end gap-2">
+        <div className="flex max-w-full flex-wrap gap-1 rounded-lg border border-border bg-surface p-1" role="group" aria-label="Período">
           {PRESETS.map((p) => (
             <button
               key={p.id}
@@ -63,6 +111,27 @@ export function DashboardPage() {
             <Input label="Até" type="date" value={custom[1]} min={custom[0]} onChange={(e) => setCustom([custom[0], e.target.value])} />
           </div>
         )}
+        {/* Vendedor(a): quem abriu a venda. "Todos" = a loja inteira. */}
+        <Select
+          label="Vendedor(a)"
+          className="w-56"
+          value={filters.sellerId ?? ''}
+          onChange={(e) => pickSeller(e.target.value ? Number(e.target.value) : undefined)}
+        >
+          <option value="">Todos</option>
+          {sellers.map((s) => <option key={s.id} value={s.id}>{s.fullName}</option>)}
+        </Select>
+        {/* Canal (spec crm/07): loja física × pedidos do espaço do cliente. */}
+        <Select
+          label="Canal"
+          className="w-44"
+          value={filters.channel ?? ''}
+          onChange={(e) => pickChannel(e.target.value === 'STORE' || e.target.value === 'ONLINE' ? e.target.value : undefined)}
+        >
+          <option value="">Todos</option>
+          <option value="STORE">Loja física</option>
+          <option value="ONLINE">Online</option>
+        </Select>
       </div>
 
       <QueryState
@@ -73,46 +142,99 @@ export function DashboardPage() {
           </div>
         }
       >
-        {(d) => <DashboardBody d={d} />}
+        {(d) => (
+          <DashboardBody
+            d={d}
+            hasFilters={hasFilters}
+            onCategory={toggleCategory}
+            onProduct={toggleProduct}
+            onDay={toggleDay}
+            onSeller={pickSeller}
+            onClear={clearFilters}
+          />
+        )}
       </QueryState>
+
+      <div className="mt-8">
+        <StockOverview />
+      </div>
     </>
   );
 }
 
-function DashboardBody({ d }: { d: DashboardDto }) {
+function FilterChip({ label, value, onRemove }: { label: string; value: string; onRemove: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onRemove}
+      aria-label={`Remover filtro ${label}: ${value}`}
+      className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-primary/40 bg-primary-soft py-1 pr-2 pl-3 text-sm text-primary hover:bg-primary-soft/70"
+    >
+      <span className="truncate"><span className="text-muted">{label}:</span> <strong>{value}</strong></span>
+      <Icon name="close" className="size-3.5 shrink-0" />
+    </button>
+  );
+}
+
+function DashboardBody({ d, hasFilters, onCategory, onProduct, onDay, onSeller, onClear }: {
+  d: DashboardDto;
+  hasFilters: boolean;
+  onCategory: (id: number) => void;
+  onProduct: (id: number) => void;
+  onDay: (date: string) => void;
+  onSeller: (id?: number) => void;
+  onClear: () => void;
+}) {
+  const sel = d.selected;
+  // Links dos cartões levam à lista de vendas já com o mesmo período.
+  const salesLink = (status: string) => `/vendas?status=${status}&from=${d.period.from}&to=${d.period.to}`;
   return (
     <div className="flex flex-col gap-4">
+      {hasFilters && (
+        <div className="flex flex-wrap items-center gap-2" aria-label="Filtros ativos">
+          <span className="text-sm text-muted">Filtrando por:</span>
+          {sel.categoryId != null && <FilterChip label="Categoria" value={sel.categoryName ?? `#${sel.categoryId}`} onRemove={() => onCategory(sel.categoryId!)} />}
+          {sel.productId != null && <FilterChip label="Produto" value={sel.productName ?? `#${sel.productId}`} onRemove={() => onProduct(sel.productId!)} />}
+          {sel.day != null && <FilterChip label="Dia" value={formatDate(sel.day)} onRemove={() => onDay(sel.day!)} />}
+          {sel.sellerId != null && <FilterChip label="Vendedor(a)" value={sel.sellerName ?? `#${sel.sellerId}`} onRemove={() => onSeller(undefined)} />}
+          <button type="button" onClick={onClear} className="text-sm font-medium text-primary hover:underline">Limpar filtros</button>
+        </div>
+      )}
+
       <p className="text-xs text-muted">
-        Período: {formatDate(d.period.from)} a {formatDate(d.period.to)} · comparado com {formatDate(d.previousPeriod.from)} a{' '}
-        {formatDate(d.previousPeriod.to)}
+        Período: {formatDate(d.period.from)}{d.period.from !== d.period.to && ` a ${formatDate(d.period.to)}`} · comparado com{' '}
+        {formatDate(d.previousPeriod.from)}{d.previousPeriod.from !== d.previousPeriod.to && ` a ${formatDate(d.previousPeriod.to)}`}
       </p>
+
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
-        <KpiCard label="Clientes cadastrados" value={d.totalCustomers} />
-        <KpiCard label="Produtos cadastrados" value={d.totalProducts} />
-        <KpiCard label="Vendas confirmadas" value={d.confirmedSales} change={percentChange(d.confirmedSales, d.previousPeriod.confirmedSales)} />
-        <KpiCard label="Faturamento" value={formatMoney(d.revenue)} change={percentChange(d.revenue, d.previousPeriod.revenue)} />
+        <KpiCard label="Clientes cadastrados" value={d.totalCustomers} to="/clientes" />
+        <KpiCard label="Produtos cadastrados" value={d.totalProducts} to="/produtos" />
+        <KpiCard label="Vendas confirmadas" value={d.confirmedSales} change={percentChange(d.confirmedSales, d.previousPeriod.confirmedSales)} to={salesLink('CONFIRMED')} />
+        <KpiCard label="Faturamento" value={formatMoney(d.revenue)} change={percentChange(d.revenue, d.previousPeriod.revenue)} to={salesLink('CONFIRMED')} />
         <KpiCard label="Ticket médio" value={formatMoney(d.averageTicket)} />
-        <KpiCard label="Vendas canceladas" value={d.cancelledSales} tone={d.cancelledSales > 0 ? 'warning' : 'default'} hint="Não entram no faturamento" />
+        <KpiCard label="Vendas canceladas" value={d.cancelledSales} tone={d.cancelledSales > 0 ? 'warning' : 'default'} hint="Não entram no faturamento" to={salesLink('CANCELLED')} />
       </div>
 
-      <Card title="Faturamento por dia">
-        <RevenueChart data={d.revenueByDay} />
+      <Card title="Faturamento por dia" actions={<span className="hidden text-xs text-muted sm:inline">Clique numa barra para ver só aquele dia</span>}>
+        <DayBars data={d.revenueByDay} selected={sel.day} onPick={onDay} />
       </Card>
 
       <div className="grid gap-4 lg:grid-cols-2">
         <Card title="Mais vendidos (top 5)">
-          {d.topProducts.length === 0 ? (
-            <p className="p-6 text-center text-sm text-muted">Nenhuma venda confirmada no período.</p>
-          ) : (
-            <HBars rows={d.topProducts.map((p) => ({ label: p.name, sub: p.code, value: p.quantity, display: `${p.quantity} un.` }))} />
-          )}
+          <ClickBars
+            empty="Nenhuma venda confirmada no período."
+            selectedId={sel.productId}
+            onPick={onProduct}
+            rows={d.topProducts.map((p) => ({ id: p.productId, label: p.name, sub: p.code, value: p.quantity, display: `${p.quantity} un.` }))}
+          />
         </Card>
         <Card title="Vendas por categoria">
-          {d.salesByCategory.length === 0 ? (
-            <p className="p-6 text-center text-sm text-muted">Nenhuma venda confirmada no período.</p>
-          ) : (
-            <HBars rows={d.salesByCategory.map((c) => ({ label: c.category, sub: `${c.quantity} un.`, value: c.revenue, display: formatMoney(c.revenue) }))} />
-          )}
+          <ClickBars
+            empty="Nenhuma venda confirmada no período."
+            selectedId={sel.categoryId}
+            onPick={onCategory}
+            rows={d.salesByCategory.map((c) => ({ id: c.categoryId, label: c.category, sub: `${c.quantity} un.`, value: c.revenue, display: formatMoney(c.revenue) }))}
+          />
         </Card>
       </div>
 
@@ -120,58 +242,9 @@ function DashboardBody({ d }: { d: DashboardDto }) {
         <StockList title="Estoque baixo" items={d.lowStock} tone="warning" empty="Nenhum produto abaixo do mínimo." />
         <StockList title="Sem estoque" items={d.outOfStock} tone="error" empty="Nenhum produto zerado." />
       </div>
-    </div>
-  );
-}
 
-function RevenueChart({ data }: { data: DashboardDto['revenueByDay'] }) {
-  const max = useMemo(() => Math.max(...data.map((x) => x.revenue), 0), [data]);
-  if (max === 0) return <p className="p-6 text-center text-sm text-muted">Sem faturamento no período.</p>;
-  const showEvery = Math.ceil(data.length / 10);
-  return (
-    <div className="px-4 pt-4 pb-2">
-      <div className="flex h-44 items-end gap-[2px]" role="img" aria-label="Gráfico de faturamento por dia">
-        {data.map((x) => (
-          <div key={x.date} className="group relative flex h-full flex-1 items-end">
-            <div
-              className="w-full rounded-t-sm bg-chart transition-opacity group-hover:opacity-80"
-              style={{ height: `${Math.max((x.revenue / max) * 100, x.revenue > 0 ? 2 : 0)}%` }}
-            />
-            <div className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-1 hidden -translate-x-1/2 rounded-md border border-border bg-surface px-2 py-1 text-xs whitespace-nowrap shadow group-hover:block">
-              {formatDate(x.date)}: {formatMoney(x.revenue)} · {x.sales} venda(s)
-            </div>
-          </div>
-        ))}
-      </div>
-      <div className="mt-1 flex gap-[2px] text-[10px] text-muted">
-        {data.map((x, i) => (
-          <div key={x.date} className="flex-1 truncate text-center">
-            {i % showEvery === 0 ? formatDate(x.date).slice(0, 5) : ''}
-          </div>
-        ))}
-      </div>
+      <DemoAgentDiary />
     </div>
-  );
-}
-
-function HBars({ rows }: { rows: { label: string; sub: string; value: number; display: string }[] }) {
-  const max = Math.max(...rows.map((r) => r.value), 1);
-  return (
-    <ul className="flex flex-col gap-3 p-4">
-      {rows.map((r) => (
-        <li key={r.label + r.sub}>
-          <div className="mb-1 flex justify-between gap-2 text-sm">
-            <span className="truncate">
-              {r.label} <span className="text-xs text-muted">{r.sub}</span>
-            </span>
-            <span className="tabular font-medium">{r.display}</span>
-          </div>
-          <div className="h-2 rounded-full bg-surface-2">
-            <div className="h-2 rounded-full bg-chart" style={{ width: `${(r.value / max) * 100}%` }} />
-          </div>
-        </li>
-      ))}
-    </ul>
   );
 }
 
@@ -183,8 +256,8 @@ function StockList({ title, items, tone, empty }: { title: string; items: StockA
       ) : (
         <ul className="divide-y divide-border">
           {items.map((p) => (
-            <li key={p.productId} className="flex items-center justify-between gap-2 px-4 py-2.5 text-sm">
-              <Link to={`/produtos/${p.productId}`} className="truncate hover:underline">
+            <li key={p.productId} className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 px-4 py-2.5 text-sm">
+              <Link to={`/produtos/${p.productId}`} className="min-w-0 truncate hover:underline">
                 {p.name} <span className="text-xs text-muted">{p.code}</span>
               </Link>
               <span className="flex shrink-0 items-center gap-3">

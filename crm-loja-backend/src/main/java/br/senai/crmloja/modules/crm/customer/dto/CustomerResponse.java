@@ -3,6 +3,7 @@ package br.senai.crmloja.modules.crm.customer.dto;
 import br.senai.crmloja.modules.crm.customer.Customer;
 import java.time.OffsetDateTime;
 
+// O que a tela recebe de um cliente. A entidade nunca sai direto pela API: assim um campo novo no banco não vaza sem querer.
 public record CustomerResponse(Long id, String fullName, String cpf, String phone, String email,
                                String zipCode, String street, String number, String complement,
                                String district, String city, String state, boolean active,

@@ -16,7 +16,7 @@ O MVP é uma aplicação web em Java (Spring Boot) com front em React e banco Po
 | Estoque | Saldo, entradas, ajustes, histórico de movimentações, estoque baixo/zerado |
 | Vendas | Carrinho com cálculo automático, confirmação com baixa, cancelamento com estorno, consulta por número/cliente/data/status |
 | Dashboard | Totais, vendas e faturamento por período, mais vendidos, estoque baixo e zerado |
-| Acesso | Login, troca de senha, 3 perfis (Gerente, Vendedor, Estoquista), auditoria das operações sensíveis |
+| Acesso | Login `nome.sobrenome`, troca de senha, 5 papéis (Gerente, Vendedor, Estoquista, Engenheiro de Software, Marketing e Desenvolvimento), auditoria das operações sensíveis |
 
 ### Fora do escopo do MVP
 

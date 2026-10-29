@@ -63,7 +63,10 @@ Guia para quem vai testar, corrigir ou evoluir o CRM. Os comandos de instalaçã
 | Tabelas e colunas | `src/main/resources/db/migration/V<n>__*.sql` + a entidade | `data/dto.ts` |
 | Indicadores do dashboard | `modules/crm/dashboard/DashboardService.java` | `presentation/pages/DashboardPage.tsx` |
 | O que o assistente sabe ou consulta | `modules/crm/assistant/AssistantPrompt.java` / `AssistantTools.java` | `presentation/pages/AssistantPage.tsx` |
-| Dados de demonstração | `modules/crm/seed/DevDataSeeder.java` | — |
+| Dados de demonstração | `modules/crm/seed/DevDataSeeder.java` (equipe e catálogo), `HistoricoVendasSeeder`, `MetasSeeder` | — |
+| Metas e painel do vendedor | `modules/crm/target/TargetService.java` (regras), `Pace.java` (conta do ritmo) | `presentation/pages/MyPanelPage.tsx`, `TargetsPage.tsx` |
+
+Pedido novo começa pelo [processo de requisitos](crm-loja-docs/docs/16-processo-de-requisitos.md): spec em `crm-loja-docs/specs/crm/NN-nome/` e issue pelo modelo de História.
 
 ## Receita: nova funcionalidade de ponta a ponta
 

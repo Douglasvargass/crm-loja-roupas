@@ -32,11 +32,11 @@ jobs:
           docker stats --no-stream crm
       - name: Telas, login e API respondem
         run: |
-          curl -sf http://localhost:8080/login | grep -q "<title>CRM Loja de Roupas</title>"
+          curl -sf http://localhost:8080/login | grep -q "<title>Orden</title>"
           # Os dados de demonstração são criados logo depois que o Tomcat sobe: espera o login existir.
           for i in $(seq 1 30); do
             curl -sf -c c.txt -X POST http://localhost:8080/auth/login -H 'Content-Type: application/json' \
-              -d '{"login":"gerente@loja.local","password":"loja12345"}' >/dev/null && break
+              -d '{"login":"douglas.vargas","password":"loja12345"}' >/dev/null && break
             sleep 2
           done
           curl -sf -b c.txt http://localhost:8080/crm/dashboard | grep -q confirmedSales

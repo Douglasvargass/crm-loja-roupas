@@ -4,7 +4,7 @@
 
 ## Contexto
 
-Tela e API precisam estar na mesma origem para o cookie sameSite=strict funcionar sem CORS.
+Tela e API precisam estar na mesma origem para o cookie httpOnly (SameSite=Lax) funcionar sem CORS.
 
 ## Decisão
 

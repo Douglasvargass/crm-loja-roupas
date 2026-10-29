@@ -128,6 +128,21 @@ class AuthIT extends IntegrationTest {
         mvc.perform(get("/admin/users").cookie(loginAs("SELLER"))).andExpect(status().isForbidden());
     }
 
+    @Test // login curto no padrão nome.sobrenome; maiúscula ou espaço são recusados
+    void loginCurtoNoPadraoNomeSobrenome() throws Exception {
+        Cookie manager = loginAs("MANAGER");
+        String login = "ana.silva" + TestData.unique("");
+        mvc.perform(post("/admin/users").cookie(manager).contentType(APPLICATION_JSON)
+                        .content("{\"login\":\"" + login + "\",\"fullName\":\"Ana Silva\",\"role\":\"SELLER\"}"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.user.login").value(login));
+        for (String ruim : new String[]{"Ana.Silva", "ana silva", "ana..silva", ".ana"}) {
+            mvc.perform(post("/admin/users").cookie(manager).contentType(APPLICATION_JSON)
+                            .content("{\"login\":\"" + ruim + "\",\"fullName\":\"Ana Silva\",\"role\":\"SELLER\"}"))
+                    .andExpect(status().isBadRequest());
+        }
+    }
+
     @Test
     void logoutRevogaORefresh() throws Exception {
         MvcResult r = loginResult(users.ensure("SELLER"), TestUsers.PASSWORD);

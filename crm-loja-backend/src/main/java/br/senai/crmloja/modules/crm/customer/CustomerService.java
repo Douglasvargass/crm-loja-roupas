@@ -61,7 +61,7 @@ public class CustomerService {
         Customer c = find(id);
         var summary = sales.purchaseSummary(id);
         return new CustomerDetailResponse(CustomerResponse.from(c), summary.count(), summary.total(),
-                summary.lastPurchaseAt());
+                summary.lastPurchaseAt(), c.getUserId());
     }
 
     @Transactional
@@ -87,6 +87,11 @@ public class CustomerService {
         if (count > 0) {
             throw new BusinessRuleException("customer_has_sales",
                     "Cliente possui " + count + " venda(s) e não pode ser excluído. Deseja inativá-lo?");
+        }
+        // Revisão de 29/10/2026: cliente com acesso à loja online não se exclui (o login ficaria órfão); inativa.
+        if (c.getUserId() != null) {
+            throw new BusinessRuleException("customer_has_login",
+                    "Este cliente tem acesso à loja online e não pode ser excluído. Deseja inativá-lo?");
         }
         customers.delete(c);
     }

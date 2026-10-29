@@ -27,6 +27,19 @@ export function RequireActivePassword() {
   return <Outlet />;
 }
 
+// Espaço do cliente (spec crm/07): cliente só entra nas telas da loja; a equipe só nas internas.
+export function RequireStaff() {
+  const { role } = useSession();
+  if (role === 'CUSTOMER') return <Navigate to="/loja" replace />;
+  return <Outlet />;
+}
+
+export function RequireCustomer() {
+  const { role } = useSession();
+  if (role !== 'CUSTOMER') return <Navigate to={role ? homeOf(role) : '/login'} replace />;
+  return <Outlet />;
+}
+
 export function RequireRole({ allow, children }: { allow: (r: Role) => boolean; children: ReactNode }) {
   const { role } = useSession();
   if (!role) return <NoAccess />;

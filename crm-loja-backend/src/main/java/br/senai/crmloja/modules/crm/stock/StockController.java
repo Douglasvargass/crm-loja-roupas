@@ -40,12 +40,14 @@ public class StockController {
         return service.history(productId, type, from, to, page, size);
     }
 
+    // HU17: entrada de mercadoria. Também fecha sozinha os chamados de peça em falta que ela cobre (spec crm/09).
     @PostMapping("/entries")
     @ResponseStatus(HttpStatus.CREATED)
     public StockMovementResponse entry(@Valid @RequestBody EntryRequest body, @AuthenticationPrincipal CurrentUser user) {
         return service.entry(body.productId(), body.quantity(), body.reason(), user.id());
     }
 
+    // HU18: ajuste (perda, avaria, inventário), para mais ou para menos, com motivo obrigatório e registro na auditoria.
     @PostMapping("/adjustments")
     @ResponseStatus(HttpStatus.CREATED)
     public StockMovementResponse adjust(@Valid @RequestBody AdjustmentRequest body,
@@ -53,6 +55,7 @@ public class StockController {
         return service.adjust(body.productId(), body.quantity(), body.reason(), user.id());
     }
 
+    // HU19: listas de estoque baixo e zerado, usadas pela tela de estoque e pelo aviso de pendências ao entrar.
     @GetMapping("/alerts")
     public StockAlertsResponse alerts() {
         return service.alerts();

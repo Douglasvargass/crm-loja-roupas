@@ -20,6 +20,13 @@ você altera o código → git push → GitHub Actions testa → Render/Pages pu
 - O Render reconstrói a imagem Docker e troca a versão em uns 5 a 10 minutos. Enquanto isso, a versão anterior continua no ar.
 - Os dados do banco **não** são apagados nas atualizações. Mudanças de tabela entram por migration nova (`V6__…`), aplicada sozinha na subida.
 
+## Acordar o sistema todo dia (agente de vendas)
+
+O workflow `acordar-demo.yml` abre o site às 03:10 de São Paulo, de graça. O servidor acorda e o agente de vendas
+da demonstração fecha o dia anterior (spec crm/08). Para testar na hora: **Actions → acordar-demo → Run workflow**.
+Para a IA escolher o clima de cada dia, configure no Render `ASSISTANT_PROVIDER=groq` e `ASSISTANT_API_KEY` com uma
+chave grátis de console.groq.com; sem isso, os dias saem no padrão.
+
 ## 1. Página de apresentação (GitHub Pages)
 
 Já configurada: cada push que altera `site/` publica a página. Para editar, mude `site/index.html`, faça commit e push, e acompanhe em **Actions → pages**.
@@ -51,11 +58,11 @@ Sem `JWT_SECRET` o sistema se recusa a subir (fail-fast). Solução: apagar esse
 3. O Render lê o `render.yaml` e mostra o que vai criar:
    - `crm-loja-db`: PostgreSQL 16 (plano free);
    - `crm-loja-roupas`: serviço web com a imagem do `Dockerfile` (plano free).
-4. Ele pede o valor de `ANTHROPIC_API_KEY`. Deixe **em branco** para o assistente ficar desligado, ou cole a sua chave para ligá-lo.
+4. Ele pede `ASSISTANT_PROVIDER`, `ASSISTANT_API_KEY` e `ASSISTANT_MODEL`. Deixe **em branco** para o assistente ficar desligado, ou preencha provedor (`groq`, `gemini`, `anthropic`…) e chave para ligá-lo (modelo em branco = padrão do provedor).
 5. Clique em **Apply** / **Deploy Blueprint**. O primeiro build leva de 5 a 10 minutos.
-6. Quando o serviço ficar **Live**, abra a URL dele (algo como `https://crm-loja-roupas.onrender.com`) e entre com `gerente@loja.local` / `loja12345`.
+6. Quando o serviço ficar **Live**, abra a URL dele (algo como `https://crm-loja-roupas.onrender.com`) e entre com `douglas.vargas` / `loja12345`.
 
-O perfil `demo` cria os dados de demonstração e os 3 logins na primeira subida. O `JWT_SECRET` é gerado pelo próprio Render, e o `COOKIE_SECURE` já vem ligado, porque o Render usa HTTPS.
+O perfil `demo` cria os dados de demonstração e os logins da equipe na primeira subida. O `JWT_SECRET` é gerado pelo próprio Render, e o `COOKIE_SECURE` já vem ligado, porque o Render usa HTTPS.
 
 ### 2.2 Limites do plano grátis do Render
 
@@ -76,7 +83,7 @@ No painel do Render: serviço `crm-loja-roupas` → **Environment**.
 
 | Variável | Para quê |
 | --- | --- |
-| `ANTHROPIC_API_KEY` | Liga ou desliga o assistente (vazio = desligado) |
+| `ASSISTANT_PROVIDER` · `ASSISTANT_API_KEY` · `ASSISTANT_MODEL` | Ligam o assistente (chave vazia = desligado). `ANTHROPIC_API_KEY` sozinha também funciona (provedor anthropic) |
 | `ASSISTANT_EFFORT` | `low` para respostas mais rápidas e baratas |
 | `SPRING_PROFILES_ACTIVE` | `demo` (cria dados de exemplo num banco vazio) ou vazio |
 

@@ -10,6 +10,8 @@ import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import java.time.OffsetDateTime;
 
+// Liga a pessoa a um módulo com um papel. Uma linha por pessoa e módulo: trocar de papel atualiza a linha, e
+// tirar o acesso só desliga (is_active = false), para o histórico de quem fez o quê continuar legível.
 @Entity
 @Table(name = "user_module_access")
 public class UserModuleAccess {

@@ -15,6 +15,9 @@ import { QueryState } from '../components/molecules/QueryState';
 import { DataTable } from '../components/organisms/DataTable';
 import { Card, PageHeader } from '../components/templates/Page';
 
+// HU07 e HU08: lista de categorias com a quantidade de produtos. Só o gerente cadastra, edita e exclui; os
+// outros papéis veem a lista (é ela que alimenta o filtro de produtos). Excluir pede confirmação e, se houver
+// produtos vinculados, mostra a frase do back-end explicando por quê.
 export function CategoriesPage() {
   const { role } = useSession();
   const manage = !!role && can.manageCategories(role);
@@ -39,7 +42,7 @@ export function CategoriesPage() {
   return (
     <>
       <PageHeader
-        title="Categorias"
+        title="Categorias" help="Organizam os produtos (camisetas, calças…). Categoria com produtos não pode ser excluída; inativa não aparece em produto novo."
         subtitle="Organizam os produtos (camisetas, calças, vestidos…)."
         actions={manage && <Button onClick={() => setEditing('new')}><Icon name="plus" className="size-4" />Nova categoria</Button>}
       />
@@ -97,6 +100,7 @@ export function CategoriesPage() {
   );
 }
 
+// Cadastro e edição no mesmo formulário: sem categoria = nova.
 function CategoryModal({ category, onClose }: { category?: CategoryDto; onClose: () => void }) {
   const save = useSaveCategory();
   const toast = useToast();

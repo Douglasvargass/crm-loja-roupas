@@ -7,6 +7,8 @@ import { homeOf } from '@/domain/permissions';
 import { Button } from '../components/atoms/Button';
 import { Input } from '../components/atoms/Field';
 
+// HU34: troca de senha. Obrigatória no primeiro acesso (sem botão Voltar); depois, abre pelo link do topo.
+// Ao trocar, as outras sessões da pessoa são encerradas pelo back-end, e ela segue para a tela inicial do papel.
 export function ChangePasswordPage() {
   const { me, setMe, logout } = useSession();
   const toast = useToast();

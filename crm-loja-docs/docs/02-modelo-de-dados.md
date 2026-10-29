@@ -134,6 +134,20 @@ erDiagram
 | stock\_movement | quantity | Com sinal e coerente com o tipo (CHECK) |
 | stock\_movement | balance\_after | Saldo do produto logo depois |
 | stock\_movement | (sale\_id, product\_id, type) | Único: o banco impede baixa ou estorno duplicado |
+| sales\_target | (seller\_id, period\_month) | Único: uma meta por vendedor e mês (V6, spec crm/06) |
+| sales\_target | period\_month | Sempre o dia 1 do mês (CHECK) |
+| stock\_request | status | `OPEN`, `RESOLVED`, `CANCELLED`; fechado exige `closed_at` e `closing_note` (CHECK) (V8, spec crm/09) |
+| stock\_request | product\_id, customer\_id | Opcionais; RESTRICT |
+| purchase\_order | status | `OPEN`, `RECEIVED`, `CANCELLED`; fechado exige `closed_at`; cancelado exige `closing_note` (CHECK) (V10, spec crm/11) |
+| purchase\_order | expected\_date, reschedule\_count | Data prometida; quantas vezes mudou (as datas antigas ficam em `audit_event`) |
+| purchase\_order | status (V11) | `OPEN`, `IN_TRANSIT`, `CHECKING`, `RECEIVED`, `CANCELLED`; em trânsito exige `shipped_at`, em conferência exige `arrived_at` (`ck_purchase_order_steps`); `invoice_number` = nº da nota fiscal |
+| purchase\_order | bonus\_invoice\_number, return\_count (V12) | Nota de bonificação do que veio a mais; quantas vezes a nota voltou |
+| purchase\_order\_item | received\_quantity (V12) | Contado na conferência; nulo até a entrada |
+| purchase\_order\_item | (order\_id, product\_id) | Único: uma linha por peça no pedido; `quantity` de 1 a 9999 (CHECK); RESTRICT |
+| sale | channel | `STORE` (balcão, padrão) ou `ONLINE` (espaço do cliente) (V9) |
+| customer | user\_id | Conta de acesso do cliente; única; opcional (V9) |
+| payment | sale\_id | Um pagamento por pedido (único); `method` PIX/CARD; `card_last4` só no cartão; `status` APPROVED/REFUNDED (V9) |
+| sales\_target | amount | `> 0` (CHECK); mudança vai para `audit_event` (`sales_target_set`, de → para) |
 
 ### Migrations Flyway (PostgreSQL 16)
 

@@ -15,13 +15,18 @@ Só precisa de Java 21 ou mais novo. O Maven vem junto (`mvnw`).
 ```
 
 - Sobe um **PostgreSQL 16 de verdade embutido** (porta 54329), gravando em `.data/postgres`. Os dados continuam lá quando você fecha e abre de novo. Para zerar, apague a pasta `.data`.
-- Roda no perfil `dev`: cria os dados de demonstração e três logins (senha `loja12345`):
+- Roda no perfil `dev`: cria os dados de demonstração e os logins da equipe (senha `loja12345`). A equipe é conferida em todo boot: trocar login ou papel aqui no código vale na próxima subida, sem zerar o banco.
 
-| Login | Papel | Tela inicial |
-| --- | --- | --- |
-| `gerente@loja.local` | Gerente | Dashboard |
-| `vendedor@loja.local` | Vendedor(a) | Vendas |
-| `estoquista@loja.local` | Estoquista | Estoque |
+| Login | Pessoa | Papel | Vê |
+| --- | --- | --- | --- |
+| `guilherme.dower` | Guilherme Dower | Gerente | Dashboard, cadastros, vendas, estoque e Usuários |
+| `douglas.vargas` | Douglas Vargas | Engenheiro(a) de Software (super admin) | Tudo |
+| `julia.alcantara` | Julia Alcantara | Marketing e Desenvolvimento | Tudo (como o gerente) |
+| `vitor.nunes` | Vitor Nunes | Vendedor(a) | Meu painel (vendas e meta), vendas e clientes |
+| `vinicius.clemente` | Vinicius Clemente | Operações e Compras | Chamados de peça em falta (recebe e faz o pedido), produtos e estoque |
+| `vinicius.muniz` | Vinicius Muniz | Vendedor(a) | Meu painel (vendas e meta), vendas e clientes |
+
+Senha de todos: `loja12345` (só no ambiente de demonstração). O login é só `nome.sobrenome`, sem @.
 
 - A API fica em `http://localhost:8080`. Se a porta estiver ocupada: `SERVER_PORT=8081 ./mvnw spring-boot:test-run` (e no front, `VITE_API_TARGET=http://localhost:8081 pnpm dev`).
 
@@ -41,7 +46,7 @@ No perfil `dev` o `JWT_SECRET` tem um valor padrão de desenvolvimento; fora del
 ./mvnw verify
 ```
 
-60 testes: 12 unitários (CPF) e 48 de integração (`*IT`) que sobem um Postgres 16 embutido, rodam **todas** as migrations do zero, fazem login de verdade e chamam a API com MockMvc. Cobrem os casos CT01–CT38 do plano de testes: venda tudo-ou-nada, duas confirmações simultâneas, reuso de refresh token, troca de senha obrigatória, virada de período do dashboard e os triggers que impedem alterar o histórico de estoque.
+116 testes: unitários (CPF, Talita, provedor de IA, ritmo da meta) e de integração (`*IT`) que sobem um Postgres 16 embutido, rodam **todas** as migrations do zero, fazem login de verdade e chamam a API com MockMvc. Cobrem os casos CT01–CT38 do plano de testes: venda tudo-ou-nada, duas confirmações simultâneas, reuso de refresh token, troca de senha obrigatória, virada de período do dashboard e os triggers que impedem alterar o histórico de estoque.
 
 O Postgres embutido (zonky) substitui o Testcontainers: funciona sem Docker no Windows do laboratório e no runner do CI.
 

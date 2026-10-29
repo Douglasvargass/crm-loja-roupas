@@ -12,8 +12,11 @@ import { Pagination } from '../../components/molecules/Pagination';
 import { QueryState } from '../../components/molecules/QueryState';
 import { DataTable } from '../../components/organisms/DataTable';
 import { Card, Filters, PageHeader } from '../../components/templates/Page';
+import { ExportButton } from '../../components/molecules/ExportButton';
 import { CustomerFormModal } from './CustomerFormModal';
 
+// HU01 e HU02: lista de clientes com busca por nome ou CPF e filtro de ativos. Clicar na linha abre a ficha
+// (HU03 e HU06, com o histórico de compras). Começa mostrando só os ativos, que é o que o balcão usa.
 export function CustomersPage() {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
@@ -27,9 +30,12 @@ export function CustomersPage() {
   return (
     <>
       <PageHeader
-        title="Clientes"
+        title="Clientes" help="Cadastre e encontre clientes por nome ou CPF (com ou sem pontos). O CEP preenche o endereço."
         subtitle="Cadastro, busca e histórico de compras."
-        actions={<Button onClick={() => setCreating(true)}><Icon name="plus" className="size-4" />Novo cliente</Button>}
+        actions={<>
+          <ExportButton path="/crm/export/customers.csv" query={{ search: debounced, active: active === 'all' ? undefined : active === 'true' }} />
+          <Button onClick={() => setCreating(true)}><Icon name="plus" className="size-4" />Novo cliente</Button>
+        </>}
       />
       <Card>
         <Filters>

@@ -5,5 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 public interface CustomerRepository extends JpaRepository<Customer, Long>, JpaSpecificationExecutor<Customer> {
+    // CPF já chega só com números (o Service limpa a pontuação antes): é assim que o cadastro duplicado é barrado.
     Optional<Customer> findByCpf(String cpf);
 }

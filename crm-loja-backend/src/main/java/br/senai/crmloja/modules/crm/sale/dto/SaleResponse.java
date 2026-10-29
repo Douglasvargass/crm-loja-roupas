@@ -10,7 +10,7 @@ import java.util.List;
 // Detalhe da venda (HU26): preços e nomes são os gravados na venda, não os atuais do produto.
 public record SaleResponse(Long id, SaleStatus status, Long customerId, String customerName, String customerCpf,
                            BigDecimal total, OffsetDateTime createdAt, OffsetDateTime confirmedAt,
-                           OffsetDateTime cancelledAt, String cancelReason, List<Item> items) {
+                           OffsetDateTime cancelledAt, String cancelReason, List<Item> items, String channel) {
 
     public record Item(Long id, Long productId, String productCode, String productName, BigDecimal unitPrice,
                        int quantity, BigDecimal subtotal, int availableStock) {
@@ -25,6 +25,6 @@ public record SaleResponse(Long id, SaleStatus status, Long customerId, String c
         return new SaleResponse(s.getId(), s.getStatus(), c == null ? null : c.getId(),
                 c == null ? null : c.getFullName(), c == null ? null : c.getCpf(), s.getTotal(),
                 s.getCreatedAt(), s.getConfirmedAt(), s.getCancelledAt(), s.getCancelReason(),
-                s.getItems().stream().map(Item::from).toList());
+                s.getItems().stream().map(Item::from).toList(), s.getChannel());
     }
 }

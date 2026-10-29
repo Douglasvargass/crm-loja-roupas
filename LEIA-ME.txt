@@ -13,4 +13,4 @@ Documentos mais usados:
 RESUMO PARA RODAR (precisa de Java 21+ e Node 22+)
   Terminal 1:  cd crm-loja-backend   e   mvnw.cmd spring-boot:test-run
   Terminal 2:  cd crm-loja-frontend  e   npx pnpm install   e   npx pnpm dev
-  Navegador:   http://localhost:5173   (gerente@loja.local / loja12345)
+  Navegador:   http://localhost:5173   (douglas.vargas / loja12345)

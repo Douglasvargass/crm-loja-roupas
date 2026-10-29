@@ -1,0 +1,21 @@
+name: acordar-demo
+# Spec crm/08. O Render grátis dorme depois de 15 minutos parado. Uma vez por dia este workflow abre o site: o
+# servidor acorda e o agente de vendas fecha o dia anterior sozinho. GitHub Actions agendado é grátis em
+# repositório público. Também dá para rodar à mão em Actions → acordar-demo → Run workflow.
+on:
+  schedule:
+    - cron: '10 6 * * *'   # 06:10 UTC = 03:10 em São Paulo, com a loja fechada e ninguém usando o sistema
+  workflow_dispatch:
+jobs:
+  wake:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Acorda o servidor e espera ele responder
+        run: |
+          for i in $(seq 1 20); do
+            if curl -sf -o /dev/null --max-time 60 https://crm-loja.onrender.com/login; then
+              echo "Servidor no ar (tentativa $i)."; exit 0
+            fi
+            sleep 15
+          done
+          echo "O servidor não respondeu em 5 minutos (o banco grátis do Render pode ter expirado)."; exit 1

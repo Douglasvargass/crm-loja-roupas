@@ -31,8 +31,8 @@ O roteiro segue os 5 passos sugeridos no enunciado e acrescenta o controle de ac
 | Excluir com vínculo | Bloquear (409) e oferecer inativar | Entidade com histórico nunca é apagada |
 | Venda | Nunca excluída; cancelada com motivo | Preserva o histórico e a auditoria |
 | Login | JWT em cookie httpOnly + refresh rotativo | Token nunca fica no navegador |
-| Permissões | Módulo `crm` com 3 papéis semeados; sem escopo por loja | Uma loja só; escopo por unidade não se aplica |
-| Front | Proxy same-origin do Vite em `/api` | Cookie `sameSite=strict` funciona sem CORS |
+| Permissões | Módulo `crm` com 5 papéis semeados (3 de balcão + 2 técnicos com acesso total); sem escopo por loja | Uma loja só; escopo por unidade não se aplica |
+| Front | Proxy same-origin do Vite em `/api` | Cookie `SameSite=Lax` + mesma origem: funciona sem CORS (Strict quebraria o deploy único no Render ao abrir um link) |
 
 ### Fluxo de trabalho (SDD + Git)
 

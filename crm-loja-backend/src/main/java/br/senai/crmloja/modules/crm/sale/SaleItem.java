@@ -56,6 +56,13 @@ public class SaleItem {
         setQuantity(quantity);
     }
 
+    // Espaço do cliente (spec crm/07): se o preço do produto mudou com a peça no carrinho, vale o novo (com aviso).
+    // Só para venda aberta; venda confirmada nunca muda de preço (RN12).
+    public void reprice(BigDecimal price) {
+        this.unitPrice = price;
+        setQuantity(quantity);
+    }
+
     public void setQuantity(int quantity) {
         this.quantity = quantity;
         this.subtotal = unitPrice.multiply(BigDecimal.valueOf(quantity)).setScale(2);

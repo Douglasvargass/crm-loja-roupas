@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+// HU07 e HU08. Cadastrar, alterar e excluir é do gerente; listar é de todos, porque vendedor e estoquista
+// precisam das categorias para filtrar produtos. A regra (nome único, vínculo com produto) fica no CategoryService.
 @RestController
 @RequestMapping("/crm/categories")
 @PreAuthorize("hasRole('MANAGER')")
@@ -43,6 +45,7 @@ public class CategoryController {
         return service.update(id, body);
     }
 
+    // 204 sem corpo quando apaga; com produtos vinculados o Service responde 409 com a frase para a tela.
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);

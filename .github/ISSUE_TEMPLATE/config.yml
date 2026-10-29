@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Como escrever um pedido (processo de requisitos)
+    url: https://github.com/Douglasvargass/crm-loja-roupas/blob/main/crm-loja-docs/docs/16-processo-de-requisitos.md
+    about: Leia antes de abrir uma História ou um Épico.

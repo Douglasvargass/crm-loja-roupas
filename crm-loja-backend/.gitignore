@@ -1,4 +1,6 @@
-target/
+# Só a pasta de compilação na raiz do back-end. Antes era "target/", que também escondia o código do
+# pacote modules/crm/target (Metas) e o teste dele: o Git e o ZIP ficavam sem esse módulo.
+/target/
 .env
 *.log
 .idea/

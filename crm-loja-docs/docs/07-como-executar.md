@@ -1,6 +1,6 @@
 ## 9. Como executar
 
-**Sem Docker (recomendado no laboratório):** na pasta do back-end, `./mvnw spring-boot:test-run` sobe um PostgreSQL 16 embutido (dados em `.data/`) já no perfil `dev`; na pasta do front, `npx pnpm install && npx pnpm dev`. Logins de demonstração: `gerente@loja.local`, `vendedor@loja.local`, `estoquista@loja.local`, senha `loja12345`. Detalhes no `README.md` do back-end.
+**Sem Docker (recomendado no laboratório):** na pasta do back-end, `./mvnw spring-boot:test-run` sobe um PostgreSQL 16 embutido (dados em `.data/`) já no perfil `dev`; na pasta do front, `npx pnpm install && npx pnpm dev`. Logins de demonstração: `douglas.vargas`, `guilherme.dower`, `vitor.nunes` (sem @), senha `loja12345`. Detalhes no `README.md` do back-end.
 
 **Com Docker:** com Java 21, Docker, Node 22 e pnpm instalados, o sistema sobe em 4 comandos. O Flyway aplica as migrations sozinho na subida do back-end, e o front abre em `http://localhost:5173`.
 
@@ -96,8 +96,8 @@ server: {
 | Seed | Quando roda | O que faz |
 | --- | --- | --- |
 | `CoreSeeder` | Sempre | Cria o super admin se não existir; imprime a senha gerada (24 caracteres) uma única vez |
-| `CrmModuleSeeder` | Sempre | Garante o módulo `crm` e os papéis `MANAGER` (admin), `SELLER`, `STOCK_KEEPER`; corrige nome ou flag divergente; nunca remove papel em uso |
-| `DevDataSeeder` | Só no perfil `dev`, se o catálogo estiver vazio | 5 categorias, 6 clientes, 12 produtos e 3 usuários de teste, criados **pelos Services** para gerar as movimentações `ENTRY` corretas |
+| `CrmModuleSeeder` | Sempre | Garante o módulo `crm` e os papéis `MANAGER` (admin), `SELLER`, `STOCK_KEEPER`, `DEVELOPER`, `MARKETING_DEV`, `PURCHASING`; corrige nome ou flag divergente; nunca remove papel em uso |
+| `DevDataSeeder` | Perfis `dev`/`demo`. A equipe (6 contas) é conferida em **todo** boot: login, nome, papel e senha de demonstração; o catálogo (5 categorias, 6 clientes, 12 produtos) só se estiver vazio | Catálogo criado **pelos Services**; produtos nascem com estoque zero (ver abaixo) |
 
 Os seeds rodam dentro de `try/catch`: falha de seed é logada e a aplicação continua no ar.
 
@@ -106,20 +106,27 @@ Dados do `DevDataSeeder`: os 6 clientes iniciais usam CPFs válidos de teste, n�
 nascem com **estoque zero**: quem abre o estoque é o `HistoricoVendasSeeder`, com a carga retrodatada.
 
 | `HistoricoVendasSeeder` | Só nos perfis `dev`/`demo`, se não houver venda anterior a hoje | 3 meses de vendas, mais 45 clientes da região de Tubarão, inseridos por SQL com data retroativa |
+| `LojaModuleSeeder` | Sempre | Garante o módulo `loja` (espaço do cliente) e o papel `CUSTOMER` |
+| `ClientesDemoSeeder` | Perfis `dev`/`demo`, em todo boot | Contas dos professores `vitor.freitas` e `matheus.carvalho` (senha `cliente12345`, troca obrigatória); senha já trocada nunca é mexida |
+| `MetasSeeder` | Perfis `dev`/`demo`, só a meta que faltar | Meta de cada vendedor nos últimos 3 meses e no mês atual, a partir do próprio histórico |
+| `PedidosCompraDemoSeeder` | Perfis `dev`/`demo`, só com a tabela vazia | 3 pedidos de compra do Vinicius Clemente com as peças que acabam primeiro (um atrasado) |
+| `AgenteVendasDemo` | Perfis `dev`/`demo`, ao subir e todo dia | Fecha cada dia que passou com vendas de demonstração (spec crm/08) |
 
 Esse seeder gera cerca de 2.000 vendas nos últimos 3 meses, respeitando o horário do shopping (10h–22h de
 segunda a sábado, 14h–21h domingo e feriado), a sazonalidade e o calendário de feriados. O modelo completo está
 em [14-dados-de-demonstracao.md](14-dados-de-demonstracao.md). Os alertas de estoque aparecem nas jaquetas, por
 causa da saída de estação simulada.
 
-### CI (.github/workflows/ci.yml do back-end)
+### CI (.github/workflows/backend.yml, na raiz do repositório)
 
 ```yaml
-name: ci
+name: backend
 on:
+  push:
+    branches: [main, develop]
+    paths: ['crm-loja-backend/**', '.github/workflows/backend.yml']
   pull_request:
-    paths-ignore: ['**/*.md', 'docs/**']
-concurrency: { group: ci-${{ github.ref }}, cancel-in-progress: true }
+    paths: ['crm-loja-backend/**', '.github/workflows/backend.yml']
 jobs:
   verify:
     runs-on: ubuntu-latest
@@ -127,7 +134,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with: { distribution: temurin, java-version: '21', cache: maven }
-      - run: ./mvnw -B verify   # Testcontainers sobe o Postgres 16 dentro do runner
+      - run: ./mvnw -B verify   # os testes sobem um Postgres 16 embutido (zonky), sem Docker
 ```
 
-O front tem o mesmo workflow com `pnpm install --frozen-lockfile && pnpm lint && pnpm typecheck && pnpm build`.
+O front tem o mesmo workflow (`frontend.yml`) com `pnpm install --frozen-lockfile && pnpm lint && pnpm typecheck && pnpm build`. Há ainda `docker.yml` (constrói e sobe a imagem como no Render) e `pages.yml` (publica a pasta `site/`).

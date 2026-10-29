@@ -4,6 +4,8 @@ import br.senai.crmloja.modules.crm.stock.StockMovement;
 import br.senai.crmloja.modules.crm.stock.StockMovementType;
 import java.time.OffsetDateTime;
 
+// Uma linha do histórico de estoque (HU20): data, peça, tipo, quantidade com sinal e o saldo logo depois.
+// saleId liga a baixa à venda que a causou.
 public record StockMovementResponse(Long id, OffsetDateTime createdAt, Long productId, String productCode,
                                     String productName, StockMovementType type, int quantity, int balanceAfter,
                                     Long saleId, String reason) {

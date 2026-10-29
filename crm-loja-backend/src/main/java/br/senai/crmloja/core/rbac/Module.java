@@ -7,6 +7,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+// Módulo do sistema (ex.: "crm" da equipe, "loja" dos clientes). Cada módulo tem os seus papéis; desligar o
+// módulo (is_active = false) tira o acesso de todo mundo a ele sem apagar nada.
 @Entity
 @Table(name = "module")
 public class Module {

@@ -12,4 +12,10 @@ export const qk = {
   sale: (id: number) => ['sales', id] as const,
   dashboard: ['dashboard'] as const,
   users: ['users'] as const,
+  myPanel: ['myPanel'] as const,
+  targets: ['targets'] as const,
+  demoAgent: ['demoAgent'] as const,
+  requests: ['requests'] as const,
+  planning: ['planning'] as const,
+  purchaseOrders: ['purchaseOrders'] as const,
 };
