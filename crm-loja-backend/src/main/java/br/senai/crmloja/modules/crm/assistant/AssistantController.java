@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @PreAuthorize("hasAnyRole('MANAGER','SELLER','STOCK_KEEPER')")
 public class AssistantController {
 
-    public record Status(boolean enabled, String model) {}
+    public record Status(boolean enabled, String provider, String model) {}
 
     public record AskRequest(String conversationId, @NotBlank(message = "Escreva sua pergunta.") String message) {}
 
@@ -26,7 +26,8 @@ public class AssistantController {
 
     @GetMapping("/status")
     public Status status() {
-        return new Status(service.enabled(), service.enabled() ? service.model() : null);
+        boolean on = service.enabled();
+        return new Status(on, on ? service.provider() : null, on ? service.model() : null);
     }
 
     @PostMapping("/chat")

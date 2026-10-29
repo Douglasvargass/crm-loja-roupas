@@ -14,8 +14,8 @@ Sistema web para uma loja de roupas organizar clientes, produtos, estoque e vend
 | Back-end | **Java 21** + Spring Boot 3.5 (API REST) |
 | Banco de dados | **PostgreSQL 16**, tabelas criadas por migrations Flyway |
 | Front-end | React 19 + TypeScript + Vite + Tailwind CSS |
-| Assistente de IA | Claude (Anthropic), via SDK oficial em Java |
-| Testes | JUnit 5 + MockMvc contra um PostgreSQL real (60 testes) |
+| Assistente de IA | Claude (Anthropic) ou provedores com plano grátis: Groq, Google Gemini, OpenRouter, Ollama |
+| Testes | JUnit 5 + MockMvc contra um PostgreSQL real (70 testes) |
 
 ## O que o sistema faz
 
@@ -53,7 +53,7 @@ Abra **http://localhost:5173** e entre com:
 | `vendedor@loja.local` | `loja12345` | Vendedor(a): clientes e vendas |
 | `estoquista@loja.local` | `loja12345` | Estoquista: produtos e estoque |
 
-O assistente de IA precisa de uma chave da Anthropic: veja [10-assistente-ia.md](crm-loja-docs/docs/10-assistente-ia.md).
+O assistente de IA precisa da chave de um provedor de IA; há opções grátis (Groq, Google Gemini): veja [10-assistente-ia.md](crm-loja-docs/docs/10-assistente-ia.md).
 
 ## Documentação
 

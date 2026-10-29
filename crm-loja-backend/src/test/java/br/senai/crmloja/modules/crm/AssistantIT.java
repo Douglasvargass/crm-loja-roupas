@@ -9,14 +9,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import br.senai.crmloja.modules.crm.assistant.AssistantTools;
 import br.senai.crmloja.support.IntegrationTest;
-import com.anthropic.models.messages.Tool;
 import jakarta.servlet.http.Cookie;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-// Sem ANTHROPIC_API_KEY: testa o modo desligado e as ferramentas que o Claude chamaria.
-// A conversa com o modelo de verdade é testada à mão (docs/10-assistente-ia.md).
+// Sem chave de IA: testa o modo desligado e as ferramentas que o modelo chamaria.
+// A conversa com um provedor de verdade é testada à mão (docs/10-assistente-ia.md); o formato
+// OpenAI-compatível tem teste próprio sem rede (OpenAiCompatibleProviderTest).
 class AssistantIT extends IntegrationTest {
 
     @Autowired AssistantTools tools;
@@ -25,7 +25,8 @@ class AssistantIT extends IntegrationTest {
     void semChaveOAssistenteFicaDesligadoComMensagemClara() throws Exception {
         Cookie seller = loginAs("SELLER");
         mvc.perform(get("/crm/assistant/status").cookie(seller))
-                .andExpect(jsonPath("$.enabled").value(false));
+                .andExpect(jsonPath("$.enabled").value(false))
+                .andExpect(jsonPath("$.provider").isEmpty());
         mvc.perform(post("/crm/assistant/chat").cookie(seller).contentType(APPLICATION_JSON)
                         .content("{\"message\":\"Quanto vendemos hoje?\"}"))
                 .andExpect(status().isConflict())
@@ -34,15 +35,15 @@ class AssistantIT extends IntegrationTest {
 
     @Test
     void ferramentasRespeitamOPapel() {
-        var sellerTools = tools.toolsFor("SELLER").stream().map(Tool::name).toList();
+        var sellerTools = tools.definitionsFor("SELLER").stream().map(AssistantTools.ToolDef::name).toList();
         assertThat(sellerTools).contains("buscar_clientes", "buscar_vendas", "buscar_produtos")
                 .doesNotContain("consultar_dashboard", "alertas_estoque", "movimentacoes_estoque");
 
-        var stockTools = tools.toolsFor("STOCK_KEEPER").stream().map(Tool::name).toList();
+        var stockTools = tools.definitionsFor("STOCK_KEEPER").stream().map(AssistantTools.ToolDef::name).toList();
         assertThat(stockTools).contains("alertas_estoque", "movimentacoes_estoque")
                 .doesNotContain("buscar_clientes", "consultar_dashboard");
 
-        assertThat(tools.toolsFor("MANAGER")).hasSize(10);
+        assertThat(tools.definitionsFor("MANAGER")).hasSize(10);
 
         // Mesmo se o modelo pedir uma ferramenta fora do papel, a execução recusa.
         var denied = tools.execute("consultar_dashboard", Map.of(), "SELLER");

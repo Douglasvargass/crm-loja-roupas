@@ -11,11 +11,8 @@ import br.senai.crmloja.modules.crm.sale.SaleService;
 import br.senai.crmloja.modules.crm.sale.SaleStatus;
 import br.senai.crmloja.modules.crm.stock.StockMovementType;
 import br.senai.crmloja.modules.crm.stock.StockService;
-import com.anthropic.core.JsonValue;
-import com.anthropic.models.messages.Tool;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,9 +22,12 @@ import org.springframework.stereotype.Component;
 
 // Ferramentas que o assistente pode chamar. Todas só LEEM dados, pelos mesmos Services da API,
 // e cada uma exige os mesmos papéis da rota equivalente: o assistente nunca mostra a alguém
-// algo que a tela não mostraria.
+// algo que a tela não mostraria. A definição é neutra (JSON Schema); cada LlmProvider converte.
 @Component
 public class AssistantTools {
+
+    // Definição neutra de uma ferramenta: nome, descrição e parâmetros em JSON Schema.
+    public record ToolDef(String name, String description, Map<String, Object> properties, List<String> required) {}
 
     private record Def(String name, String description, Set<String> roles, Map<String, Object> properties,
                        List<String> required, Function<Map<String, Object>, Object> run) {}
@@ -128,20 +128,12 @@ public class AssistantTools {
                         dateArg(a, "de"), dateArg(a, "ate"), intArg(a, "pagina", 0), 30)));
     }
 
-    // Ferramentas que o papel pode usar, já no formato da API do Claude.
-    public List<Tool> toolsFor(String role) {
-        List<Tool> tools = new ArrayList<>();
-        for (Def d : defs.values()) {
-            if (!d.roles().contains(role)) continue;
-            var props = Tool.InputSchema.Properties.builder();
-            d.properties().forEach((k, v) -> props.putAdditionalProperty(k, JsonValue.from(v)));
-            tools.add(Tool.builder()
-                    .name(d.name())
-                    .description(d.description())
-                    .inputSchema(Tool.InputSchema.builder().properties(props.build()).required(d.required()).build())
-                    .build());
-        }
-        return tools;
+    // Ferramentas que o papel pode usar.
+    public List<ToolDef> definitionsFor(String role) {
+        return defs.values().stream()
+                .filter(d -> d.roles().contains(role))
+                .map(d -> new ToolDef(d.name(), d.description(), d.properties(), d.required()))
+                .toList();
     }
 
     public record Result(String content, boolean error) {}
