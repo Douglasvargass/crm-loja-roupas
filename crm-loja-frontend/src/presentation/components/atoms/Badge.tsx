@@ -2,6 +2,8 @@ import type { ReactNode } from 'react';
 import type { Tone } from '@/data/adapters';
 import { cn } from '@/lib/cn';
 
+// Etiqueta de situação (ex.: Confirmada, Sem estoque). A cor vem do "tom", nunca de uma cor fixa: assim a
+// paleta da marca (tokens.css) muda num lugar só. O texto sempre acompanha a cor, para quem não distingue cores.
 const tones: Record<Tone, string> = {
   neutral: 'bg-surface-2 text-muted',
   success: 'bg-success-soft text-success',

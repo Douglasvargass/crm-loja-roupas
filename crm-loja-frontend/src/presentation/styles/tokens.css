@@ -1,16 +1,19 @@
 /* Paleta da loja: Creme #F6F1E9, Areia #D8C7B0, Caramelo #6B4F3A, Café #29231F.
-   Num projeto novo só estes valores mudam; os componentes usam as classes do @theme. */
+   Num projeto novo só estes valores mudam; os componentes usam as classes do @theme.
+   29/10/2026: a pedido do Douglas, o site fica sempre na paleta clara da marca (antes ele trocava sozinho para o
+   escuro quando o computador estava no modo escuro, e a tela ficava toda café). O fundo puxa para a Areia, os
+   cartões ficam quase brancos e a moldura (menu e barra de cima) fica Creme. */
 :root {
-  --bg: #f6f1e9;            /* Creme */
-  --surface: #fffcf7;
-  --surface-2: #efe6d9;
+  --bg: #ece2d4;            /* Areia clareada: fundo da página */
+  --surface: #fffcf7;       /* cartões, quase branco */
+  --surface-2: #f3ece1;
   --border: #d8c7b0;        /* Areia */
   --text: #29231f;          /* Café */
-  --text-muted: #6e6156;
+  --text-muted: #6e6156;    /* Café suavizado */
   --primary: #6b4f3a;       /* Caramelo */
   --primary-hover: #573f2e;
-  --primary-soft: #ebdfcf;
-  --on-primary: #f6f1e9;
+  --primary-soft: #e6d7c3;
+  --on-primary: #f6f1e9;    /* Creme */
   --success: #3f6b35;
   --success-soft: #e4ecd9;
   --warning: #87500f;
@@ -19,13 +22,15 @@
   --error-soft: #f5dcd6;
   --info: #4a5f73;
   --info-soft: #e1e6ea;
-  --chart: #6b4f3a;
-  --chart-2: #d8c7b0;
+  --chart: #6b4f3a;         /* Caramelo */
+  --chart-2: #d8c7b0;       /* Areia */
+  --logo-plate: transparent;   /* a logo é marrom: no escuro ela precisa de uma placa creme */
   color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
+/* Tema escuro guardado, mas desligado: só vale se alguém colocar data-theme="dark" no <html>. Não segue mais o
+   modo escuro do computador. */
+:root[data-theme="dark"] {
     --bg: #1f1a17;
     --surface: #29231f;       /* Café */
     --surface-2: #342d28;
@@ -46,6 +51,32 @@
     --info-soft: #232b33;
     --chart: #d8c7b0;
     --chart-2: #6b4f3a;
+    --logo-plate: #f6f1e9;
     color-scheme: dark;
-  }
+}
+
+/* Menu lateral e barra superior sempre claros, em bege (pedido do Douglas em 29/10/2026), inclusive no tema
+   escuro: a moldura fica com a cor da marca e só o conteúdo segue o tema. A classe redefine as cores dentro
+   dela, então ícones, sino, "Ver como" e a logo (sem placa) acompanham sozinhos. */
+.chrome-light {
+  --surface: #f8f2e8;       /* bege claro, um tom acima do Creme */
+  --surface-2: #efe6d9;
+  --border: #d8c7b0;
+  --text: #29231f;
+  --text-muted: #6e6156;
+  --primary: #6b4f3a;
+  --primary-hover: #573f2e;
+  --primary-soft: #e6d7c3;
+  --on-primary: #f6f1e9;
+  --success: #3f6b35;
+  --success-soft: #e4ecd9;
+  --warning: #87500f;
+  --warning-soft: #f6e6cc;
+  --error: #a63a2b;
+  --error-soft: #f5dcd6;
+  --info: #4a5f73;
+  --info-soft: #e1e6ea;
+  --logo-plate: transparent;
+  color: var(--text);
+  color-scheme: light;
 }

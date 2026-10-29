@@ -3,8 +3,11 @@ import { Navigate, useNavigate } from 'react-router';
 import { useSession } from '@/app/context/SessionContext';
 import { homeOf } from '@/domain/permissions';
 import { Button } from '../components/atoms/Button';
+import { Logo } from '../components/atoms/Logo';
 import { Input } from '../components/atoms/Field';
 
+// HU33: entrar. Erro sempre com a mesma frase ("Login ou senha incorretos"), para não revelar se o login existe.
+// Quem precisa trocar a senha vai primeiro para /trocar-senha; os outros, para a tela inicial do papel.
 export function LoginPage() {
   const { state, login } = useSession();
   const navigate = useNavigate();
@@ -38,14 +41,18 @@ export function LoginPage() {
     <div className="flex min-h-full items-center justify-center px-4 py-10">
       <div className="w-full max-w-sm">
         <div className="mb-6 flex flex-col items-center gap-2 text-center">
-          <img src="/favicon.svg" alt="" className="size-12" />
-          <h1 className="text-xl font-semibold">CRM Loja de Roupas</h1>
+          <h1 className="sr-only">Orden</h1>
+          <Logo className="h-36" />
           <p className="text-sm text-muted">Entre com seu login para continuar</p>
         </div>
         <form onSubmit={submit} className="flex flex-col gap-4 rounded-xl border border-border bg-surface p-6 shadow-sm" noValidate>
           <Input
-            label="Login (e-mail)"
-            type="email"
+            label="Login"
+            type="text"
+            placeholder="nome.sobrenome"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
             autoComplete="username"
             autoFocus
             value={form.login}

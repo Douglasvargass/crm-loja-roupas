@@ -33,6 +33,18 @@ public class AuthCookies {
     public void clear(HttpServletResponse res) {
         res.addHeader(HttpHeaders.SET_COOKIE, cookie(ACCESS, "", "/", Duration.ZERO).toString());
         res.addHeader(HttpHeaders.SET_COOKIE, cookie(REFRESH, "", "/auth", Duration.ZERO).toString());
+        clearViewAs(res);   // sair do sistema também sai do "Ver como"
+    }
+
+    // "Ver como" (spec crm/10): cookie separado do login, para sair dele não derrubar a sessão de quem olha.
+    public static final String VIEW_AS = "view_as";
+
+    public void writeViewAs(HttpServletResponse res, String token, int ttlSeconds) {
+        res.addHeader(HttpHeaders.SET_COOKIE, cookie(VIEW_AS, token, "/", Duration.ofSeconds(ttlSeconds)).toString());
+    }
+
+    public void clearViewAs(HttpServletResponse res) {
+        res.addHeader(HttpHeaders.SET_COOKIE, cookie(VIEW_AS, "", "/", Duration.ZERO).toString());
     }
 
     public static Optional<String> read(HttpServletRequest req, String name) {

@@ -58,6 +58,10 @@ public class Sale {
     @Column(name = "created_by", updatable = false)
     private Long createdBy;
 
+    // Spec crm/07: STORE = balcão; ONLINE = pedido do espaço do cliente. Definido ao abrir e nunca muda.
+    @Column(nullable = false, updatable = false)
+    private String channel = "STORE";
+
     @Column(name = "cancelled_by")
     private Long cancelledBy;
 
@@ -127,6 +131,8 @@ public class Sale {
     public OffsetDateTime getCancelledAt() { return cancelledAt; }
     public String getCancelReason() { return cancelReason; }
     public Long getCreatedBy() { return createdBy; }
+    public String getChannel() { return channel; }
+    public void markOnline() { this.channel = "ONLINE"; }
     public Long getCancelledBy() { return cancelledBy; }
     public OffsetDateTime getCreatedAt() { return createdAt; }
     public List<SaleItem> getItems() { return items; }

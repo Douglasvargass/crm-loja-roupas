@@ -34,7 +34,7 @@ class OpenAiCompatibleProvider implements LlmProvider {
         if (props.apiKey() != null) b = b.defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + props.apiKey());
         // O OpenRouter usa estes cabeçalhos para identificar o app no painel (opcionais nos demais).
         b = b.defaultHeader("HTTP-Referer", "https://github.com/Douglasvargass/crm-loja-roupas")
-                .defaultHeader("X-Title", "CRM Loja de Roupas");
+                .defaultHeader("X-Title", "Orden");
         this.http = b.build();
     }
 

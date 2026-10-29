@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router';
-import { customerLabel, saleStatusLabel, saleStatusTone } from '@/data/adapters';
+import { useNavigate, useSearchParams } from 'react-router';
+import { channelLabel, customerLabel, saleStatusLabel, saleStatusTone } from '@/data/adapters';
 import { useSales } from '@/data/hooks';
 import type { CustomerDto, SaleStatus, SaleSummaryDto } from '@/data/dto';
 import { formatDateTime, formatMoney } from '@/lib/format';
@@ -14,14 +14,20 @@ import { Pagination } from '../../components/molecules/Pagination';
 import { QueryState } from '../../components/molecules/QueryState';
 import { DataTable } from '../../components/organisms/DataTable';
 import { Card, Filters, PageHeader } from '../../components/templates/Page';
+import { ExportButton } from '../../components/molecules/ExportButton';
 
 export function SalesPage() {
   const navigate = useNavigate();
   const [id, setId] = useState('');
   const [customer, setCustomer] = useState<CustomerDto | null>(null);
-  const [from, setFrom] = useState('');
-  const [to, setTo] = useState('');
-  const [status, setStatus] = useState<SaleStatus | ''>('');
+  // Os cartões do dashboard abrem esta lista já filtrada (?status=&from=&to=).
+  const [params] = useSearchParams();
+  const [from, setFrom] = useState(() => params.get('from') ?? '');
+  const [to, setTo] = useState(() => params.get('to') ?? '');
+  const [status, setStatus] = useState<SaleStatus | ''>(() => {
+    const s = params.get('status');
+    return s === 'DRAFT' || s === 'CONFIRMED' || s === 'CANCELLED' ? s : '';
+  });
   const [page, setPage] = useState(0);
   const debouncedId = useDebounced(id);
 
@@ -38,9 +44,12 @@ export function SalesPage() {
   return (
     <>
       <PageHeader
-        title="Vendas"
+        title="Vendas" help="Aberta ainda pode mudar; confirmada baixou o estoque; cancelada devolveu as peças. Filtre por número, cliente, data ou situação."
         subtitle="Consulte por número, cliente, data ou status."
-        actions={<Button onClick={() => navigate('/vendas/nova')}><Icon name="plus" className="size-4" />Nova venda</Button>}
+        actions={<>
+          <ExportButton path="/crm/export/sales.csv" query={{ customerId: customer?.id, from: from || undefined, to: to || undefined, status: status || undefined }} />
+          <Button onClick={() => navigate('/vendas/nova')}><Icon name="plus" className="size-4" />Nova venda</Button>
+        </>}
       />
       <Card>
         <Filters>
@@ -78,6 +87,7 @@ export function SalesPage() {
                   { header: 'Cliente', cell: (s) => <span className={s.customerName ? '' : 'text-muted'}>{customerLabel(s.customerName)}</span> },
                   { header: 'Itens', cell: (s) => s.itemsQuantity, align: 'right' },
                   { header: 'Total', cell: (s) => <span className="tabular">{formatMoney(s.total)}</span>, align: 'right' },
+                  { header: 'Canal', cell: (s) => <Badge tone={s.channel === 'ONLINE' ? 'info' : 'neutral'}>{channelLabel[s.channel]}</Badge> },
                   { header: 'Status', cell: (s) => <Badge tone={saleStatusTone[s.status]}>{saleStatusLabel[s.status]}</Badge> },
                 ]}
               />

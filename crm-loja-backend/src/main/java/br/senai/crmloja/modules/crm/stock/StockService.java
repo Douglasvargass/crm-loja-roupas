@@ -9,6 +9,7 @@ import br.senai.crmloja.core.http.PageResponse;
 import br.senai.crmloja.modules.crm.product.Product;
 import br.senai.crmloja.modules.crm.product.ProductRepository;
 import br.senai.crmloja.modules.crm.product.dto.ProductResponse;
+import br.senai.crmloja.modules.crm.request.StockRequestService;
 import br.senai.crmloja.modules.crm.sale.Sale;
 import br.senai.crmloja.modules.crm.stock.dto.StockAlertsResponse;
 import br.senai.crmloja.modules.crm.stock.dto.StockMovementResponse;
@@ -32,13 +33,15 @@ public class StockService {
     private final ProductRepository products;
     private final AuditService audit;
     private final AppProperties props;
+    private final StockRequestService requests;
 
     public StockService(StockMovementRepository movements, ProductRepository products, AuditService audit,
-                        AppProperties props) {
+                        AppProperties props, StockRequestService requests) {
         this.movements = movements;
         this.products = products;
         this.audit = audit;
         this.props = props;
+        this.requests = requests;
     }
 
     // Único lugar que muda product.stock_qty (RN08). O chamador já travou o produto e está numa
@@ -59,7 +62,11 @@ public class StockService {
     public StockMovementResponse entry(Long productId, int quantity, String reason, Long actorId) {
         if (quantity <= 0) throw new InvalidInputException("invalid_quantity", "A quantidade deve ser maior que zero.");
         Product p = lockProduct(productId);
-        return StockMovementResponse.from(move(p, quantity, StockMovementType.ENTRY, null, blankToNull(reason), actorId));
+        StockMovement m = move(p, quantity, StockMovementType.ENTRY, null, blankToNull(reason), actorId);
+        // Spec crm/09: a peça chegou, então os chamados abertos dela (que a entrada cobre) são resolvidos e quem
+        // abriu recebe o aviso. Mesma transação: se a entrada falhar, nada é resolvido.
+        requests.onStockEntry(productId, quantity, actorId);
+        return StockMovementResponse.from(m);
     }
 
     @Transactional

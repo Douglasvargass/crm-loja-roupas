@@ -65,12 +65,16 @@ function ProductDetail({ d }: { d: ProductDetailDto }) {
   return (
     <>
       <PageHeader
-        title={p.name}
+        title={p.name} help="Ficha do produto, últimas movimentações de estoque e quanto já vendeu. O estoque só muda pela tela Estoque ou por vendas."
         subtitle={`${p.code} · ${p.categoryName}`}
         actions={
           <>
             <Button variant="secondary" onClick={() => navigate('/produtos')}>Voltar</Button>
             {role && can.stock(role) && <Button variant="secondary" onClick={() => navigate(`/estoque?entrada=${p.id}`)}>Movimentar estoque</Button>}
+            {/* Spec crm/09: peça zerada → o vendedor registra que o cliente queria. */}
+            {role && can.openRequest(role) && p.stockQty === 0 && (
+              <Button variant="secondary" onClick={() => navigate(`/chamados?novo=${p.id}`)}>Cliente quer esta peça</Button>
+            )}
             {role && can.manageProducts(role) && <Button variant="secondary" onClick={() => setEditing(true)}>Editar</Button>}
             {role && can.deleteProduct(role) && (p.active
               ? <Button variant="secondary" onClick={() => setConfirmDelete(true)}>Excluir</Button>

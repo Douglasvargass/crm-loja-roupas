@@ -228,6 +228,20 @@ Os CPFs são **gerados com dígito verificador válido** — não são de pessoa
 RN01, porque o cadastro é feito pelo `CustomerService` e não por SQL direto. **58% das vendas** têm cliente
 identificado; o resto é consumidor de balcão, como numa loja de rua.
 
+**Quem vendeu:** cada venda é creditada a um dos vendedores da equipe (hoje Vitor Nunes e Vinicius Muniz; Vinicius
+Clemente passou a Operações e Compras em 29/10/2026) com pesos 5 : 4 : 3, num sorteio **separado** do sorteio principal, para a sequência de vendas
+continuar idêntica à da seção 14.11. É o que alimenta o filtro **Vendedor(a)** do dashboard. Num banco criado
+antes de 29/10/2026 (tudo no nome de um vendedor só), o seeder redistribui as vendas uma vez, na subida.
+
+**Metas:** o `MetasSeeder` (depois do histórico) cria a meta de cada vendedor nos últimos 3 meses e no mês atual, a
+partir do próprio histórico e arredondada para R$ 500: mês passado = vendido × fator; mês atual = vendido do mês
+anterior × fator. Fatores 0,92 (Vitor, bate a meta) e 1,12 (Vinicius Muniz,
+fica abaixo), para a demonstração ter as duas situações. Meta já gravada nunca é alterada pelo seed.
+
+**Pedidos de compra:** o `PedidosCompraDemoSeeder` (depois das metas, só com a tabela vazia) cria 3 pedidos do
+Vinicius Clemente com as peças que acabam primeiro: "Malharia Vale do Sul" chega em 3 dias, "Confecções Litoral SC"
+em 10, e "Jeans Tubarão" está 2 dias atrasado. Assim a Reposição já abre com pedidos a caminho e um atrasado.
+
 ---
 
 ### 14.10 Por que SQL direto e não os Services
@@ -348,6 +362,18 @@ O seeder é **idempotente**: se já existir venda anterior a hoje, não faz nada
 quebrar, loga o erro e a aplicação sobe assim mesmo, igual aos outros três seeders.
 
 ---
+
+### 14.12b Depois da primeira subida: o agente de vendas (spec crm/08)
+
+O histórico é criado uma vez. Dali em diante, o **agente de vendas** fecha cada dia que passou com o mesmo modelo
+desta página (horário, dia da semana, mês, feriados, datas comerciais, quinzena, peso dos vendedores, reposição de
+terça com o giro real da semana). Se houver IA configurada (a mesma da Talita, grátis no Groq ou no Gemini), ela
+escolhe só o "clima" do dia: fator de movimento entre 0,60 e 1,40, uma categoria em destaque e uma frase com o
+motivo ("sexta de pagamento, shopping cheio"). Sem IA, o dia sai no padrão.
+
+O agente nunca simula o dia de hoje e pula o dia se o sistema foi usado depois dele, para não contradizer o estoque
+real. Tudo fica no **Diário do agente**, no Dashboard do gerente. Um workflow grátis do GitHub
+(`acordar-demo.yml`) acorda o Render às 03:10 para o agente rodar com a loja fechada.
 
 ### 14.13 Fontes
 

@@ -17,10 +17,17 @@ public class DashboardController {
 
     public DashboardController(DashboardService service) { this.service = service; }
 
+    // categoryId, productId e day: filtros dos cliques nos gráficos; sellerId: filtro da lista de vendedores
+    // (todos opcionais, combináveis).
     @GetMapping
     public DashboardResponse get(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
-        return service.build(from, to);
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) Long productId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate day,
+            @RequestParam(required = false) Long sellerId,
+            @RequestParam(required = false) String channel) {
+        return service.build(from, to, categoryId, productId, day, sellerId, channel);
     }
 }

@@ -1,5 +1,6 @@
 import { Link } from 'react-router';
 
+// Endereço que não existe dentro do sistema: oferece voltar ao início em vez de uma tela em branco.
 export function NotFound() {
   return (
     <div className="p-8 text-center">

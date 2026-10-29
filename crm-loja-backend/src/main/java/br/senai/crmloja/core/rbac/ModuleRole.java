@@ -7,6 +7,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+// Papel dentro de um módulo (ex.: MANAGER, SELLER). `admin` marca o papel que administra o módulo: a loja nunca
+// pode ficar sem nenhum administrador ativo (conferido no UserAdminService).
 @Entity
 @Table(name = "module_role")
 public class ModuleRole {

@@ -1,0 +1,49 @@
+name: Épico
+description: Agrupa as Histórias de um módulo, com as jornadas ponta a ponta e o roteiro de validação da demo
+title: "[Épico] "
+labels: ["tipo:epico"]
+body:
+  - type: textarea
+    id: contexto
+    attributes:
+      label: Contextualização
+      description: A dor geral, com números quando existirem.
+    validations:
+      required: true
+  - type: textarea
+    id: objetivo
+    attributes:
+      label: Objetivo do épico
+      description: O resultado de negócio esperado, em 1 ou 2 linhas.
+    validations:
+      required: true
+  - type: textarea
+    id: blocos
+    attributes:
+      label: Blocos de entrega
+      value: |
+        | Bloco | O que entrega | Histórias | Tamanho |
+        | --- | --- | --- | --- |
+        | 1 — | | # | |
+  - type: textarea
+    id: jornadas
+    attributes:
+      label: Critérios de aceite do épico (jornadas ponta a ponta)
+      placeholder: |
+        - DADO que ..., QUANDO ..., ENTÃO ...
+        - DADO [papel sem acesso], QUANDO tenta ..., ENTÃO não vê / não consegue.
+    validations:
+      required: true
+  - type: textarea
+    id: roteiro
+    attributes:
+      label: Roteiro de validação (demo)
+      value: |
+        | ID | Caso | Passos | Esperado | Status |
+        | --- | --- | --- | --- | --- |
+        | J1 | | | | não testado |
+  - type: input
+    id: spec
+    attributes:
+      label: Spec
+      placeholder: crm-loja-docs/specs/crm/NN-nome/requirements.md

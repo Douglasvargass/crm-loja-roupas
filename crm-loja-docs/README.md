@@ -7,7 +7,7 @@ Documentação do CRM da loja de roupas.
 | [docs/00-visao.md](docs/00-visao.md) | Visão geral, módulos e fora de escopo |
 | [docs/01-arquitetura.md](docs/01-arquitetura.md) | Stack, camadas, pastas |
 | [docs/02-modelo-de-dados.md](docs/02-modelo-de-dados.md) | Tabelas e colunas (ERD em [specs/erd.md](specs/erd.md)) |
-| [docs/03-historias-de-usuario.md](docs/03-historias-de-usuario.md) | 35 histórias com critérios de aceitação (HU36 em 09) |
+| [docs/03-historias-de-usuario.md](docs/03-historias-de-usuario.md) | 36 histórias com critérios de aceitação (HU36 em 09) |
 | [docs/04-regras-de-negocio.md](docs/04-regras-de-negocio.md) | Regras RN01–RN25 e ciclo de vida da venda |
 | [docs/05-telas-e-navegacao.md](docs/05-telas-e-navegacao.md) | Telas, rotas e padrões do front |
 | [docs/06-plano-de-testes.md](docs/06-plano-de-testes.md) | Casos de teste CT01–CT38 |
@@ -18,5 +18,9 @@ Documentação do CRM da loja de roupas.
 | [docs/11-guia-de-comandos.md](docs/11-guia-de-comandos.md) | **Todos os comandos** e solução de problemas |
 | [docs/12-roteiro-de-testes.md](docs/12-roteiro-de-testes.md) | Checklist de testes manuais |
 | [docs/13-publicar-online.md](docs/13-publicar-online.md) | GitHub Pages, Render, custos e atualizações |
+| [docs/14-dados-de-demonstracao.md](docs/14-dados-de-demonstracao.md) | Como os 3 meses de vendas de demonstração são gerados |
+| [docs/15-conferencia-enunciado.md](docs/15-conferencia-enunciado.md) | Cada critério do enunciado do SENAI → onde está atendido |
+| [docs/17-nossa-historia.md](docs/17-nossa-historia.md) | A história da Orden (a Talita conta a versão curta) |
+| [docs/16-processo-de-requisitos.md](docs/16-processo-de-requisitos.md) | Como escrever um pedido: história, critérios, regras, etiquetas e revisão |
 | [docs/decisions/](docs/decisions/) | ADRs (registros de decisão) |
 | [specs/](specs/) | Contrato da API, ERD e specs por entrega (requirements, design, tasks) |

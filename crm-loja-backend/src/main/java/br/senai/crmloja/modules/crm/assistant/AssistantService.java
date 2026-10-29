@@ -71,6 +71,17 @@ public class AssistantService {
         String role = user.superAdmin() && user.role() == null ? "MANAGER" : user.role();
         if (role == null) throw new BusinessRuleException("no_role", "Sua conta não tem papel no CRM.");
 
+        // "oi" e "quem é você?": a Talita se apresenta sem chamar a IA (rápido e não gasta a cota do provedor).
+        if (TalitaPersona.isIntroductionRequest(question)) {
+            String id = conversationId != null ? conversationId : UUID.randomUUID().toString();
+            return new Reply(id, TalitaPersona.introduction(user.fullName(), role), List.of());
+        }
+        // A história da Orden também sai pronta: é sempre a mesma e não gasta a cota do provedor.
+        if (TalitaPersona.isStoryRequest(question)) {
+            String id = conversationId != null ? conversationId : UUID.randomUUID().toString();
+            return new Reply(id, TalitaPersona.story(user.fullName()), List.of());
+        }
+
         evictIdle();
         Conversation conv = conversationId == null ? null : conversations.get(conversationId);
         // Conversa de outra pessoa ou com papel diferente: começa outra, nunca reaproveita.
@@ -88,7 +99,7 @@ public class AssistantService {
             String finalRole = role;
             LlmProvider.ToolRunner runner = (name, args) -> {
                 if (!used.contains(name)) used.add(name);
-                var result = tools.execute(name, args, finalRole);
+                var result = tools.execute(name, args, finalRole, user.id());
                 log.info("assistente: ferramenta {} {}", name, result.error() ? "com erro" : "ok");
                 return result;
             };
@@ -107,10 +118,34 @@ public class AssistantService {
         }
     }
 
+    /**
+     * Uma pergunta avulsa, sem ferramentas e sem conversa guardada, usando o mesmo provedor configurado para a
+     * Talita (inclusive os grátis: Groq, Gemini). Serve ao agente de demonstração (spec crm/08). Nunca lança: sem
+     * provedor, sem cota ou com erro, devolve vazio e quem chamou segue o caminho sem IA.
+     */
+    public java.util.Optional<String> completeOnce(String system, String prompt) {
+        if (provider == null) return java.util.Optional.empty();
+        try {
+            String answer = provider.ask(new ArrayList<>(), system, prompt, List.of(),
+                    (name, args) -> new AssistantTools.Result("Nenhuma ferramenta disponível.", true));
+            return java.util.Optional.ofNullable(answer);
+        } catch (RuntimeException e) {
+            log.warn("Pergunta avulsa ao provedor {} falhou: {}", props.provider(), e.getMessage());
+            return java.util.Optional.empty();
+        }
+    }
+
     private String systemPrompt(String role, CurrentUser user) {
+        // Cliente da loja: outras instruções (só a vitrine e os pedidos dele), sem nada da operação interna.
+        if ("CUSTOMER".equals(role)) {
+            return AssistantPrompt.CUSTOMER
+                    + "\n\n<contexto>\nHoje: " + LocalDate.now(app.zone()) + ".\n"
+                    + "Cliente: " + user.fullName() + " (trate por " + TalitaPersona.firstName(user.fullName()) + ").\n</contexto>";
+        }
         return AssistantPrompt.SYSTEM
                 + "\n\n<contexto>\nHoje: " + LocalDate.now(app.zone()) + " (fuso " + app.timeZone() + ").\n"
-                + "Quem pergunta: " + user.fullName() + ", papel " + role + ".\n</contexto>";
+                + "Quem pergunta: " + user.fullName() + " (trate por " + TalitaPersona.firstName(user.fullName())
+                + "), papel " + role + ".\n</contexto>";
     }
 
     private void evictIdle() {

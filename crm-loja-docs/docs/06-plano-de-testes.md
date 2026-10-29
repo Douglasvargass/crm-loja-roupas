@@ -1,16 +1,20 @@
 ## 8. Plano de testes
 
-São 38 casos. Os marcados **(auto)** são testes de integração: sobem um Postgres 16 real com Testcontainers, rodam **todas** as migrations Flyway do zero, fazem login de verdade e chamam a API com MockMvc. Assim a suíte testa também as migrations, os CHECKs e os triggers. Os demais são roteiro manual antes da apresentação.
+São 38 casos. Os marcados **(auto)** são testes de integração: sobem um Postgres 16 real **embutido** (biblioteca zonky, sem Docker), rodam **todas** as migrations Flyway do zero, fazem login de verdade e chamam a API com MockMvc. Assim a suíte testa também as migrations, os CHECKs e os triggers. Os demais são roteiro manual antes da apresentação.
 
 ```java
 @SpringBootTest
 @AutoConfigureMockMvc
-@Testcontainers
 public abstract class IntegrationTest {
 
-    // Banco descartável e real: o mesmo Postgres 16 do docker-compose e do CI, nunca o de desenvolvimento.
-    @Container @ServiceConnection
-    static PostgreSQLContainer<?> db = new PostgreSQLContainer<>("postgres:16");
+    // Banco descartável e real: um Postgres 16 embutido, nunca o de desenvolvimento. Sem Docker, porque
+    // o Docker do laboratório nem sempre está ligado.
+    private static final EmbeddedPostgres PG = EmbeddedPostgres.builder().start();
+
+    @DynamicPropertySource
+    static void props(DynamicPropertyRegistry r) {
+        r.add("spring.datasource.url", () -> PG.getJdbcUrl("postgres", "postgres"));
+    }
 
     @Autowired protected MockMvc mvc;
     @Autowired protected TestUsers users;   // cria usuários por papel com senha conhecida
@@ -67,3 +71,49 @@ public abstract class IntegrationTest {
 | CT38 | Banco (auto) | `UPDATE` ou `DELETE` direto em `stock_movement` | Banco recusa (trigger) |  |
 
 Cobrir também a virada de período no dashboard: venda confirmada às 23:59 do último dia entra; às 00:00 do dia seguinte, não.
+
+### Casos das funções que vieram depois do MVP (29/10/2026)
+
+| ID | Tipo | Cenário | Resultado esperado | Onde |
+| --- | --- | --- | --- | --- |
+| CT39 | Válido (auto) | Gerente define a meta do mês de um vendedor | Salva; mudança na auditoria (de → para) | TargetIT |
+| CT40 | Inválido (auto) | Meta em mês fechado, valor 0 ou para quem não é vendedor ativo | 400 / 409, nada salvo | TargetIT |
+| CT41 | Acesso (auto) | Vendedor abre Meu painel | Vê só os próprios números | TargetIT |
+| CT42 | Válido (auto) | Ritmo e projeção por dia útil (segunda a sábado) | Conta igual à da spec 06 | PaceTest (7) |
+| CT43 | Válido (auto) | Cliente monta carrinho e paga com Pix | Venda com canal Online, estoque baixa | StoreIT |
+| CT44 | Exceção (auto) | Cartão final 0002, preço que mudou no carrinho, peça que acabou | 409 `payment_declined` / `price_changed` / `insufficient_stock`, nada baixado | StoreIT |
+| CT45 | Acesso (auto) | Cliente abre pedido de outro cliente ou rota da equipe | 404 / 403 | StoreIT |
+| CT46 | Válido (auto) | Vendedor abre chamado de peça zerada; entrada da peça resolve | Chamado resolvido e aviso no sino | StockRequestIT |
+| CT47 | Exceção (auto) | Chamado de peça com estoque; fechar chamado já fechado | 409 `product_in_stock` / `request_closed` | StockRequestIT |
+| CT48 | Acesso (auto) | Gerente usa "Ver como" e tenta alterar algo | Vê como a pessoa; alteração 403 `read_only_view_as` | ViewAsIT |
+| CT49 | Válido (auto) | Reposição: vende 15 de 20 em 30 dias | Acaba em 10 dias, pedir 12; com pedido a caminho, pedir 0 | ReplenishmentIT, CoverageTest (7) |
+| CT50 | Inválido (auto) | Pedido de compra com data passada, peça repetida ou sem peças | 400, nada salvo | ReplenishmentIT |
+| CT51 | Exceção (auto) | Receber pedido duas vezes; receber dá entrada e fecha chamado | Segunda 409 `order_closed`; estoque sobe uma vez só | ReplenishmentIT |
+| CT52 | Acesso (auto) | Estoquista tenta registrar pedido; vendedor abre a Reposição | 403 | ReplenishmentIT |
+| CT53 | Válido (auto) | Talita: cada papel recebe só as ferramentas que a tela dele permite | Gerente 15, equipe técnica 16, vendedor sem estoque/faturamento | AssistantIT |
+| CT54 | Válido (auto) | Talita conta a história e recusa assunto fora da loja | Texto pronto, sem inventar | TalitaPersonaTest |
+
+### Onde estão os testes automáticos
+
+Rodada completa em 29/10/2026 com `./mvnw verify`: **106 testes unitários e 97 de integração, todos passando** (rodada final, depois da revisão de 29/10).
+
+| Classe | Testes | O que cobre |
+| --- | --- | --- |
+| `CustomerIT` | 9 | Clientes: cadastro, busca, CPF, exclusão com vínculo |
+| `CatalogStockIT` | 12 | Categorias, produtos e estoque (entrada, ajuste, histórico, alertas) |
+| `SaleIT` | 12 | Vendas: itens, total, confirmação, estoque, cancelamento, concorrência |
+| `DashboardIT` | 10 | Indicadores, período, filtros de vendedor e canal |
+| `AuthIT` | 8 | Login, troca de senha, sessão, papéis |
+| `ViewAsIT` | 5 | "Ver como" só leitura |
+| `TargetIT` | 8 | Metas e Meu painel |
+| `StoreIT` | 12 | Espaço do cliente, Prévia da loja, Talita do cliente, pedido de peça, cliente com login e reset de senha |
+| `StockRequestIT` | 7 | Chamados de peça em falta |
+| `ReplenishmentIT` | 8 | Reposição, pedidos de compra, etapas e conferência (devolver a nota, bonificação) |
+| `DemoAgentIT` | 2 | Agente de vendas da demonstração |
+| `AssistantIT` | 4 | Ferramentas da Talita por papel |
+| `CpfTest` | 12 | Dígito verificador do CPF |
+| `PaceTest` | 7 | Ritmo e projeção da meta |
+| `CoverageTest` | 8 | Conta da Reposição, caso a caso (inclui peça nova) |
+| `HumorDoDiaTest` | 6 | Clima do dia do agente |
+| `TalitaPersonaTest` | 63 | Apresentação, história e recusas da Talita |
+| `AssistantPropertiesTest` · `OpenAiCompatibleProviderTest` | 6 · 4 | Configuração e conexão com a IA |

@@ -1,11 +1,16 @@
 import type { ReactNode } from 'react';
 import { cn } from '@/lib/cn';
+import { HelpHint } from '../atoms/HelpHint';
 
-export function PageHeader({ title, subtitle, actions }: { title: string; subtitle?: string; actions?: ReactNode }) {
+// help: a frase do "?" ao lado do título (toda tela tem uma, em português simples).
+export function PageHeader({ title, subtitle, actions, help }: { title: string; subtitle?: string; actions?: ReactNode; help?: string }) {
   return (
     <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
       <div>
-        <h1 className="text-xl font-semibold tracking-tight">{title}</h1>
+        <h1 className="flex items-center gap-2 text-xl font-semibold tracking-tight">
+          {title}
+          {help && <HelpHint text={help} label={`Ajuda sobre ${title}`} />}
+        </h1>
         {subtitle && <p className="mt-0.5 text-sm text-muted">{subtitle}</p>}
       </div>
       {actions && <div className="flex flex-wrap gap-2">{actions}</div>}

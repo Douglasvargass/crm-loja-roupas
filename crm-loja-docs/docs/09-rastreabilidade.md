@@ -31,15 +31,31 @@ Situação em 27/10/2026. **Feito** = implementado e coberto por teste automáti
 | HU25 | Consultar vendas | `/vendas` | `GET /crm/sales?id=&customerId=&from=&to=&status=` | consulta por número e status | Feito |
 | HU26 | Ver detalhes da venda | `/vendas/:id` | `GET /crm/sales/{id}` | CT30 | Feito |
 | HU27 | Indicadores gerais | `/` | `GET /crm/dashboard` | CT10, CT12 | Feito |
-| HU28 | Vendas e faturamento por período | `/` (Hoje, 7, 30 dias, Este mês, Personalizado) | `from=&to=` | virada de período 23:59/00:00 | Feito |
+| HU28 | Vendas e faturamento por período | `/` (Hoje, 7, 30 dias, Este mês, Personalizado; lista Vendedor(a)) | `from=&to=&sellerId=` | virada de período 23:59/00:00; filtro por vendedor (DashboardIT) | Feito |
 | HU29 | Mais vendidos | `/` | `topProducts` | CT10 | Feito |
 | HU30 | Alertas de estoque | `/` (com atalho para entrada) | `lowStock`, `outOfStock` | CT10 | Feito |
 | HU31 | Navegação e feedback | menu lateral, avisos de 4 s, confirmações | — | roteiro manual | Feito |
-| HU32 | Exportar CSV | — | — | — | Fora (Could) |
+| HU32 | Exportar CSV | Clientes, Produtos e Vendas → Exportar planilha (gerente) | `GET /crm/export/{customers,products,sales}.csv` | — | Feito |
 | HU33 | Entrar no sistema | `/login` | `POST /auth/login` · `/refresh` · `/logout` | CT32, CT36, login inválido | Feito |
 | HU34 | Trocar a senha | `/trocar-senha` (obrigatória no 1º acesso; link no topo) | `POST /auth/change-password` | CT35 | Feito |
-| HU35 | Gerenciar usuários e papéis | `/usuarios` | `GET · POST · PATCH /admin/users` | CT37, criação com senha provisória | Feito |
-| HU36 | Tirar dúvidas com o assistente de IA | `/assistente` | `GET /crm/assistant/status` · `POST /crm/assistant/chat` | AssistantIT (sem chave); seção 9 do roteiro manual (com chave) | Feito |
+| HU35 | Gerenciar usuários e papéis | `/usuarios` | `GET · POST · PATCH /admin/users` | CT37, criação com senha provisória, login curto `nome.sobrenome`, papéis técnicos (DashboardIT) | Feito |
+| HU36 | Tirar dúvidas com a Talita (assistente de IA) | botão flutuante (todas as telas) | `GET /crm/assistant/status` · `POST /crm/assistant/chat` | AssistantIT (sem chave); seção 9 do roteiro manual (com chave) | Feito |
+| HU37 | Meu painel: minhas vendas e minha meta | `/meu-painel` (tela inicial do vendedor) | `GET /crm/my-panel` | TargetIT, PaceTest; seção 10 do roteiro | Feito (spec 06) |
+| HU38 | Definir a meta de cada vendedor | `/metas` | `PUT /crm/targets/{sellerId}` | TargetIT (validações, mês fechado, auditoria) | Feito (spec 06) |
+| HU39 | Quadro de metas da equipe | `/metas` | `GET /crm/targets` | TargetIT | Feito (spec 06) |
+| HU46 | Agente de vendas da demonstração (um dia por vez, clima pela IA) | Dashboard → Diário do agente | `GET /crm/demo-agent` | HumorDoDiaTest, DemoAgentIT | Feito (spec 08) |
+| HU47 | Abrir chamado de peça em falta (tela ou Talita) | `/chamados` → Novo chamado; ficha do produto zerado | `POST /crm/requests` | StockRequestIT | Feito (spec 09) |
+| HU48 | Resolver ou cancelar chamado; peça que chega resolve sozinha | `/chamados` | `POST /crm/requests/{id}/resolve` · `/cancel`; `POST /crm/stock/entries` | StockRequestIT | Feito (spec 09) |
+| HU49 | Sino de avisos | topo de todas as telas | `GET /crm/requests/alerts` | StockRequestIT | Feito (spec 09) |
+| HU50 | "Ver como" (só leitura) | botão no topo; faixa "Vendo como…" | `/auth/view-as` | ViewAsIT | Feito (spec 10) |
+| HU51 | Ver o que vai faltar e quanto pedir | `/reposicao` | `GET /crm/stock/planning` | CoverageTest, ReplenishmentIT | Feito (spec 11) |
+| HU52 | Registrar pedido de compra | `/pedidos-compra` → Novo pedido; Reposição → Pedir | `POST /crm/purchase-orders` | ReplenishmentIT | Feito (spec 11) |
+| HU53 | Receber o pedido (entrada + fecha chamados) | `/pedidos-compra` → Receber | `POST /crm/purchase-orders/{id}/receive` | ReplenishmentIT | Feito (spec 11) |
+| HU55 | Etapas do pedido e nota fiscal | `/pedidos-compra` → Saiu do fornecedor / Chegou na loja / Dar entrada | `/ship` · `/arrive` · `/receive` | ReplenishmentIT (`etapasDoPedidoAteAEntrada`) | Feito (spec 11) |
+| HU56 | Estoque no Dashboard | `/` (bloco Estoque) | `GET /crm/stock/planning`, `GET /crm/purchase-orders` | ReplenishmentIT; roteiro seção 18 | Feito (spec 11) |
+| HU57 | Talita do cliente e pedido de peça | Loja: Talita, "Não achou? Peça à loja", Meus pedidos | `/loja/assistant/**`, `/loja/requests` | StoreIT (`clientePedePeca…`) | Feito (spec 07) |
+| HU54 | Mudar data ou cancelar o pedido, com motivo | `/pedidos-compra` → Mudar data / Cancelar | `/reschedule` · `/cancel` | ReplenishmentIT | Feito (spec 11) |
+| HU40–HU45 | Espaço do cliente: conta e troca de senha, vitrine, carrinho, pagamento simulado, meus pedidos, meus dados | `/loja/...` | `/loja/**` | StoreIT | Feito (spec 07) |
 
 **HU36 · Assistente de IA (extra).** Como membro da equipe, quero perguntar em linguagem natural sobre vendas, estoque, clientes e uso do sistema, para decidir sem procurar em várias telas.
 

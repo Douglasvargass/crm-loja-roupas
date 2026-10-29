@@ -10,6 +10,8 @@ import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import java.time.OffsetDateTime;
 
+// Categoria de produto (camisetas, calças, vestidos...). Nome único sem diferenciar maiúscula (índice do V3).
+// Com produtos vinculados não se exclui; inativa some da lista ao cadastrar produto novo (RN05 e RN06).
 @Entity
 @Table(name = "category")
 public class Category {

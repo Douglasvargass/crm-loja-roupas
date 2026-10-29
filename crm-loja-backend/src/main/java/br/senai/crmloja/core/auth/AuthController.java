@@ -27,13 +27,17 @@ public class AuthController {
                                         @NotBlank(message = "Informe a nova senha.") String newPassword) {}
 
     // Papel efetivo: super admin enxerga o sistema como gerente.
+    // viewAs: preenchido só no "Ver como" (spec crm/10); aí o resto é da pessoa vista e o front mostra a faixa.
     public record MeResponse(Long id, String login, String fullName, boolean superAdmin,
-                             boolean mustChangePassword, String role) {
+                             boolean mustChangePassword, String role, ViewAsInfo viewAs) {
         static MeResponse of(CurrentUser u) {
             return new MeResponse(u.id(), u.login(), u.fullName(), u.superAdmin(), u.mustChangePassword(),
-                    u.superAdmin() && u.role() == null ? "MANAGER" : u.role());
+                    u.superAdmin() && u.role() == null ? "MANAGER" : u.role(),
+                    u.viewingAs() ? new ViewAsInfo(u.viewerId(), u.viewerName()) : null);
         }
     }
+
+    public record ViewAsInfo(Long viewerId, String viewerName) {}
 
     private final AuthService auth;
     private final AuthCookies cookies;
@@ -88,7 +92,7 @@ public class AuthController {
     }
 
     private MeResponse me(AppUser u) {
-        String role = rbac.roleCodeOf(u.getId(), "crm").orElse(null);
+        String role = rbac.effectiveRoleOf(u.getId()).orElse(null);
         return MeResponse.of(new CurrentUser(u.getId(), u.getLogin(), u.getFullName(), u.isSuperAdmin(),
                 u.isMustChangePassword(), role));
     }

@@ -79,6 +79,11 @@ async function parseError(res: Response): Promise<ApiError> {
 
 type Query = Record<string, string | number | boolean | null | undefined>;
 
+// Exportado para links diretos (ex.: baixar planilha), que precisam do mesmo prefixo /api da tela.
+export function apiUrl(path: string, query?: Query) {
+  return url(path, query);
+}
+
 function url(path: string, query?: Query) {
   const qs = new URLSearchParams();
   Object.entries(query ?? {}).forEach(([k, v]) => {

@@ -53,7 +53,7 @@ public class HistoricoVendasSeeder implements ApplicationRunner {
     private static final Logger log = LoggerFactory.getLogger(HistoricoVendasSeeder.class);
 
     /** Semente fixa: o mesmo banco sai igual em toda execução, na máquina do aluno e na banca. */
-    private static final long SEMENTE = 20_260_801L;
+    static final long SEMENTE = 20_260_801L;
 
     private static final int DIAS = 89;
     private static final double VENDAS_POR_DIA = 20.0;
@@ -98,7 +98,10 @@ public class HistoricoVendasSeeder implements ApplicationRunner {
                 OffsetDateTime corte = inicio.atStartOfDay(props.zone()).toOffsetDateTime();
                 Long antigas = jdbc.queryForObject(
                         "select count(*) from sale where created_at < ?", Long.class, corte.plusDays(DIAS - 1L));
-                if (antigas != null && antigas > 0) return;
+                if (antigas != null && antigas > 0) {
+                    redistribuirVendedores();
+                    return;
+                }
                 gerar(inicio, hoje);
             });
         } catch (RuntimeException e) {
@@ -110,8 +113,12 @@ public class HistoricoVendasSeeder implements ApplicationRunner {
 
     private void gerar(LocalDate inicio, LocalDate fim) {
         Random rnd = new Random(SEMENTE);
-        Long vendedor = usuarioId("vendedor@loja.local");
-        Long gerente = usuarioId("gerente@loja.local");
+        // Quem vende: os três vendedores da equipe, com pesos diferentes (o filtro por vendedor do dashboard
+        // precisa de volumes distintos para fazer sentido). O sorteio usa um Random PRÓPRIO: se consumisse o
+        // principal, mudaria toda a sequência de vendas e o histórico deixaria de bater com o documento 14.
+        List<Long> vendedores = DevDataSeeder.vendedores().stream().map(this::usuarioId).toList();
+        Random rndVendedor = new Random(SEMENTE + 1);
+        Long gerente = usuarioId("guilherme.dower");
 
         List<Catalogo> catalogo = carregarCatalogo();
         if (catalogo.isEmpty()) return;
@@ -185,6 +192,7 @@ public class HistoricoVendasSeeder implements ApplicationRunner {
                                 ? compradores.get(rnd.nextInt(compradores.size())) : null;
                         // A venda é aberta alguns minutos antes de ser confirmada, como no balcão.
                         OffsetDateTime aberta = e.quando().minusMinutes(2L + rnd.nextInt(12));
+                        Long vendedor = sortearVendedor(vendedores, rndVendedor);
                         Long saleId = inserirVenda(cliente, total, e.quando(), aberta, vendedor);
                         confirmadas++;
 
@@ -240,7 +248,7 @@ public class HistoricoVendasSeeder implements ApplicationRunner {
      * folga de segurança. Na virada para o verão a loja para de repor jaqueta — é daí que nascem, sozinhos,
      * os alertas de ruptura no dashboard.
      */
-    private void repor(List<Catalogo> catalogo, Map<Long, Integer> saldo, Map<Long, Integer> vendidoNaSemana,
+    void repor(List<Catalogo> catalogo, Map<Long, Integer> saldo, Map<Long, Integer> vendidoNaSemana,
                        List<Movimento> movimentos, Long ator, OffsetDateTime quando, boolean fimDaTemporada,
                        Random rnd) {
         for (Catalogo c : catalogo) {
@@ -269,9 +277,11 @@ public class HistoricoVendasSeeder implements ApplicationRunner {
     }
 
     // ------------------------------------------------------------- modelagem
+    // Os métodos daqui para baixo não são private porque o AgenteVendasDemo (mesmo pacote) gera os dias novos
+    // com exatamente o mesmo modelo do histórico. Nenhum deles muda de comportamento por isso.
 
     /** Movimento da loja no dia, antes do acaso: dia da semana × mês × data comemorativa × quinzena. */
-    private int vendasDoDia(LocalDate d, boolean feriado, Random rnd) {
+    int vendasDoDia(LocalDate d, boolean feriado, Random rnd) {
         double esperado = VENDAS_POR_DIA
                 * pesoDoDia(d.getDayOfWeek(), feriado)
                 * pesoDoMes(d.getMonthValue())
@@ -309,14 +319,14 @@ public class HistoricoVendasSeeder implements ApplicationRunner {
         return (diaDoMes >= 5 && diaDoMes <= 9) || (diaDoMes >= 20 && diaDoMes <= 24);
     }
 
-    private OffsetDateTime horario(LocalDate dia, boolean feriado, Random rnd) {
+    OffsetDateTime horario(LocalDate dia, boolean feriado, Random rnd) {
         boolean reduzido = feriado || dia.getDayOfWeek() == DayOfWeek.SUNDAY;
         int[] curva = reduzido ? HORAS_DOMINGO : dia.getDayOfWeek() == DayOfWeek.SATURDAY ? HORAS_SABADO : HORAS_SEMANA;
         int base = reduzido ? ABRE_DOMINGO : ABRE_SEMANA;
         return instante(dia, base + sortearIndice(curva, rnd), -1, rnd);
     }
 
-    private OffsetDateTime instante(LocalDate dia, int hora, int minuto, Random rnd) {
+    OffsetDateTime instante(LocalDate dia, int hora, int minuto, Random rnd) {
         int m = minuto >= 0 ? minuto : rnd.nextInt(60);
         return dia.atTime(LocalTime.of(hora, m, rnd.nextInt(60))).atZone(props.zone()).toOffsetDateTime();
     }
@@ -333,7 +343,7 @@ public class HistoricoVendasSeeder implements ApplicationRunner {
     }
 
     /** Monta o carrinho: 1 a 3 produtos distintos, respeitando o saldo e o UNIQUE (sale_id, product_id). */
-    private List<ItemLinha> montarCarrinho(List<Catalogo> catalogo, Map<Long, Integer> saldo, LocalDate dia,
+    List<ItemLinha> montarCarrinho(List<Catalogo> catalogo, Map<Long, Integer> saldo, LocalDate dia,
                                            Random rnd) {
         double sorteio = rnd.nextDouble();
         int linhas = sorteio < 0.62 ? 1 : sorteio < 0.91 ? 2 : 3;
@@ -398,7 +408,7 @@ public class HistoricoVendasSeeder implements ApplicationRunner {
 
     // ------------------------------------------------------------- persistência
 
-    private Long inserirVenda(Long clienteId, BigDecimal total, OffsetDateTime confirmada, OffsetDateTime aberta,
+    Long inserirVenda(Long clienteId, BigDecimal total, OffsetDateTime confirmada, OffsetDateTime aberta,
                               Long ator) {
         return jdbc.queryForObject("""
                 insert into sale (customer_id, status, total, confirmed_at, created_by, created_at, updated_at)
@@ -407,7 +417,7 @@ public class HistoricoVendasSeeder implements ApplicationRunner {
                 """, Long.class, clienteId, total, confirmada, ator, aberta, confirmada);
     }
 
-    private void gravarItens(List<ItemLinha> itens) {
+    void gravarItens(List<ItemLinha> itens) {
         jdbc.batchUpdate("""
                 insert into sale_item (sale_id, product_id, product_code, product_name, unit_price, quantity, subtotal)
                 values (?, ?, ?, ?, ?, ?, ?)
@@ -431,7 +441,7 @@ public class HistoricoVendasSeeder implements ApplicationRunner {
         });
     }
 
-    private void gravarMovimentos(List<Movimento> movimentos) {
+    void gravarMovimentos(List<Movimento> movimentos) {
         // Inseridos na ordem cronológica em que foram gerados: o id acompanha a data.
         jdbc.batchUpdate("""
                 insert into stock_movement
@@ -487,7 +497,60 @@ public class HistoricoVendasSeeder implements ApplicationRunner {
         return usuarios.findByLoginIgnoreCase(login).orElseThrow().getId();
     }
 
-    private List<Catalogo> carregarCatalogo() {
+    /** Pesos 5 : 4 : 3 na ordem da equipe: o primeiro vendedor vende mais, o último menos. */
+    private static final int[] PESOS_VENDEDORES = {5, 4, 3};
+
+    Long sortearVendedor(List<Long> vendedores, Random rnd) {
+        int total = 0;
+        for (int i = 0; i < vendedores.size(); i++) total += PESOS_VENDEDORES[Math.min(i, PESOS_VENDEDORES.length - 1)];
+        int sorteio = rnd.nextInt(total);
+        for (int i = 0; i < vendedores.size(); i++) {
+            sorteio -= PESOS_VENDEDORES[Math.min(i, PESOS_VENDEDORES.length - 1)];
+            if (sorteio < 0) return vendedores.get(i);
+        }
+        return vendedores.get(vendedores.size() - 1);
+    }
+
+    /**
+     * Banco criado antes do filtro por vendedor (29/10/2026): todas as vendas do histórico ficaram no nome de
+     * um vendedor só. Uma vez, e só nesse caso, elas são redistribuídas com o mesmo sorteio de {@link #gerar},
+     * para a demonstração pública não mostrar um vendedor com 100% das vendas. As movimentações de estoque
+     * não mudam (o trigger não deixa, e o nome de quem vendeu fica na venda, não no estoque).
+     */
+    private void redistribuirVendedores() {
+        List<Long> vendedores = DevDataSeeder.vendedores().stream()
+                .map(l -> usuarios.findByLoginIgnoreCase(l).map(u -> u.getId()).orElse(null))
+                .filter(java.util.Objects::nonNull).toList();
+        if (vendedores.size() < 2) return;
+        // Só age quando um autor só tem 90% ou mais das vendas: é a marca do histórico antigo. Um banco
+        // já distribuído (ou de uso real, com vários vendedores) fica como está.
+        List<Map<String, Object>> porAutor = jdbc.queryForList(
+                "select created_by as autor, count(*) as n from sale where created_by is not null "
+                        + "group by created_by order by n desc");
+        if (porAutor.isEmpty()) return;
+        long total = porAutor.stream().mapToLong(r -> ((Number) r.get("n")).longValue()).sum();
+        long maior = ((Number) porAutor.get(0).get("n")).longValue();
+        long autor = ((Number) porAutor.get(0).get("autor")).longValue();
+        if (maior < total * 0.9) return;
+
+        List<Long> ids = jdbc.queryForList("select id from sale where created_by = ? order by id", Long.class, autor);
+        Random rndVendedor = new Random(SEMENTE + 1);
+        jdbc.batchUpdate("update sale set created_by = ? where id = ?", new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                ps.setLong(1, sortearVendedor(vendedores, rndVendedor));
+                ps.setLong(2, ids.get(i));
+            }
+
+            @Override
+            public int getBatchSize() {
+                return ids.size();
+            }
+        });
+        log.warn("Histórico de demonstração: {} vendas redistribuídas entre {} vendedores", ids.size(), vendedores.size());
+    }
+
+    List<Catalogo> carregarCatalogo() {
         // Peso de giro por produto: básico barato gira muito, peça de ticket alto gira pouco.
         Map<String, Double> giro = Map.ofEntries(
                 Map.entry("CAM-001-M-BR", 14.0), Map.entry("CAM-002-G-BR", 11.0), Map.entry("CAM-003-P-PT", 10.0),
@@ -599,17 +662,17 @@ public class HistoricoVendasSeeder implements ApplicationRunner {
     /** Um acontecimento do dia, com hora marcada. A agenda é ordenada por {@code quando} antes de ser aplicada. */
     private record Evento(OffsetDateTime quando, Tipo tipo, Cancelamento cancelamento) {}
 
-    private record Catalogo(Long id, String codigo, String nome, BigDecimal preco, String familia, double peso,
+    record Catalogo(Long id, String codigo, String nome, BigDecimal preco, String familia, double peso,
                             int estoqueInicial, int minStock) {}
 
-    private record ItemLinha(Long saleId, Long productId, String code, String name, BigDecimal unitPrice,
+    record ItemLinha(Long saleId, Long productId, String code, String name, BigDecimal unitPrice,
                              int quantity, BigDecimal subtotal) {
         ItemLinha comVenda(Long id) {
             return new ItemLinha(id, productId, code, name, unitPrice, quantity, subtotal);
         }
     }
 
-    private record Movimento(Long productId, Long saleId, String tipo, int quantidade, int saldo, String motivo,
+    record Movimento(Long productId, Long saleId, String tipo, int quantidade, int saldo, String motivo,
                              Long ator, OffsetDateTime quando) {}
 
     private record Cancelamento(Long saleId, OffsetDateTime quando, String motivo, List<ItemLinha> itens) {}

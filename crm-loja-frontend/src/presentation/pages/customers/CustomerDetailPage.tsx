@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router';
 import { useSession } from '@/app/context/SessionContext';
 import { useToast } from '@/app/context/ToastContext';
 import { saleStatusLabel, saleStatusTone } from '@/data/adapters';
-import { useCustomer, useCustomerActions, useCustomerSales } from '@/data/hooks';
+import { useCustomer, useCustomerActions, useCustomerSales, useUserActions } from '@/data/hooks';
 import { ApiError } from '@/data/http';
 import type { CustomerDto, SaleSummaryDto } from '@/data/dto';
 import { can } from '@/domain/permissions';
@@ -16,23 +16,26 @@ import { QueryState } from '../../components/molecules/QueryState';
 import { DataTable } from '../../components/organisms/DataTable';
 import { Card, Detail, PageHeader } from '../../components/templates/Page';
 import { CustomerFormModal } from './CustomerFormModal';
+import { ProvisionalPasswordModal } from '../UsersPage';
 
 export function CustomerDetailPage() {
   const id = Number(useParams().id);
   const query = useCustomer(id);
   return (
     <QueryState query={query}>
-      {(d) => <CustomerDetail customer={d.customer} purchases={d.confirmedPurchases} total={d.confirmedTotal} last={d.lastPurchaseAt} />}
+      {(d) => <CustomerDetail customer={d.customer} purchases={d.confirmedPurchases} total={d.confirmedTotal} last={d.lastPurchaseAt} userId={d.userId} />}
     </QueryState>
   );
 }
 
-function CustomerDetail({ customer: c, purchases, total, last }: { customer: CustomerDto; purchases: number; total: number; last: string | null }) {
+function CustomerDetail({ customer: c, purchases, total, last, userId }: { customer: CustomerDto; purchases: number; total: number; last: string | null; userId: number | null }) {
   const { role } = useSession();
   const toast = useToast();
   const navigate = useNavigate();
   const sales = useCustomerSales(c.id);
   const { remove, setActive } = useCustomerActions();
+  const { resetPassword } = useUserActions();
+  const [reset, setReset] = useState<{ login: string; password: string } | null>(null);
   const [editing, setEditing] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [offerDeactivate, setOfferDeactivate] = useState<string | null>(null);
@@ -44,8 +47,8 @@ function CustomerDetail({ customer: c, purchases, total, last }: { customer: Cus
       navigate('/clientes');
     } catch (err) {
       setConfirmDelete(false);
-      // HU05: cliente com vendas → oferece inativar em vez de excluir.
-      if (err instanceof ApiError && err.code === 'customer_has_sales') setOfferDeactivate(err.message);
+      // HU05: cliente com vendas (ou com login na loja, revisão 29/10) → oferece inativar em vez de excluir.
+      if (err instanceof ApiError && (err.code === 'customer_has_sales' || err.code === 'customer_has_login')) setOfferDeactivate(err.message);
       else toast.error(err);
     }
   }
@@ -63,12 +66,19 @@ function CustomerDetail({ customer: c, purchases, total, last }: { customer: Cus
   return (
     <>
       <PageHeader
-        title={c.fullName}
+        title={c.fullName} help="Dados do cliente e tudo o que ele já comprou. Cliente com compras não é apagado: dá para inativar."
         subtitle={`Cliente desde ${formatDateTime(c.createdAt)}`}
         actions={
           <>
             <Button variant="secondary" onClick={() => navigate('/clientes')}>Voltar</Button>
             <Button variant="secondary" onClick={() => setEditing(true)}>Editar</Button>
+            {userId && role && can.users(role) && (
+              <Button variant="secondary" loading={resetPassword.isPending}
+                onClick={() => void resetPassword.mutateAsync({ id: userId, module: 'loja' })
+                  .then((r) => setReset({ login: r.user.login, password: r.provisionalPassword })).catch((err) => toast.error(err))}>
+                Resetar senha da loja
+              </Button>
+            )}
             {role && can.deleteCustomer(role) && (
               c.active
                 ? <Button variant="secondary" onClick={() => setConfirmDelete(true)}>Excluir</Button>
@@ -92,6 +102,8 @@ function CustomerDetail({ customer: c, purchases, total, last }: { customer: Cus
           </dl>
         </Card>
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-1">
+          <KpiCard label="Acesso à loja online" value={userId ? 'Sim' : 'Não'}
+            hint={userId ? 'Este cliente entra no site da loja' : 'Só compra no balcão'} />
           <KpiCard label="Compras confirmadas" value={purchases} />
           <KpiCard label="Total comprado" value={formatMoney(total)} hint={last ? `Última: ${formatDateTime(last)}` : 'Ainda sem compras'} />
         </div>
@@ -122,6 +134,7 @@ function CustomerDetail({ customer: c, purchases, total, last }: { customer: Cus
       )}
 
       {editing && <CustomerFormModal customer={c} onClose={() => setEditing(false)} />}
+      {reset && <ProvisionalPasswordModal title="Senha da loja resetada" login={reset.login} password={reset.password} onClose={() => setReset(null)} />}
       <ConfirmDialog
         open={confirmDelete}
         title="Excluir cliente"

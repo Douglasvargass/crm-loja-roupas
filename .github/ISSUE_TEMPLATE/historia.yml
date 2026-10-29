@@ -1,0 +1,89 @@
+name: História
+description: Uma funcionalidade nova ou mudança de comportamento (ver crm-loja-docs/docs/16-processo-de-requisitos.md)
+title: "[História] "
+labels: ["tipo:historia"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Escreva em português simples. Critério sempre no formato DADO / QUANDO / ENTÃO, com pelo menos um negativo
+        (quem **não** vê, o que **não** acontece). Dúvida sem resposta vai em "Decisões pendentes" e a issue ganha `a-confirmar`.
+  - type: textarea
+    id: contexto
+    attributes:
+      label: Contextualização
+      description: O que acontece hoje, quem sente, com que frequência, o que acontece se nunca for feito.
+    validations:
+      required: true
+  - type: textarea
+    id: objetivo
+    attributes:
+      label: Objetivo
+      placeholder: |
+        Como [papel],
+        quero [ação],
+        para [benefício].
+    validations:
+      required: true
+  - type: textarea
+    id: regras
+    attributes:
+      label: Regras de negócio (uma por linha)
+      placeholder: |
+        R1 — Regra: ...
+             Exemplo: DADO ..., QUANDO ..., ENTÃO ...
+             Exceções: nenhuma
+             Quem decidiu: nome, dd/mm/aaaa
+    validations:
+      required: true
+  - type: textarea
+    id: criterios
+    attributes:
+      label: Critérios de aceite
+      placeholder: |
+        - DADO que ..., QUANDO ..., ENTÃO ...
+        - DADO [papel sem acesso], QUANDO tenta ..., ENTÃO não vê / não consegue.
+    validations:
+      required: true
+  - type: textarea
+    id: fora
+    attributes:
+      label: Não inclui
+      description: O que fica fora desta entrega.
+  - type: textarea
+    id: papeis
+    attributes:
+      label: Papéis
+      description: Quem vê e quem NÃO vê (Gerente, Vendedor, Estoquista, Engenheiro de Software, Marketing e Desenvolvimento, Cliente).
+    validations:
+      required: true
+  - type: dropdown
+    id: prioridade
+    attributes:
+      label: Prioridade (MoSCoW)
+      options: ["Must (alta)", "Should (média)", "Could (baixa)"]
+    validations:
+      required: true
+  - type: dropdown
+    id: tamanho
+    attributes:
+      label: Tamanho
+      description: "P: sem regra nova, 1 rota ou tela · M: 1-2 regras ou 1 tabela ou 1-3 telas · G: 3+ regras, fluxo novo, várias tabelas"
+      options: ["P", "M", "G"]
+    validations:
+      required: true
+  - type: textarea
+    id: riscos
+    attributes:
+      label: Dependências e riscos
+      description: Depende de quê? Se der errado, alguém veria o que não devia, perderia histórico ou teria número errado?
+  - type: textarea
+    id: pendentes
+    attributes:
+      label: Decisões pendentes
+      placeholder: "| # | Pergunta | Proposta padrão | Para quem |"
+  - type: input
+    id: spec
+    attributes:
+      label: Spec
+      placeholder: crm-loja-docs/specs/crm/NN-nome/requirements.md

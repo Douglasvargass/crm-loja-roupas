@@ -42,7 +42,7 @@ class AssistantPropertiesTest {
         var groq = new AssistantProperties("GROQ", "gsk_x", "", "", "", 0, 0);
         assertThat(groq.openAiCompatible()).isTrue();
         assertThat(groq.baseUrl()).isEqualTo("https://api.groq.com/openai/v1");
-        assertThat(groq.model()).isEqualTo("llama-3.3-70b-versatile");
+        assertThat(groq.model()).isEqualTo("openai/gpt-oss-120b");
 
         var gemini = new AssistantProperties("gemini", "AIza-x", "", "", "", 0, 0);
         assertThat(gemini.baseUrl()).isEqualTo("https://generativelanguage.googleapis.com/v1beta/openai");

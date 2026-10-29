@@ -5,5 +5,6 @@ import java.time.OffsetDateTime;
 
 // Ficha do cliente (HU03): dados + resumo das compras confirmadas.
 public record CustomerDetailResponse(CustomerResponse customer, long confirmedPurchases,
-                                     BigDecimal confirmedTotal, OffsetDateTime lastPurchaseAt) {
+                                     BigDecimal confirmedTotal, OffsetDateTime lastPurchaseAt,
+                                     Long userId) {   // conta de acesso à loja online, se houver
 }

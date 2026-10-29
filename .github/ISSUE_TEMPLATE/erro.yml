@@ -1,0 +1,66 @@
+name: Erro
+description: Algo que funcionava, ou deveria funcionar, e não funciona
+title: "[Erro] "
+labels: ["tipo:erro", "bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Nunca cole senha aqui. Copie o texto do erro exatamente como apareceu na tela.
+  - type: textarea
+    id: esperado
+    attributes:
+      label: O que era esperado
+    validations:
+      required: true
+  - type: textarea
+    id: aconteceu
+    attributes:
+      label: O que aconteceu
+      description: Com a mensagem de erro literal, se houver.
+    validations:
+      required: true
+  - type: textarea
+    id: passos
+    attributes:
+      label: Passo a passo para reproduzir
+      placeholder: |
+        1. Entrar como vitor.nunes
+        2. Abrir Meu painel
+        3. ...
+    validations:
+      required: true
+  - type: dropdown
+    id: onde
+    attributes:
+      label: Onde
+      options: ["Local (localhost)", "Online (Render)"]
+    validations:
+      required: true
+  - type: input
+    id: papel
+    attributes:
+      label: Papel de quem viu
+      placeholder: Vendedor(a)
+  - type: dropdown
+    id: frequencia
+    attributes:
+      label: Frequência
+      options: ["Sempre", "Às vezes", "Aconteceu uma vez"]
+    validations:
+      required: true
+  - type: input
+    id: desde
+    attributes:
+      label: Desde quando
+  - type: textarea
+    id: contorno
+    attributes:
+      label: Existe contorno?
+  - type: dropdown
+    id: urgencia
+    attributes:
+      label: Urgência
+      options: ["Impede o trabalho", "Incomoda", "Cosmético"]
+    validations:
+      required: true

@@ -2,8 +2,8 @@ package br.senai.crmloja.core.users;
 
 import br.senai.crmloja.core.auth.CurrentUser;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -25,7 +25,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserAdminController {
 
     public record CreateUserRequest(
-            @NotBlank(message = "Informe o login.") @Email(message = "O login deve ser um e-mail.") String login,
+            // Login curto no padrão nome.sobrenome (e-mail completo também vale, para contas antigas).
+            @NotBlank(message = "Informe o login.")
+            @Pattern(regexp = "^[a-z0-9]+([._-][a-z0-9]+)*(@[a-z0-9.-]+\\.[a-z]{2,})?$",
+                     message = "Use o padrão nome.sobrenome, só letras minúsculas, números e ponto.")
+            String login,
             @NotBlank(message = "Informe o nome.") @Size(min = 3, max = 120, message = "Nome entre 3 e 120 letras.") String fullName,
             @NotBlank(message = "Escolha o papel.") String role) {}
 
@@ -46,6 +50,12 @@ public class UserAdminController {
                                                @Valid @RequestBody CreateUserRequest body,
                                                @AuthenticationPrincipal CurrentUser actor) {
         return service.create(module, body.login(), body.fullName(), body.role(), actor.id());
+    }
+
+    @PostMapping("/{id}/reset-password")
+    public UserAdminService.CreatedUser resetPassword(@RequestParam(defaultValue = "crm") String module, @PathVariable Long id,
+                                                      @AuthenticationPrincipal CurrentUser actor) {
+        return service.resetPassword(module, id, actor.id());
     }
 
     @PatchMapping("/{id}")

@@ -1,12 +1,13 @@
 ## 7. Telas e navegação
 
-São 11 telas numa SPA React. As internas ficam sob `RequireAuth → RequireActivePassword → AppShell` (menu lateral, topo com usuário e Sair); o menu mostra só o que o papel permite.
+São 13 telas internas numa SPA React (mais as 5 do espaço do cliente). As internas ficam sob `RequireAuth → RequireActivePassword → AppShell` (menu lateral, topo com usuário e Sair); o menu mostra só o que o papel permite.
 
 | Tela | Rota | Conteúdo | Papéis | HU |
 | --- | --- | --- | --- | --- |
 | Entrar | `/login` | Login e senha, mensagem única de erro | público | HU33 |
 | Trocar senha | `/trocar-senha` | Obrigatória no primeiro acesso | logado | HU34 |
-| Dashboard | `/` | Período; 5 cartões com variação; faturamento por dia; mais vendidos; por categoria; estoque baixo e zerado | G | HU27–HU30 |
+| Dashboard | `/` | Período; lista Vendedor(a); 5 cartões com variação; faturamento por dia; mais vendidos; por categoria; estoque baixo e zerado | G | HU27–HU30 |
+| Dashboard (estoque) | `/` | Para Operações e Compras e estoquista: só o bloco Estoque, com a Sugestão de pedido (botão que monta o pedido) (o gerente vê o mesmo bloco abaixo das vendas) | E | HU56 |
 | Clientes | `/clientes` | Busca, tabela, cadastro em modal, ficha com histórico | G V | HU01–HU06 |
 | Categorias | `/categorias` | Tabela com quantidade de produtos | G (V E leem) | HU07–HU08 |
 | Produtos | `/produtos` | Filtros, etiquetas de situação, cadastro em modal | G E (V lê) | HU09–HU15 |
@@ -14,7 +15,14 @@ São 11 telas numa SPA React. As internas ficam sob `RequireAuth → RequireActi
 | Vendas | `/vendas` | Filtros e tabela | G V | HU25 |
 | Nova venda | `/vendas/nova` | Cliente opcional, busca de produto, carrinho, total, Confirmar | G V | HU21–HU23 |
 | Detalhe da venda | `/vendas/:id` | Itens com preço praticado, Cancelar (G), dados do cancelamento | G V | HU24, HU26 |
-| Usuários | `/usuarios` | Contas, papel, ativo | G | HU35 |
+| Usuários | `/usuarios` | Contas, papel, ativo, Resetar senha (senha provisória) | G | HU35 |
+| Meu painel | `/meu-painel` | Tela inicial do vendedor: meta do mês com barra e frases, vendido, hoje, vendas por dia, mais vendidos, últimas vendas; mês escolhível | V | HU37 |
+| Loja (cliente) | `/loja`, `/loja/carrinho`, `/loja/pedidos[/:id]`, `/loja/meus-dados` | Layout próprio, sem o menu da equipe: vitrine, carrinho com Pix ou cartão simulado, pedidos e dados | C | HU40–HU45 |
+| Prévia da loja | `/previa-loja` | O site como qualquer cliente vê (vitrine de verdade, carrinho só na tela, Pix de demonstração, pedidos e dados de exemplo); nada é gravado. Abre pelo "Ver como" → Loja do cliente | G | HU50 |
+| Reposição | `/reposicao` | O que vai faltar: 6 cartões (zerados, acabam em 7 dias, para pedir, pedidos atrasados, chegam em 7 dias, dinheiro parado), filtros, busca, "Pedir" e "Pedir marcadas"; tela inicial de Operações e Compras | G E | HU51 |
+| Pedidos de compra | `/pedidos-compra` | Abas por etapa (pedidos feitos, em trânsito, em conferência, atrasados, entradas, cancelados), novo pedido (vem montado da Reposição), saiu do fornecedor, chegou na loja, dar entrada (conta peça por peça; nota fiscal e, se veio a mais, nota de bonificação), devolver a nota, mudar data, cancelar | G E (registrar e envio: G e Operações e Compras) | HU52–HU55 |
+| Chamados | `/chamados` | Abas por situação, novo chamado (produto e cliente opcionais), resolver ou cancelar com nota; sino no topo com os abertos (G E) ou as novidades dos meus (V) | G V E | HU47–HU49 |
+| Metas | `/metas` | Quadro da equipe no mês: meta editável na linha, vendido, %, projeção, falta, situação; totais | G | HU38, HU39 |
 
 ### Padrões do front
 

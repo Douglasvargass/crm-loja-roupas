@@ -15,13 +15,18 @@ import { Pagination } from '../../components/molecules/Pagination';
 import { QueryState } from '../../components/molecules/QueryState';
 import { DataTable } from '../../components/organisms/DataTable';
 import { Card, Filters, PageHeader } from '../../components/templates/Page';
+import { ExportButton } from '../../components/molecules/ExportButton';
 import { ProductFormModal } from './ProductFormModal';
 
+// Situação do produto (disponível, estoque baixo, sem estoque, inativo), igual em toda tela que mostra produto.
 export function StockBadge({ p }: { p: ProductDto }) {
   if (p.availability === 'AVAILABLE' && p.lowStock) return <Badge tone="warning">Estoque baixo</Badge>;
   return <Badge tone={availabilityTone[p.availability]}>{availabilityLabel[p.availability]}</Badge>;
 }
 
+// HU10, HU14 e HU15: lista de produtos com filtros combináveis (nome, código, tamanho, categoria e situação).
+// O filtro de categoria pode vir pela URL (?categoria=), a partir da tela de Categorias. Só estoque e gerente
+// cadastram; o vendedor consulta.
 export function ProductsPage() {
   const { role } = useSession();
   const navigate = useNavigate();
@@ -48,11 +53,14 @@ export function ProductsPage() {
   return (
     <>
       <PageHeader
-        title="Produtos"
+        title="Produtos" help="Cada combinação de tamanho e cor é um produto com código próprio. Disponível = ativo e com estoque."
         subtitle="Catálogo com preço, tamanho, cor e situação de estoque."
-        actions={role && can.manageProducts(role) && (
-          <Button onClick={() => setCreating(true)}><Icon name="plus" className="size-4" />Novo produto</Button>
-        )}
+        actions={<>
+          <ExportButton path="/crm/export/products.csv" query={{ name, code, size, categoryId: categoryId || undefined, availability }} />
+          {role && can.manageProducts(role) && (
+            <Button onClick={() => setCreating(true)}><Icon name="plus" className="size-4" />Novo produto</Button>
+          )}
+        </>}
       />
       <Card>
         <Filters>

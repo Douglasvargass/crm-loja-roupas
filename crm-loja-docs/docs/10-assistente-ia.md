@@ -1,6 +1,6 @@
-# Assistente de IA
+# Talita, a assistente de IA
 
-O menu **Assistente IA** abre um chat onde qualquer pessoa da equipe pergunta sobre a loja em linguagem natural:
+A **Talita** é a assistente virtual da Orden. Ela fica num botão redondo no canto inferior direito de **todas as telas** (no celular, a conversa abre em tela cheia). Qualquer pessoa da equipe pergunta sobre a loja em linguagem natural:
 
 - "Quanto vendemos este mês? E comparado com o mês passado?"
 - "Quais produtos preciso repor com urgência?"
@@ -18,7 +18,7 @@ O assistente precisa de um **provedor de IA** e de uma **chave de API** dele. Vo
 
 | Provedor | `ASSISTANT_PROVIDER` | Onde pegar a chave | Modelo padrão | Limite grátis (aprox.) | Observações |
 | --- | --- | --- | --- | --- | --- |
-| **Groq** (recomendado) | `groq` | https://console.groq.com → *API Keys* → *Create API Key* (começa com `gsk_`) | `llama-3.3-70b-versatile` | Dezenas de perguntas por dia; o teto é de tokens por dia e por minuto, veja https://console.groq.com/settings/limits | Rápido, bom com as consultas. Se bater o limite, a tela avisa "limite gratuito atingido"; espere um minuto ou troque para `llama-3.1-8b-instant` (mais fraco, limite maior) |
+| **Groq** (recomendado) | `groq` | https://console.groq.com → *API Keys* → *Create API Key* (começa com `gsk_`) | `openai/gpt-oss-120b` | Dezenas de perguntas por dia; o teto é de tokens por dia e por minuto, veja https://console.groq.com/settings/limits | Rápido, bom com as consultas. Se bater o limite, a tela avisa "limite gratuito atingido"; espere um minuto ou troque `ASSISTANT_MODEL` para `openai/gpt-oss-20b` (mais leve) ou `qwen/qwen3.8-27b`. O catálogo do Groq muda: se aparecer "modelo não existe", liste os atuais com `curl https://api.groq.com/openai/v1/models -H "Authorization: Bearer $CHAVE"` |
 | **Google Gemini** | `gemini` | https://aistudio.google.com/apikey → *Create API key* | `gemini-2.5-flash` | ~250 perguntas por dia | Ótima qualidade. No plano grátis, o Google pode usar as conversas para treinar modelos |
 | **OpenRouter** | `openrouter` | https://openrouter.ai/keys (começa com `sk-or-`) | `meta-llama/llama-3.3-70b-instruct:free` | ~50 pedidos por dia nos modelos `:free` | Modelos grátis mudam e às vezes ficam fora do ar; só os com sufixo `:free` são grátis |
 | **Ollama** (na sua máquina) | `ollama` | não precisa de chave | `llama3.1` | Sem limite | Precisa do [Ollama](https://ollama.com) instalado e `ollama pull llama3.1`. Não serve para o Render (sem GPU, pouca memória) |
@@ -52,24 +52,32 @@ ASSISTANT_PROVIDER=groq ASSISTANT_API_KEY=gsk_... ./mvnw spring-boot:test-run
 | `ASSISTANT_PROVIDER` | `groq` |
 | `ASSISTANT_API_KEY` | a chave `gsk_...` |
 
-Clique em **Save Changes**; o serviço reinicia em alguns minutos. Depois abra **Assistente IA** no menu: o aviso amarelo some e, no rodapé do chat, aparece "IA: Groq (llama-3.3-70b-versatile)".
+Clique em **Save Changes**; o serviço reinicia em alguns minutos. Depois clique no botão da Talita: o aviso amarelo some e, no rodapé do chat, aparece "IA: Groq (openai/gpt-oss-120b)".
 
 Para trocar de provedor, mude as duas variáveis. Para outro modelo do mesmo provedor, acrescente `ASSISTANT_MODEL`.
 
 > **Nunca coloque a chave no código, no `application.yml` ou no Git.** Ela fica só na variável de ambiente (ou no `.env`, que o `.gitignore` já exclui). Uma chave publicada no GitHub pode ser usada por qualquer pessoa.
 
-## O que ele sabe
+## Apresentação ("oi")
+
+Ao receber um cumprimento ("oi", "olá, Talita", "bom dia") ou "quem é você?", "qual seu nome?", "o que você faz?", a Talita se apresenta pelo primeiro nome da pessoa e sugere perguntas do perfil dela. Essa resposta é **local**: sai na hora, não gasta a cota do provedor e funciona mesmo quando o limite grátis acabou. Qualquer outra frase vai para a IA ("oi, quanto vendemos hoje?" **não** é só um oi). A regra está em `TalitaPersona.java`, com testes em `TalitaPersonaTest.java`.
+
+## O que ela sabe
 
 | Fonte | Conteúdo |
 | --- | --- |
 | Instruções fixas (`AssistantPrompt.java`) | Regras da loja (CPF, estoque, ciclo da venda, cancelamento…), o que cada papel faz e onde fica cada função na tela |
 | Consultas ao banco (`AssistantTools.java`) | Dados vivos: vendas, produtos, estoque, clientes, indicadores |
 
-As 10 consultas, todas **somente leitura**:
+Talita do cliente (29/10/2026): no espaço do cliente ela usa outras instruções (`AssistantPrompt.CUSTOMER`) e outras 6 ferramentas, só de cliente: `vitrine`, `categorias_loja`, `meus_pedidos`, `detalhe_meu_pedido`, `minhas_solicitacoes` e `pedir_peca` (grava, só depois de o cliente confirmar). Nenhuma ferramenta da equipe chega ao cliente, nem o contrário.
+
+As 16 ferramentas da equipe (as regras de conferência e de reset de senha estão no texto de instruções). Todas só leem, **menos uma**: `abrir_chamado`, que só grava depois de a pessoa confirmar o resumo.
+
+Perfis técnicos (Engenheiro de Software, Marketing e Desenvolvimento) recebem as mesmas consultas do gerente.
 
 | Consulta | O que traz | Perfis |
 | --- | --- | --- |
-| `consultar_dashboard` | Indicadores de um período, comparação, mais vendidos, por categoria | Gerente |
+| `consultar_dashboard` | Indicadores de um período, comparação, mais vendidos, por categoria; opcionalmente de um vendedor só (`vendedor_id`) | Gerente |
 | `buscar_produtos` | Produtos por nome, código, categoria, tamanho e situação | Todos |
 | `detalhe_produto` | Ficha, últimas movimentações e total vendido | Todos |
 | `listar_categorias` | Categorias e quantidade de produtos | Todos |
@@ -79,6 +87,14 @@ As 10 consultas, todas **somente leitura**:
 | `detalhe_venda` | Itens, preços praticados, cancelamento | Gerente, Vendedor |
 | `alertas_estoque` | Estoque baixo e zerado | Gerente, Estoquista |
 | `movimentacoes_estoque` | Histórico de entradas, ajustes, vendas e estornos | Gerente, Estoquista |
+| `meu_painel` | Meta, vendido, quanto falta, ritmo e projeção de **quem pergunta** (nunca de outra pessoa) | Vendedor |
+| `metas_vendedores` | Quadro de metas do mês: cada vendedor com meta, vendido, % e situação | Gerente |
+| `abrir_chamado` | Abre chamado de peça em falta, só com `confirmado=true` | Gerente, Vendedor |
+| `listar_chamados` | Chamados (vendedor: só os dele) | Todos |
+| `previsao_estoque` | O que vai faltar: média por dia, dias até acabar, a caminho, quanto pedir (spec crm/11) | Gerente, Estoquista, Operações e Compras |
+| `pedidos_compra` | Pedidos de compra por situação ou só os atrasados | Gerente, Estoquista, Operações e Compras |
+
+**Só assuntos da loja.** A Talita recusa com simpatia o que não é da Orden (receita, notícia, lição de casa…) e sugere uma pergunta sobre a loja. **A história da Orden** (doc 17) sai pronta, sem gastar a IA, quando perguntam "quem criou o sistema?" ou "conta a história da Orden".
 
 ## Segurança
 
@@ -116,7 +132,9 @@ Tela (AssistantPage)  --POST /api/crm/assistant/chat-->  AssistantController
 | `crm-loja-backend/.../assistant/AssistantTools.java` | As consultas, com descrição, parâmetros e papéis |
 | `crm-loja-backend/.../assistant/AssistantPrompt.java` | O "conhecimento da empresa": regras e funcionamento |
 | `crm-loja-backend/.../assistant/AssistantController.java` | `GET /crm/assistant/status` e `POST /crm/assistant/chat` |
-| `crm-loja-frontend/src/presentation/pages/AssistantPage.tsx` | O chat |
+| `crm-loja-backend/.../assistant/TalitaPersona.java` | Respostas fixas para "oi" e "quem é você?" (apresentação da Talita, sem chamar a IA) |
+| `crm-loja-frontend/src/presentation/components/organisms/TalitaChat.tsx` | O chat flutuante |
+| `crm-loja-frontend/src/presentation/components/atoms/TalitaAvatar.tsx` | O rosto da Talita (SVG) |
 
 Configurações (variáveis de ambiente):
 
@@ -124,7 +142,7 @@ Configurações (variáveis de ambiente):
 | --- | --- | --- |
 | `ASSISTANT_PROVIDER` | `anthropic` | `anthropic`, `groq`, `gemini`, `openrouter`, `ollama` ou `openai` (outro provedor OpenAI-compatível) |
 | `ASSISTANT_API_KEY` | vazio | Liga o assistente (menos no `ollama`). `ANTHROPIC_API_KEY` continua aceita como sinônimo |
-| `ASSISTANT_MODEL` | padrão do provedor | `claude-opus-5-5`, `llama-3.3-70b-versatile`, `gemini-2.5-flash`, `meta-llama/llama-3.3-70b-instruct:free`, `llama3.1` |
+| `ASSISTANT_MODEL` | padrão do provedor | `claude-opus-5-5`, `openai/gpt-oss-120b`, `gemini-2.5-flash`, `meta-llama/llama-3.3-70b-instruct:free`, `llama3.1` |
 | `ASSISTANT_BASE_URL` | padrão do provedor | Obrigatória só no `openai`. No `anthropic`, aponta para um provedor compatível com a API da Anthropic (ex.: `https://openrouter.ai/api`) |
 | `ASSISTANT_EFFORT` | `medium` | Só na Anthropic: `low` responde mais rápido e gasta menos; `high` pensa mais |
 | `ASSISTANT_MAX_TOKENS` | `16000` | Teto de tokens por resposta. Abaixe (ex.: `4000`) nos planos grátis ou se o provedor recusar por falta de créditos (erro 402) |
@@ -171,7 +189,7 @@ Para gastar menos em qualquer provedor: `ASSISTANT_MAX_TOKENS=4000` e perguntas 
    - os parâmetros (`str`, `integer`, `date`, `enumOf`) e quais são obrigatórios;
    - a função que chama o Service.
 3. Em `AssistantIT.java`, ajuste a contagem (`hasSize(10)`) e teste a consulta nova.
-4. Em `AssistantPage.tsx`, adicione o nome amigável em `TOOL_LABEL`.
+4. Em `TalitaChat.tsx`, adicione o nome amigável em `TOOL_LABEL`.
 
 ## Testar
 

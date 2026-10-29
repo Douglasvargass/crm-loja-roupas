@@ -140,14 +140,19 @@ O que acontece, na ordem:
 1. Na primeira vez, o `mvnw` baixa o Maven e as bibliotecas (pode levar alguns minutos).
 2. Sobe um **PostgreSQL 16 de verdade**, embutido, na porta **54329**, gravando em `crm-loja-backend/.data/postgres`.
 3. O Flyway cria as tabelas (migrations `V1` a `V5`).
-4. Os *seeds* criam o módulo, os papéis, o super admin e, no perfil `dev`, os **dados de demonstração**: 5 categorias, 12 produtos, 51 clientes, os 3 logins e cerca de **2.000 vendas distribuídas pelos últimos 3 meses** (ver [14-dados-de-demonstracao.md](14-dados-de-demonstracao.md)). A primeira execução leva alguns segundos a mais por causa disso.
+4. Os *seeds* criam o módulo, os papéis, o super admin e, no perfil `dev`, os **dados de demonstração**: 5 categorias, 12 produtos, 51 clientes, os 6 logins da equipe e cerca de **2.000 vendas distribuídas pelos últimos 3 meses** (ver [14-dados-de-demonstracao.md](14-dados-de-demonstracao.md)). A primeira execução leva alguns segundos a mais por causa disso.
 5. A API fica no ar em **http://localhost:8080**.
 
 Deu certo quando aparecer no terminal:
 
 ```
-Dados de demonstração criados. Logins (senha loja12345):
-  gerente@loja.local · vendedor@loja.local · estoquista@loja.local
+Dados de demonstração criados. Equipe (senha loja12345):
+  guilherme.dower
+  douglas.vargas
+  julia.alcantara
+  vitor.nunes
+  vinicius.clemente   (Operações e Compras)
+  vinicius.muniz
 ...
 Tomcat started on port 8080
 ```
@@ -167,18 +172,23 @@ Remove-Item -Recurse -Force crm-loja-backend\.data
 **Trocar portas** (quando a 8080 ou a 54329 já estão em uso por outro programa):
 
 ```bash
-SERVER_PORT=8081 EMBEDDED_PG_PORT=54330 ./mvnw spring-boot:test-run
+SERVER_PORT=8081 EMBEDDED_PG_PORT=55432 ./mvnw spring-boot:test-run
 ```
 
 ```powershell
-$env:SERVER_PORT = "8081"; $env:EMBEDDED_PG_PORT = "54330"; .\mvnw.cmd spring-boot:test-run
+$env:SERVER_PORT = "8081"; $env:EMBEDDED_PG_PORT = "55432"; .\mvnw.cmd spring-boot:test-run
 ```
 
 ```cmd
 set SERVER_PORT=8081
-set EMBEDDED_PG_PORT=54330
+set EMBEDDED_PG_PORT=55432
 mvnw.cmd spring-boot:test-run
 ```
+
+**"Gave up waiting for server to start" com "Permission denied" no log do banco (Windows):** o Windows reserva
+faixas de portas (Hyper-V, WSL) e a 54329 pode cair numa delas, mesmo sem nenhum programa usando. Veja as faixas com
+`netsh int ipv4 show excludedportrange protocol=tcp` e escolha uma porta fora delas (em 29/10/2026, numa máquina
+assim, a 55432 funcionou). Antes de subir de novo, apague `crm-loja-backend/.data/postgres` se ele ficou pela metade.
 
 Se mudar a porta da API, avise o front: veja a [seção 4](#4-rodar-o-front-end).
 
@@ -257,7 +267,7 @@ Se a porta 5173 estiver ocupada, o Vite usa a próxima livre (5174, 5175…) e m
 
 ## 5. Testes automáticos
 
-### 5.1 Back-end (60 testes)
+### 5.1 Back-end (116 testes)
 
 ```bash
 cd crm-loja-backend
@@ -391,7 +401,7 @@ API=http://localhost:8080
 # Entrar (grava os cookies em cookies.txt)
 curl -s -c cookies.txt -X POST $API/auth/login \
   -H 'Content-Type: application/json' \
-  -d '{"login":"gerente@loja.local","password":"loja12345"}'
+  -d '{"login":"douglas.vargas","password":"loja12345"}'
 
 # Quem sou eu
 curl -s -b cookies.txt $API/auth/me
@@ -420,7 +430,7 @@ $API = "http://localhost:8080"
 $s = New-Object Microsoft.PowerShell.Commands.WebRequestSession
 
 Invoke-RestMethod -Method Post "$API/auth/login" -WebSession $s -ContentType "application/json; charset=utf-8" `
-  -Body '{"login":"gerente@loja.local","password":"loja12345"}'
+  -Body '{"login":"douglas.vargas","password":"loja12345"}'
 
 Invoke-RestMethod "$API/crm/dashboard" -WebSession $s
 Invoke-RestMethod "$API/crm/customers?search=ana" -WebSession $s | Select-Object -ExpandProperty content
@@ -600,5 +610,5 @@ npx pnpm install                            # dependências
 npx pnpm dev                                # rodar (http://localhost:5173)
 npx pnpm lint && npx pnpm typecheck && npx pnpm build   # checagens
 
-# Logins: gerente@ / vendedor@ / estoquista@loja.local — senha loja12345
+# Logins: nome.sobrenome da equipe (ex.: douglas.vargas, guilherme.dower, vitor.nunes) — senha loja12345
 ```

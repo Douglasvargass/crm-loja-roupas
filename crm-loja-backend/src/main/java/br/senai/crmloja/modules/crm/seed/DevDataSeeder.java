@@ -2,7 +2,9 @@ package br.senai.crmloja.modules.crm.seed;
 
 import br.senai.crmloja.core.identity.AppUser;
 import br.senai.crmloja.core.identity.AppUserRepository;
+import br.senai.crmloja.core.rbac.Module;
 import br.senai.crmloja.core.rbac.ModuleRepository;
+import br.senai.crmloja.core.rbac.ModuleRole;
 import br.senai.crmloja.core.rbac.ModuleRoleRepository;
 import br.senai.crmloja.core.rbac.UserModuleAccess;
 import br.senai.crmloja.core.rbac.UserModuleAccessRepository;
@@ -27,8 +29,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionTemplate;
 
-// Cadastros de demonstração (perfis dev e demo, só com o catálogo vazio): usuários, categorias, clientes e
-// produtos. Tudo passa pelos Services, como aconteceria pela tela.
+// Cadastros de demonstração (perfis dev e demo). Duas partes:
+//  1) A equipe: reconciliada em TODO boot. Garante login, nome e papel de cada pessoa, mesmo num banco que
+//     já existia (o do Render, o .data local). Assim trocar o login ou o papel de alguém aqui vale na
+//     próxima subida, sem precisar zerar o banco. A senha só é definida na criação da conta: uma senha
+//     escolhida pela pessoa nunca é sobrescrita.
+//  2) O catálogo (categorias, clientes, produtos): só quando o banco está vazio. Tudo passa pelos Services,
+//     como aconteceria pela tela.
 // Os produtos nascem com estoque zero de propósito: quem abre o estoque é o HistoricoVendasSeeder, que grava a
 // carga inicial com data retrodatada. Se a entrada fosse criada aqui, ficaria com a data do boot — e o trigger
 // trg_stock_movement_immutable não deixa corrigir depois.
@@ -39,6 +46,27 @@ import org.springframework.transaction.support.TransactionTemplate;
 public class DevDataSeeder implements ApplicationRunner {
 
     public static final String DEMO_PASSWORD = "loja12345";
+
+    // Logins eram nome.sobrenome@loja.local; hoje são só nome.sobrenome. Contas antigas são renomeadas.
+    static final String OLD_LOGIN_SUFFIX = "@loja.local";
+
+    // Equipe real do projeto. ADMIN = super admin (passa em tudo) e, por cima disso, o papel DEVELOPER
+    // para aparecer na tela com o rótulo certo. Os demais têm um papel só.
+    public record Membro(String login, String nome, String papel, boolean superAdmin) {}
+
+    public static final List<Membro> EQUIPE = List.of(
+            new Membro("guilherme.dower", "Guilherme Dower", "MANAGER", false),
+            new Membro("douglas.vargas", "Douglas Vargas", "DEVELOPER", true),
+            new Membro("julia.alcantara", "Julia Alcantara", "MARKETING_DEV", false),
+            new Membro("vitor.nunes", "Vitor Nunes", "SELLER", false),
+            // Gestão de operação e compras: recebe os chamados de peça em falta e faz o pedido ao fornecedor.
+            new Membro("vinicius.clemente", "Vinicius Clemente", "PURCHASING", false),
+            new Membro("vinicius.muniz", "Vinicius Muniz", "SELLER", false));
+
+    // Quem registra venda nos dados de demonstração (HistoricoVendasSeeder), em ordem de peso.
+    public static List<String> vendedores() {
+        return EQUIPE.stream().filter(m -> "SELLER".equals(m.papel())).map(Membro::login).toList();
+    }
 
     private static final Logger log = LoggerFactory.getLogger(DevDataSeeder.class);
 
@@ -73,21 +101,48 @@ public class DevDataSeeder implements ApplicationRunner {
     public void run(ApplicationArguments args) {
         try {
             tx.executeWithoutResult(s -> {
+                reconcileTeam();
                 if (categoryRepo.count() > 0) return;
-                seed();
-                log.warn("\n\n  Dados de demonstração criados. Logins (senha {}):\n"
-                        + "    gerente@loja.local · vendedor@loja.local · estoquista@loja.local\n", DEMO_PASSWORD);
+                seedCatalog();
+                log.warn("\n\n  Dados de demonstração criados. Equipe (senha {}):\n    {}\n", DEMO_PASSWORD,
+                        EQUIPE.stream().map(Membro::login).collect(java.util.stream.Collectors.joining("\n    ")));
             });
         } catch (RuntimeException e) {
             log.error("DevDataSeeder falhou; a aplicação segue no ar", e);
         }
     }
 
-    private void seed() {
-        user("gerente@loja.local", "Gabriela Gerente", "MANAGER");
-        user("vendedor@loja.local", "Vitor Vendedor", "SELLER");
-        user("estoquista@loja.local", "Elisa Estoquista", "STOCK_KEEPER");
+    // ---------------------------------------------------------------- equipe
 
+    private void reconcileTeam() {
+        Module crm = modules.findByCode("crm").orElseThrow();
+        for (Membro m : EQUIPE) {
+            AppUser u = users.findByLoginIgnoreCase(m.login())
+                    .or(() -> users.findByLoginIgnoreCase(m.login() + OLD_LOGIN_SUFFIX).map(old -> {
+                        old.setLogin(m.login());
+                        log.info("Login de demonstração renomeado: {}{} -> {}", m.login(), OLD_LOGIN_SUFFIX, m.login());
+                        return old;
+                    }))
+                    .orElseGet(() -> {
+                        AppUser novo = new AppUser(m.login(), m.nome(), encoder.encode(DEMO_PASSWORD));
+                        novo.setMustChangePassword(false);
+                        return users.save(novo);
+                    });
+
+            if (!m.nome().equals(u.getFullName())) u.setFullName(m.nome());
+            if (u.isSuperAdmin() != m.superAdmin()) u.setSuperAdmin(m.superAdmin());
+
+            ModuleRole role = roles.findByModuleIdAndCode(crm.getId(), m.papel()).orElseThrow();
+            accesses.findByUserIdAndModuleId(u.getId(), crm.getId()).ifPresentOrElse(a -> {
+                if (!a.getModuleRoleId().equals(role.getId())) a.setModuleRoleId(role.getId());
+                if (!a.isActive()) a.setActive(true);
+            }, () -> accesses.save(new UserModuleAccess(u.getId(), crm.getId(), role.getId())));
+        }
+    }
+
+    // --------------------------------------------------------------- catálogo
+
+    private void seedCatalog() {
         Map<String, Long> cat = new HashMap<>();
         for (String[] c : List.of(
                 new String[]{"Camisetas", "Camisetas e regatas"},
@@ -124,16 +179,6 @@ public class DevDataSeeder implements ApplicationRunner {
         product("ACE-001-U-MR", "Cinto de Couro", cat.get("Acessórios"), "U", "Marrom", "79.90", 5);
         product("ACE-002-U-PT", "Boné Aba Curva", cat.get("Acessórios"), "U", "Preto", "59.90", 5);
         product("ACE-003-U-CZ", "Kit Meias 3 Pares", cat.get("Acessórios"), "U", "Cinza", "29.90", 10);
-    }
-
-    private Long user(String login, String name, String roleCode) {
-        AppUser u = new AppUser(login, name, encoder.encode(DEMO_PASSWORD));
-        u.setMustChangePassword(false);
-        users.save(u);
-        var crm = modules.findByCode("crm").orElseThrow();
-        var role = roles.findByModuleIdAndCode(crm.getId(), roleCode).orElseThrow();
-        accesses.save(new UserModuleAccess(u.getId(), crm.getId(), role.getId()));
-        return u.getId();
     }
 
     private Long customer(String name, String cpf, String phone, String email, String zip, String street,

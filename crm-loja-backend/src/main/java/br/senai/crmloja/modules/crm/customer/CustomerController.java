@@ -25,6 +25,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+// HU01 a HU06. Vendedor e gerente atendem o cliente; excluir e inativar é só do gerente. As regras (CPF válido
+// e único, vínculo com vendas) ficam no CustomerService; aqui só entram e saem os dados.
 @RestController
 @RequestMapping("/crm/customers")
 @PreAuthorize("hasAnyRole('MANAGER','SELLER')")
@@ -38,6 +40,7 @@ public class CustomerController {
         this.sales = sales;
     }
 
+    // HU02: busca por parte do nome (sem acento) ou pelo CPF, com ou sem pontuação.
     @GetMapping
     public PageResponse<CustomerResponse> list(@RequestParam(required = false) String search,
                                                @RequestParam(required = false) Boolean active,
@@ -51,6 +54,7 @@ public class CustomerController {
         return service.detail(id);
     }
 
+    // HU06: histórico de compras. O find() antes garante 404 para cliente que não existe, em vez de lista vazia.
     @GetMapping("/{id}/sales")
     public List<SaleSummary> history(@PathVariable Long id) {
         service.find(id);
@@ -69,6 +73,7 @@ public class CustomerController {
         return service.update(id, body, user.id());
     }
 
+    // HU05: sem vendas apaga; com vendas o Service responde 409 e a tela oferece inativar.
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('MANAGER')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {

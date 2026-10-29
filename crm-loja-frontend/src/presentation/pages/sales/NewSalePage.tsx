@@ -30,7 +30,7 @@ export function NewSalePage() {
 
   return (
     <>
-      <PageHeader title="Nova venda" subtitle="Escolha o cliente, se ele quiser se identificar." />
+      <PageHeader help="Escolha o cliente, se ele quiser se identificar, e monte o carrinho. O estoque só baixa quando a venda é confirmada." title="Nova venda" subtitle="Escolha o cliente, se ele quiser se identificar." />
       <Card className="max-w-xl">
         <div className="flex flex-col gap-4 p-4">
           {customer ? (

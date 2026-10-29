@@ -14,7 +14,7 @@ Instruções para quem (pessoa ou agente) mexer neste repositório.
 
 ## Portões antes de dar uma tarefa por concluída
 
-- `./mvnw verify` (compila, roda testes unitários e de integração com Testcontainers)
+- `./mvnw verify` (compila, roda testes unitários e de integração contra um Postgres 16 embutido, sem Docker)
 
 ## Arquitetura
 

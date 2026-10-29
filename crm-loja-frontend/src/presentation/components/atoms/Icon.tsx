@@ -13,8 +13,13 @@ const paths = {
   close: 'M6 6l12 12M18 6 6 18',
   menu: 'M4 6h16M4 12h16M4 18h16',
   trash: 'M4 7h16M10 11v6m4-6v6M6 7l1 13h10l1-13M9 7V4h6v3',
-  assistant: 'M4 5h16v11H9l-5 4V5zm5 5h.01M12 10h.01M15 10h.01',
+  send: 'M4 12 20 4l-4 16-4-6-8-2zM12 14l8-10',
+  refresh: 'M20 11a8 8 0 0 0-14.5-3.5M4 4v4.5h4.5M4 13a8 8 0 0 0 14.5 3.5M20 20v-4.5h-4.5',
   alert:'M12 9v4m0 4h.01M10.3 3.9 2.2 18a2 2 0 0 0 1.7 3h16.2a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z',
+  target: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zm0-4a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0-4a1 1 0 1 0 0-2 1 1 0 0 0 0 2z',
+  trend: 'M3 17l6-6 4 4 8-8M15 7h6v6',
+  eye: 'M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12zm10 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6z',
+  truck: 'M3 6h11v10H3zM14 10h4l3 3v3h-7M7 19a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm10 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4z',
 } as const;
 
 export type IconName = keyof typeof paths;

@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+// HU09 a HU15. Estoquista e gerente cadastram e editam; o vendedor só consulta. Excluir, desativar e reativar é do
+// gerente. O estoque não muda por aqui: só por entrada, ajuste ou venda (StockService, RN08).
 @RestController
 @RequestMapping("/crm/products")
 @PreAuthorize("hasAnyRole('MANAGER','STOCK_KEEPER')")
@@ -32,6 +34,8 @@ public class ProductController {
 
     public ProductController(ProductService service) { this.service = service; }
 
+    // HU10, HU14 e HU15: filtros combináveis por nome, categoria, tamanho, código e situação (disponível, sem estoque,
+    // estoque baixo, inativo).
     @GetMapping
     @PreAuthorize("hasAnyRole('MANAGER','SELLER','STOCK_KEEPER')")
     public PageResponse<ProductResponse> list(@RequestParam(required = false) String name,
@@ -62,6 +66,7 @@ public class ProductController {
         return service.update(id, body, user.id());
     }
 
+    // HU13: só sai do banco o produto que nunca vendeu nem movimentou (fora o estoque inicial); senão 409 e a tela oferece desativar.
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('MANAGER')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {

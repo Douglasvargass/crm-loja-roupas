@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,9 +39,11 @@ public class SaleService {
     private final StockService stock;
     private final AuditService audit;
     private final AppProperties props;
+    private final JdbcTemplate jdbc;
 
     public SaleService(SaleRepository sales, ProductRepository products, CustomerRepository customers,
-                       StockService stock, AuditService audit, AppProperties props) {
+                       StockService stock, AuditService audit, AppProperties props, JdbcTemplate jdbc) {
+        this.jdbc = jdbc;
         this.sales = sales;
         this.products = products;
         this.customers = customers;
@@ -52,6 +55,12 @@ public class SaleService {
     // HU21: venda nasce aberta (DRAFT), total zero, cliente opcional.
     @Transactional
     public SaleResponse open(Long customerId, Long actorId) {
+        return open(customerId, actorId, false);
+    }
+
+    // Espaço do cliente (spec crm/07): o carrinho é uma venda aberta com canal ONLINE e o cliente já vinculado.
+    @Transactional
+    public SaleResponse open(Long customerId, Long actorId, boolean online) {
         Customer customer = null;
         if (customerId != null) {
             customer = customers.findById(customerId)
@@ -60,7 +69,9 @@ public class SaleService {
                 throw new BusinessRuleException("customer_inactive", "Este cliente está inativo e não pode comprar.");
             }
         }
-        return SaleResponse.from(sales.save(new Sale(customer, actorId)));
+        Sale sale = new Sale(customer, actorId);
+        if (online) sale.markOnline();
+        return SaleResponse.from(sales.save(sale));
     }
 
     // HU22: o mesmo produto de novo soma na mesma linha. O estoque é conferido aqui para avisar
@@ -158,6 +169,9 @@ public class SaleService {
             }
         }
         sale.markCancelled(OffsetDateTime.now(), reason.trim(), actorId);
+        // Pedido online pago e cancelado: o pagamento simulado vira estornado (spec crm/07, REQ-10).
+        jdbc.update("update payment set status = 'REFUNDED', refunded_at = now() where sale_id = ? and status = 'APPROVED'",
+                sale.getId());
         audit.record(actorId, "crm", "sale_cancelled", "sale", sale.getId(),
                 Map.of("from", previous.name(), "total", sale.getTotal(), "reason", reason.trim()));
         return SaleResponse.from(sale);

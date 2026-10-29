@@ -36,14 +36,20 @@ class AssistantIT extends IntegrationTest {
     @Test
     void ferramentasRespeitamOPapel() {
         var sellerTools = tools.definitionsFor("SELLER").stream().map(AssistantTools.ToolDef::name).toList();
-        assertThat(sellerTools).contains("buscar_clientes", "buscar_vendas", "buscar_produtos")
-                .doesNotContain("consultar_dashboard", "alertas_estoque", "movimentacoes_estoque");
+        assertThat(sellerTools).contains("buscar_clientes", "buscar_vendas", "buscar_produtos", "meu_painel", "abrir_chamado", "listar_chamados")
+                .doesNotContain("consultar_dashboard", "alertas_estoque", "movimentacoes_estoque", "metas_vendedores", "previsao_estoque", "pedidos_compra");
 
         var stockTools = tools.definitionsFor("STOCK_KEEPER").stream().map(AssistantTools.ToolDef::name).toList();
-        assertThat(stockTools).contains("alertas_estoque", "movimentacoes_estoque")
-                .doesNotContain("buscar_clientes", "consultar_dashboard");
+        assertThat(stockTools).contains("alertas_estoque", "movimentacoes_estoque", "listar_chamados", "previsao_estoque", "pedidos_compra")
+                .doesNotContain("buscar_clientes", "consultar_dashboard", "abrir_chamado");
 
-        assertThat(tools.definitionsFor("MANAGER")).hasSize(10);
+        // 10 do MVP + metas_vendedores + abrir_chamado + listar_chamados + previsao_estoque + pedidos_compra.
+        // meu_painel é só de vendedor.
+        assertThat(tools.definitionsFor("MANAGER")).hasSize(15);
+        // Equipe técnica vale por gerente + vendedor + estoquista: recebe as 16.
+        assertThat(tools.definitionsFor("DEVELOPER")).hasSize(16);
+        assertThat(tools.definitionsFor("MARKETING_DEV")).hasSize(16);
+        assertThat(tools.execute("consultar_dashboard", Map.of(), "DEVELOPER").error()).isFalse();
 
         // Mesmo se o modelo pedir uma ferramenta fora do papel, a execução recusa.
         var denied = tools.execute("consultar_dashboard", Map.of(), "SELLER");

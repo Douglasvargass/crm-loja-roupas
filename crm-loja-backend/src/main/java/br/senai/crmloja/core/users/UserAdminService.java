@@ -68,6 +68,27 @@ public class UserAdminService {
                 .toList();
     }
 
+    // Revisão de 29/10/2026: resetar senha pela tela (antes só pelo banco). Senha provisória nova, troca obrigatória no
+    // próximo acesso e todas as sessões abertas encerradas. Vale para a equipe (módulo crm) e para clientes (loja).
+    @Transactional
+    public CreatedUser resetPassword(String moduleCode, Long userId, Long actorId) {
+        Module module = moduleForUpdate(moduleCode);
+        if (userId.equals(actorId)) {
+            throw new BusinessRuleException("self_reset", "Para a sua própria senha, use \"Trocar senha\" no topo da tela.");
+        }
+        AppUser user = users.findById(userId).orElseThrow(() -> new NotFoundException("Conta não encontrada."));
+        UserModuleAccess access = accesses.findByUserIdAndModuleId(userId, module.getId())
+                .orElseThrow(() -> new NotFoundException("Conta não encontrada neste módulo."));
+        String password = PasswordGenerator.generate(10);
+        user.setPasswordHash(encoder.encode(password));
+        user.setMustChangePassword(true);
+        refreshTokens.revokeAllOfUser(userId, OffsetDateTime.now());
+        audit.record(actorId, moduleCode, "password_reset", "app_user", userId, Map.of());
+        String roleCode = roles.findById(access.getModuleRoleId()).map(ModuleRole::getCode).orElse(null);
+        return new CreatedUser(new UserRow(user.getId(), user.getLogin(), user.getFullName(), roleCode,
+                user.isActive() && access.isActive(), true, user.getLastLoginAt()), password);
+    }
+
     @Transactional
     public CreatedUser create(String moduleCode, String login, String fullName, String roleCode, Long actorId) {
         Module module = moduleForUpdate(moduleCode);

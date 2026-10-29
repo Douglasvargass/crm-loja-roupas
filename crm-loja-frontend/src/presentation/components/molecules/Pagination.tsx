@@ -7,6 +7,8 @@ interface Props {
   onChange: (page: number) => void;
 }
 
+// Paginação das listas. A página começa em 0 na API e aparece como 1 para a pessoa. Com uma página só, mostra
+// apenas o total de registros.
 export function Pagination({ page, totalPages, totalElements, onChange }: Props) {
   if (totalPages <= 1) {
     return <p className="px-4 py-3 text-xs text-muted">{totalElements} registro(s)</p>;

@@ -1,6 +1,6 @@
 # CRM Loja de Roupas — Documentação do MVP
 
-Oct 26, 2026 · @Douglas Vargas
+Oct 26, 2026 · @Douglas Vargas · revisado em 29/10/2026 (ver histórico no fim)
 
 ## 1. Visão geral
 
@@ -20,7 +20,7 @@ O MVP é uma aplicação web em Java (Spring Boot) com front em React e banco Po
 | Estoque | Saldo, entradas, ajustes, histórico de movimentações, estoque baixo/zerado |
 | Vendas | Carrinho com cálculo automático, confirmação com baixa, cancelamento com estorno, consulta por número/cliente/data/status |
 | Dashboard | Totais, vendas e faturamento por período, mais vendidos, estoque baixo e zerado |
-| Acesso | Login, troca de senha, 3 perfis (Gerente, Vendedor, Estoquista), auditoria das operações sensíveis |
+| Acesso | Login `nome.sobrenome`, troca de senha, 5 papéis (Gerente, Vendedor, Estoquista, Engenheiro de Software, Marketing e Desenvolvimento), auditoria das operações sensíveis |
 
 ### Fora do escopo do MVP
 
@@ -41,7 +41,7 @@ O projeto usa Java/Spring Boot no back-end. É um **monólito modular**: um núc
 | Banco | PostgreSQL 16 | Persistência, CHECKs, triggers |
 | Migrations | Flyway (SQL versionado) | Único caminho para mudar o schema; `ddl-auto=validate` |
 | Autenticação | Spring Security + JWT (jjwt) em cookie httpOnly | Access 10 min, refresh rotativo 24 h |
-| Testes | JUnit 5 + MockMvc + Testcontainers (Postgres real) | Integração contra banco de verdade |
+| Testes | JUnit 5 + MockMvc + Postgres 16 embutido (zonky, sem Docker) | Integração contra banco de verdade |
 | Front-end | React 19 + Vite + TypeScript estrito | SPA |
 | Estado de servidor | TanStack Query 5 | Cache, invalidação após mutações |
 | Estilo | Tailwind CSS 4 + tokens CSS | Tema claro/escuro por variáveis |
@@ -63,7 +63,7 @@ O projeto usa Java/Spring Boot no back-end. É um **monólito modular**: um núc
 | Congelar valor da época | `sale_item` copia código, nome e preço do produto |
 | Log imutável por trigger | `stock_movement` e `audit_event` recusam UPDATE/DELETE no banco |
 | Seed reconciliador no boot | `ApplicationRunner` idempotente para módulo, papéis e super admin |
-| Testes Vitest + Supertest em Postgres real | JUnit + MockMvc + Testcontainers, rodando as migrations do zero |
+| Testes Vitest + Supertest em Postgres real | JUnit + MockMvc + Postgres embutido, rodando as migrations do zero |
 | RBAC por módulo | Tabelas `module`, `module_role`, `user_module_access` + `@PreAuthorize` |
 | Front: http.ts, hooks, adapters | Igual, em React (seção 7) |
 
@@ -106,7 +106,7 @@ Se a turma preferir um só repositório, as três pastas ficam na raiz (`backend
 crm-loja-backend/
 ├── pom.xml · mvnw · docker-compose.yml · .env.example
 ├── CLAUDE.md · README.md · MIGRATIONS_RUNBOOK.md
-├── .github/workflows/ci.yml
+├── (workflows de CI ficam na raiz do repositório: .github/workflows/backend.yml, frontend.yml, docker.yml, pages.yml)
 └── src/
     ├── main/java/br/senai/crmloja/
     │   ├── CrmApplication.java          composition root
@@ -133,8 +133,8 @@ crm-loja-backend/
     │   └── db/migration/                V1__core_identity_rbac.sql, V2__core_audit.sql,
     │                                    V3__crm_catalog.sql, V4__crm_sales_stock.sql
     └── test/java/br/senai/crmloja/
-        ├── support/IntegrationTest.java base com Testcontainers + login
-        └── modules/crm/                 SaleFlowIT, StockIT, CustomerIT, DashboardIT, AuthIT
+        ├── support/IntegrationTest.java base com Postgres embutido + login
+        └── modules/crm/                 SaleIT, CatalogStockIT, CustomerIT, DashboardIT, AssistantIT (AuthIT em core/)
 ```
 
 ### Estrutura do front-end
@@ -297,6 +297,20 @@ erDiagram
 | stock\_movement | quantity | Com sinal e coerente com o tipo (CHECK) |
 | stock\_movement | balance\_after | Saldo do produto logo depois |
 | stock\_movement | (sale\_id, product\_id, type) | Único: o banco impede baixa ou estorno duplicado |
+| sales\_target | (seller\_id, period\_month) | Único: uma meta por vendedor e mês (V6, spec crm/06) |
+| sales\_target | period\_month | Sempre o dia 1 do mês (CHECK) |
+| stock\_request | status | `OPEN`, `RESOLVED`, `CANCELLED`; fechado exige `closed_at` e `closing_note` (CHECK) (V8, spec crm/09) |
+| stock\_request | product\_id, customer\_id | Opcionais; RESTRICT |
+| purchase\_order | status | `OPEN`, `RECEIVED`, `CANCELLED`; fechado exige `closed_at`; cancelado exige `closing_note` (CHECK) (V10, spec crm/11) |
+| purchase\_order | expected\_date, reschedule\_count | Data prometida; quantas vezes mudou (as datas antigas ficam em `audit_event`) |
+| purchase\_order | status (V11) | `OPEN`, `IN_TRANSIT`, `CHECKING`, `RECEIVED`, `CANCELLED`; em trânsito exige `shipped_at`, em conferência exige `arrived_at` (`ck_purchase_order_steps`); `invoice_number` = nº da nota fiscal |
+| purchase\_order | bonus\_invoice\_number, return\_count (V12) | Nota de bonificação do que veio a mais; quantas vezes a nota voltou |
+| purchase\_order\_item | received\_quantity (V12) | Contado na conferência; nulo até a entrada |
+| purchase\_order\_item | (order\_id, product\_id) | Único: uma linha por peça no pedido; `quantity` de 1 a 9999 (CHECK); RESTRICT |
+| sale | channel | `STORE` (balcão, padrão) ou `ONLINE` (espaço do cliente) (V9) |
+| customer | user\_id | Conta de acesso do cliente; única; opcional (V9) |
+| payment | sale\_id | Um pagamento por pedido (único); `method` PIX/CARD; `card_last4` só no cartão; `status` APPROVED/REFUNDED (V9) |
+| sales\_target | amount | `> 0` (CHECK); mudança vai para `audit_event` (`sales_target_set`, de → para) |
 
 ### Migrations Flyway (PostgreSQL 16)
 
@@ -562,7 +576,7 @@ No Java, os enums mapeiam com `@Enumerated(EnumType.STRING)` + `@JdbcType(Postgr
 
 ## 4. Histórias de usuário
 
-São 35 histórias em 8 épicos, todas rastreáveis aos critérios do enunciado. A prioridade usa MoSCoW: **Must** é obrigatório para o MVP, **Should** é desejável e **Could** é extra depois do essencial.
+São 57 histórias em 13 épicos (HU01 a HU35 são o MVP do enunciado; HU36 a HU54 vieram depois, sem mexer no que é obrigatório), todas rastreáveis aos critérios do enunciado. A prioridade usa MoSCoW: **Must** é obrigatório para o MVP, **Should** é desejável e **Could** é extra depois do essencial.
 
 **Personas:** **Vendedor(a)** atende o balcão e registra vendas. **Estoquista** recebe mercadoria e faz ajustes. **Gerente** acompanha resultados e cadastros. Cada persona é um papel do módulo crm; o Gerente é o administrador do módulo.
 
@@ -605,6 +619,28 @@ São 35 histórias em 8 épicos, todas rastreáveis aos critérios do enunciado.
 | HU33 | Entrar no sistema | Todos | Must |
 | HU34 | Trocar a senha | Todos | Must |
 | HU35 | Gerenciar usuários e papéis | Gerente | Should |
+| HU36 | Tirar dúvidas com a Talita (assistente de IA) | Todos | Could |
+| HU37 | Meu painel: minhas vendas e minha meta | Vendedor | Should |
+| HU38 | Definir a meta de cada vendedor | Gerente | Should |
+| HU39 | Quadro de metas da equipe | Gerente | Should |
+| HU40 | Entrar como cliente e trocar a senha | Cliente | Could |
+| HU41 | Vitrine de produtos | Cliente | Could |
+| HU42 | Carrinho | Cliente | Could |
+| HU43 | Pagar (Pix ou cartão simulados) | Cliente | Could |
+| HU44 | Meus pedidos | Cliente | Could |
+| HU45 | Meus dados | Cliente | Could |
+| HU46 | Agente de vendas da demonstração | Equipe | Could |
+| HU47 | Abrir chamado de peça em falta | Vendedor | Should |
+| HU48 | Resolver ou cancelar chamado | Estoquista | Should |
+| HU49 | Sino de avisos | Todos | Should |
+| HU50 | "Ver como" (só leitura) | Gerente | Should |
+| HU51 | Ver o que vai faltar e quanto pedir | Operações e Compras | Should |
+| HU52 | Registrar pedido de compra | Operações e Compras | Should |
+| HU53 | Receber o pedido de compra | Estoquista | Should |
+| HU54 | Mudar a data ou cancelar o pedido de compra | Operações e Compras | Should |
+| HU55 | Acompanhar as etapas do pedido e a nota fiscal | Operações e Compras | Should |
+| HU56 | Ver o estoque no Dashboard | Operações e Compras | Should |
+| HU57 | Falar com a Talita e pedir uma peça (cliente) | Cliente | Could |
 
 ### EP01 · Clientes
 
@@ -760,6 +796,7 @@ São 35 histórias em 8 épicos, todas rastreáveis aos critérios do enunciado.
 
 - Atalhos: Hoje, 7 dias, 30 dias, Este mês, Personalizado. Padrão: Este mês.
 - Contam só vendas `CONFIRMED` (canceladas aparecem num contador à parte).
+- Lista **Vendedor(a)** ("Todos" ou uma pessoa): cartões e gráficos passam a mostrar só as vendas abertas por ela, para saber quanto cada um vendeu.
 
 **HU29 · Mais vendidos.** Como gerente, quero ver o top 5 de produtos por quantidade vendida no período, em gráfico de barras.
 
@@ -771,7 +808,7 @@ São 35 histórias em 8 épicos, todas rastreáveis aos critérios do enunciado.
 
 **HU31 · Navegação e feedback.** Como usuário, quero um menu fixo e mensagens claras, para usar o sistema sem treinamento.
 
-- Menu lateral com os 6 módulos, item ativo destacado.
+- Menu lateral com os módulos que o papel pode usar, item ativo destacado; toda tela tem o "?" de ajuda.
 - Toda operação mostra aviso de sucesso (verde) ou erro (vermelho) que some sozinho em 4 segundos.
 - Exclusões e cancelamentos pedem confirmação.
 - Erros de validação aparecem ao lado do campo.
@@ -782,7 +819,7 @@ São 35 histórias em 8 épicos, todas rastreáveis aos critérios do enunciado.
 
 **HU33 · Entrar no sistema.** Como usuário, quero entrar com login e senha, para usar só o que meu papel permite.
 
-- Login e senha corretos abrem a tela inicial do papel (Gerente: Dashboard; Vendedor: Vendas; Estoquista: Estoque).
+- Login e senha corretos abrem a tela inicial do papel (Gerente e equipe técnica: Dashboard; Vendedor: Meu painel; Estoquista: Estoque; Operações e Compras: Reposição; Cliente: Vitrine).
 - Login ou senha errados, conta inativa ou bloqueada mostram a mesma frase: "Login ou senha incorretos".
 - A sessão dura enquanto a pessoa usa o sistema; parada por mais de 24 h, pede login de novo.
 - Botão Sair encerra a sessão neste navegador.
@@ -797,7 +834,138 @@ São 35 histórias em 8 épicos, todas rastreáveis aos critérios do enunciado.
 
 - Cria conta com senha provisória e troca obrigatória no primeiro acesso.
 - Muda o papel ou inativa a conta; a mudança fica registrada na auditoria.
+- Reseta a senha de quem esqueceu (equipe em Usuários; cliente na ficha dele): senha provisória, troca obrigatória, sessões encerradas.
 - O gerente não muda o próprio papel, e a loja nunca fica sem nenhum gerente ativo (validado dentro da transação).
+
+### EP09 · Assistente de IA
+
+**HU36 · Tirar dúvidas com a Talita (extra).** Como membro da equipe, quero perguntar em linguagem natural sobre vendas, estoque, clientes e uso do sistema, para decidir sem procurar em várias telas.
+
+- As respostas usam dados consultados no banco no momento; nada é inventado.
+- Cada perfil só obtém o que a tela já mostraria a ele.
+- Ela só fala da loja: receita, notícia ou lição de casa ela recusa com simpatia.
+- O assistente só consulta; a única exceção é abrir chamado de peça em falta, e só depois de a pessoa confirmar (HU47).
+- Sem a chave da IA configurada, o assistente aparece desligado e o resto do sistema funciona.
+
+### EP10 · Metas e painel do vendedor (spec crm/06)
+
+**HU37 · Meu painel.** Como vendedor, quero ver as minhas vendas do mês, a minha meta e quanto falta por dia, para saber se estou no caminho.
+
+- Mostra vendido no mês, meta, quanto falta, ritmo por dia útil (segunda a sábado) e a projeção do mês.
+- Cada vendedor vê só os próprios números, sem comparação com colegas.
+- Sem meta definida, o painel mostra as vendas e avisa que a meta ainda não foi definida.
+
+**HU38 · Definir a meta de cada vendedor.** Como gerente, quero definir a meta de cada vendedor por mês, para acompanhar a equipe com um alvo claro.
+
+- Só o mês atual e os próximos 12 meses aceitam meta; mês fechado não muda.
+- Só vendedor ativo recebe meta; valor maior que zero.
+- Toda mudança vai para a auditoria (de quanto para quanto).
+
+**HU39 · Quadro de metas da equipe.** Como gerente, quero ver a equipe toda num quadro, para saber quem precisa de ajuda.
+
+- Uma linha por vendedor com vendido, meta, projeção e a situação (bateu, no ritmo, atenção, abaixo, sem meta).
+
+### EP11 · Espaço do cliente (spec crm/07)
+
+**HU40 · Entrar como cliente.** Como cliente, quero entrar com o meu login, para comprar pela internet.
+
+- A conta do cliente é separada da equipe: ele só vê a loja (`/loja`) e nunca o sistema interno.
+- Primeiro acesso com a senha padrão e troca obrigatória.
+
+**HU41 · Vitrine.** Como cliente, quero ver as peças disponíveis, para escolher o que comprar.
+
+- Só peças ativas e com estoque; "Últimas unidades" quando está no mínimo; a quantidade exata não aparece.
+
+**HU42 · Carrinho.** Como cliente, quero montar um carrinho, para comprar várias peças de uma vez.
+
+- Adicionar, mudar a quantidade e remover; o total é calculado sozinho.
+- Se o preço mudar com a peça no carrinho, vale o preço novo e o cliente confere antes de pagar.
+
+**HU43 · Pagar.** Como cliente, quero pagar com Pix ou cartão, para fechar o pedido.
+
+- Pagamento simulado: nada é cobrado; o Pix mostra um QR code de demonstração; cartão final 0002 é recusado, para testar.
+- Fechar o pedido é tudo ou nada: se faltar estoque de uma peça, nada é baixado.
+- Só os 4 últimos dígitos do cartão são guardados.
+
+**HU44 · Meus pedidos.** Como cliente, quero acompanhar os meus pedidos, para saber o que comprei.
+
+- Lista e detalhe só dos meus pedidos; pedido de outro cliente não existe para mim (404).
+- Pedido cancelado pela loja aparece como estornado.
+
+**HU45 · Meus dados.** Como cliente, quero atualizar telefone, e-mail e endereço, para manter o cadastro certo.
+
+- Nome e CPF só a loja muda.
+
+### EP12 · Dados de demonstração (spec crm/08)
+
+**HU46 · Agente de vendas da demonstração.** Como equipe, quero que a demonstração continue vendendo sozinha todo dia, para o dashboard nunca ficar parado.
+
+- Fecha um dia por vez, sempre no passado, com o mesmo jeito de vender do histórico.
+- A IA grátis só escolhe o "clima" do dia (mais ou menos movimento); os números vêm do sistema.
+- Se houve uso real naquele dia, o agente não mexe; o gerente vê o diário no Dashboard.
+
+### EP04 · Estoque (continuação)
+
+**HU47 · Abrir chamado de peça em falta (spec crm/09).** Como vendedor, quero registrar a peça que o cliente queria e não tinha, para o estoque repor e eu avisar o cliente quando chegar.
+
+- Descrição, tamanho, cor, quantidade (1 a 99), produto e cliente opcionais.
+- Peça com estoque suficiente não abre chamado: é para vender.
+- A Talita também abre, sempre mostrando o resumo e esperando o "sim".
+
+**HU48 · Resolver ou cancelar chamado.** Como estoquista ou gerente, quero fechar o chamado com uma nota, para registrar o que foi feito.
+
+- Resolver: estoque e gerente; cancelar: esses ou quem abriu; sempre com nota.
+- A entrada de estoque da peça resolve sozinha os chamados mais antigos que ela cobre.
+
+**HU49 · Sino de avisos.** Como membro da equipe, quero ver no topo o que precisa da minha atenção.
+
+- Estoque e gerente veem os chamados abertos; o vendedor vê as novidades dos chamados dele.
+
+**HU51 · Ver o que vai faltar (spec crm/11).** Como Operações e Compras, quero ver o que vai faltar antes de faltar e quanto pedir, para comprar na hora certa.
+
+- Média de venda por dia nos últimos 30 dias, dias até acabar, o que está a caminho, chamados abertos e quanto pedir.
+- Situações: zerado, acaba em até 7 dias, até 21 dias, tranquilo e parado (dinheiro empatado).
+- Escolher quantos dias o pedido deve cobrir (7 a 90).
+
+**HU52 · Registrar pedido de compra.** Como Operações e Compras, quero registrar o que pedi ao fornecedor e quando chega, para a loja saber o que está a caminho.
+
+- Fornecedor, data prevista (hoje a 180 dias) e de 1 a 30 peças; o pedido pode vir montado da Reposição.
+- O estoquista não registra pedido: ele recebe a mercadoria.
+
+**HU53 · Receber o pedido.** Como estoquista, quero dar entrada no pedido que chegou com um clique, para o estoque subir e os chamados fecharem.
+
+- Cada peça entra no estoque na mesma transação (tudo ou nada); pedido recebido não recebe de novo.
+
+**HU54 · Mudar a data ou cancelar o pedido.** Como Operações e Compras, quero mudar a data ou cancelar o pedido com o motivo, para a previsão continuar certa.
+
+- Motivo obrigatório; a data antiga fica na auditoria; cancelado não some, vai para a aba Cancelados.
+- Pedido aberto com a data vencida aparece como atrasado.
+
+### EP13 · Acesso (continuação)
+
+**HU50 · "Ver como" (spec crm/10).** Como gerente, quero ver o sistema exatamente como outra pessoa da equipe vê, para tirar dúvidas e conferir permissões.
+
+- Só gerente e equipe técnica usam; dura até 30 minutos.
+- É só para olhar: qualquer alteração é recusada; entrar e sair ficam registrados.
+- Uma faixa no topo mostra o tempo todo de quem é a visão.
+
+### Adendo de 29/10/2026 (fim do dia)
+
+**HU55 · Etapas do pedido e nota fiscal.** Como Operações e Compras, quero saber se o pedido saiu do fornecedor, se chegou e qual nota deu entrada, para cobrar o fornecedor e conferir a mercadoria.
+
+- Pedido feito → em trânsito (eu marco, com a nota se já veio) → em conferência (quem recebe marca) → entrada feita (com a nota fiscal, obrigatória).
+- Depois que chegou, a data não muda; cancelar vale até a entrada; cada etapa fica na auditoria.
+- Na conferência conto peça por peça: chegou a menos, devolvo a nota (nada entra); chegou a mais, o extra entra com a nota de bonificação.
+
+**HU56 · Estoque no Dashboard.** Como Operações e Compras, quero abrir o Dashboard e ver o estoque, para saber na hora o que precisa de atenção.
+
+- Peças e valor em estoque, zerados, acabam em 7 dias, para pedir, pedidos feitos, em trânsito, em conferência e notas que deram entrada.
+- Eu não vejo vendas nem faturamento; o gerente vê vendas e estoque.
+
+**HU57 · Talita do cliente e pedido de peça.** Como cliente, quero perguntar sobre peças e meus pedidos e pedir uma peça que não está na vitrine, para comprar o que procuro.
+
+- A Talita do cliente só fala da vitrine, dos meus pedidos e das peças que pedi; nada da operação da loja.
+- Pedir peça (pela Talita, depois de confirmar, ou pelo botão da vitrine) avisa o gerente e o estoque; acompanho em Meus pedidos.
 
 ## 5. Regras de negócio
 
@@ -828,8 +996,37 @@ As regras ficam no Service e, sempre que possível, também no banco (CHECK, UNI
 | RN21 | Dashboard conta e soma só vendas `CONFIRMED` no período; canceladas à parte | — | — |
 | RN22 | Produto inativo ou sem estoque não aparece na busca da tela de venda | — | — |
 | RN23 | Confirmar, cancelar, ajustar estoque, inativar e mudar papel gravam `audit_event` na mesma transação | Trigger de imutabilidade | — |
-| RN24 | Cada rota exige papel (seção 6); o front só esconde, quem barra é o back-end | — | 401 sem sessão · 403 sem papel |
+| RN24 | Cada rota exige papel (seção 6); o front só esconde, quem barra é o back-end. Os papéis técnicos (`DEVELOPER`, `MARKETING_DEV`) valem por gerente + vendedor + estoquista; Operações e Compras (`PURCHASING`) vale por estoquista e recebe os chamados | — | 401 sem sessão · 403 sem papel |
 | RN25 | O gerente não muda o próprio papel e a loja nunca fica sem gerente ativo | Contagem dentro da transação | 409 `self_role_change` · `last_admin` |
+| RN26 | Meta é por vendedor e mês, maior que zero, uma por mês (spec crm/06) | `ux_sales_target_seller_month`, `ck_sales_target_amount` | 400 |
+| RN27 | Meta só no mês atual ou até 12 meses à frente; mês fechado não muda | — | 409 `month_closed` · `month_too_far` |
+| RN28 | Só vendedor(a) ativo(a) recebe meta | — | 409 `not_a_seller` |
+| RN29 | Vendido = vendas `CONFIRMED` que o vendedor **abriu**, pela data de confirmação no fuso da loja; canceladas saem | — | — |
+| RN30 | Dia útil = segunda a sábado. Ritmo = vendido ÷ dias úteis passados; projeção = ritmo × dias úteis do mês; por dia = falta ÷ dias úteis restantes. Situação: batida, no ritmo (projeção ≥ meta), atenção (80–100%), abaixo do ritmo (< 80%), não bateu (mês fechado) | — | — |
+| RN31 | O vendedor vê só os próprios números (Meu painel, sem parâmetro de vendedor); o gerente vê todos; toda mudança de meta grava `audit_event` com o valor anterior | `audit_event` imutável | 403 |
+| RN32 | Chamado de peça em falta: descrição de 3 a 200 letras, quantidade de 1 a 99; abre quem atende (gerente, vendedor) | `ck_stock_request_*` | 400 · 403 |
+| RN33 | Peça ativa com estoque suficiente não abre chamado | — | 409 `product_in_stock` |
+| RN34 | Resolver: estoque ou gerente; cancelar: esses ou quem abriu; sempre com nota; fechado não reabre | `ck_stock_request_closed` | 409 `request_closed` |
+| RN35 | Entrada de estoque resolve os chamados abertos da peça, do mais antigo ao mais novo, enquanto a quantidade cobrir | Mesma transação da entrada | — |
+| RN36 | A Talita só grava uma coisa: chamado, depois de a pessoa confirmar o resumo | — | — |
+| RN37 | Cliente só acessa a loja (`/loja/**`), sempre resolvido pela sessão; pedido, carrinho ou dado de outro cliente: 404 | `ux_customer_user` | 403 · 404 |
+| RN38 | Pedido online = venda com canal ONLINE; pagar confirma pela mesma regra tudo-ou-nada do balcão | `ck_sale_channel`, `ux_payment_sale` | 409 `insufficient_stock` |
+| RN39 | Preço que mudou com a peça no carrinho: vale o novo; o carrinho é atualizado e o cliente confere antes de pagar | — | 409 `price_changed` |
+| RN40 | Pagamento simulado; cartão final 0002 é recusado; só os 4 últimos dígitos são guardados | `ck_payment_card` | 409 `payment_declined` |
+| RN41 | Cancelar pedido online pago estorna o pagamento (status REFUNDED) e devolve o estoque | `ck_payment_refund` | — |
+| RN42 | O cliente muda contato e endereço; nome e CPF só a loja muda | — | — |
+| RN43 | Reposição: média por dia = vendido (confirmado) nos últimos 30 dias ÷ 30; dias até acabar = estoque ÷ média; sem venda, sem previsão | `Coverage` | — |
+| RN44 | Quanto pedir = venda prevista nos dias escolhidos (7 a 90) + estoque mínimo + chamados abertos da peça − estoque − o que está a caminho; nunca negativo | `Coverage` | 400 `invalid_horizon` |
+| RN45 | "A caminho" = soma dos pedidos de compra abertos da peça; pedido recebido ou cancelado deixa de contar | — | — |
+| RN46 | Situação: zerado; acaba em até 7 dias ou no mínimo; até 21 dias; tranquilo; parado (com estoque e sem venda em 30 dias) | `Coverage` | — |
+| RN47 | Pedido de compra: fornecedor, data de hoje a 180 dias, 1 a 30 peças de 1 a 9999 un.; registra, muda data e cancela só quem compra (G, Operações e Compras), sempre com motivo para mudar ou cancelar; nada se apaga | `ck_purchase_order_closed` | 400 · 403 · 409 `order_closed` |
+| RN49 | Pedido de compra: pedido feito → em trânsito (quem compra) → em conferência (quem recebe) → entrada feita com o nº da nota fiscal; data só muda antes de chegar; cancela até a entrada | `ck_purchase_order_steps` | 400 `invoice_required` · 409 `wrong_step` |
+| RN50 | Dashboard: o bloco Estoque é de gerente, Operações e Compras e estoquista; vendas e faturamento continuam só do gerente | `/crm/dashboard` G | 403 |
+| RN51 | Cliente pede peça que não está na vitrine (Talita com confirmação ou botão da vitrine); vira chamado ligado a ele; cada cliente vê só os seus | — | 409 `product_in_stock` |
+| RN52 | Conferência do pedido de compra: contado peça por peça; chegou a menos → a nota volta ao fornecedor (nada entra, pedido volta a feito); chegou a mais → o extra entra com a nota de bonificação; nunca entrada "mais ou menos" para ajustar depois | `ck_purchase_order_item_received` | 409 `short_delivery` · 400 `bonus_invoice_required` |
+| RN53 | Cliente com acesso à loja online não se exclui; inativa | `fk_customer_user` | 409 `customer_has_login` |
+| RN54 | Resetar senha (gerente): senha provisória, troca obrigatória, sessões encerradas; ninguém reseta a própria por aí | — | 409 `self_reset` |
+| RN48 | Receber dá entrada de todas as peças na mesma transação (tudo ou nada) e fecha os chamados que a entrada cobre (RN35); aberto com data vencida = atrasado | Mesma transação da entrada | 409 `order_closed` |
 
 ### Ciclo de vida da venda
 
@@ -848,8 +1045,7 @@ As regras ficam no Service e, sempre que possível, também no banco (CHECK, UNI
 
 ```java
 @Service
-@RequiredArgsConstructor
-public class SaleService {
+public class SaleService {   // sem Lombok: construtor explícito (omitido aqui)
 
     private final SaleRepository sales;
     private final ProductRepository products;
@@ -917,7 +1113,7 @@ O back-end expõe as rotas **sem** prefixo; o front chama `/api/...` e o proxy d
 
 **Formato de erro, sempre:** `{"error": "<frase em português>", "code": "<código estável, quando houver>"}`. Códigos HTTP: 200, 201 (criado), 204 (sem corpo), 400 (validação), 401 (sem sessão), 403 (sem papel), 404, 409 (regra de negócio), 500 (logado, com `"Erro interno"` para a tela).
 
-**Papéis:** G = Gerente (admin do módulo), V = Vendedor, E = Estoquista. Super admin passa em tudo.
+**Papéis:** G = Gerente (admin do módulo), V = Vendedor, E = Estoquista, C = Cliente (módulo loja, sem acesso ao crm). Os papéis técnicos `DEVELOPER` (Engenheiro(a) de Software) e `MARKETING_DEV` (Marketing e Desenvolvimento) valem por G + V + E. Operações e Compras (`PURCHASING`) vale por E. Super admin passa em tudo. Login no padrão `nome.sobrenome` (e-mail completo também é aceito).
 
 | Método | Rota | O que faz | Papéis | HU |
 | --- | --- | --- | --- | --- |
@@ -951,8 +1147,38 @@ O back-end expõe as rotas **sem** prefixo; o front chama `/api/...` e o proxy d
 | POST · PUT · DELETE | `/crm/sales/{id}/items[/{itemId}]` | Inclui, altera quantidade, remove item | G V | HU22 |
 | POST | `/crm/sales/{id}/confirm` | Confirma e baixa estoque | G V | HU23 |
 | POST | `/crm/sales/{id}/cancel` | `{reason}`; estorna se confirmada | G | HU24 |
-| GET | `/crm/dashboard?from=&to=` | Todos os indicadores numa chamada | G | HU27–HU30 |
+| GET | `/crm/dashboard?from=&to=&categoryId=&productId=&day=&sellerId=` | Todos os indicadores numa chamada; `sellerId` = quem abriu a venda (a resposta traz `sellers` com as opções e `selected.sellerId/sellerName`) | G | HU27–HU30 |
 | GET · POST · PATCH | `/admin/users?module=crm` | Lista, cria, muda papel, inativa | G | HU35 |
+| POST | `/admin/users/{id}/reset-password?module=crm\|loja` | Senha provisória nova (troca obrigatória), sessões encerradas; devolve `{user, provisionalPassword}`; 409 `self_reset` | G | HU35 |
+| GET | `/crm/assistant/status` | `{enabled, model}`: se o assistente de IA está ligado | G V E | HU36 |
+| POST | `/crm/assistant/chat` | `{conversationId?, message}` → `{conversationId, answer, toolsUsed}`; 409 `assistant_disabled` sem chave | G V E | HU36 |
+| PATCH | `/crm/customers/{id}/activate` · `/crm/products/{id}/activate` | Reativa cliente ou produto inativo | G | HU05, HU13 |
+| GET | `/crm/my-panel?month=aaaa-mm` | Painel de **quem está logado**: meta, vendido, %, falta, ritmo, projeção, hoje, vendas por dia, mais vendidos, últimas vendas. Sem parâmetro de vendedor. Mês futuro: 400 `invalid_month` | V | HU37 |
+| GET | `/crm/targets?month=aaaa-mm` | Quadro de metas: cada vendedor ativo com meta, vendido, %, projeção, falta, situação; totais da equipe; `editable` | G | HU38, HU39 |
+| GET | `/crm/requests?status=&page=` | Chamados de peça em falta; vendedor recebe só os que abriu | G V E | HU47 |
+| POST | `/crm/requests` | `{description, productId?, size?, color?, quantity, customerId?}`; 409 `product_in_stock` se a peça tem estoque | G V | HU47 |
+| POST | `/crm/requests/{id}/resolve` · `/cancel` | `{note}`; resolver: G E; cancelar: G E ou quem abriu (outro vendedor: 404); 409 `request_closed` | G V E | HU48 |
+| GET · POST | `/crm/requests/alerts` · `/alerts/seen` | Sino: abertos (G E) ou novidades dos meus (V); marcar como visto | G V E | HU49 |
+| GET | `/auth/view-as/targets` | Pessoas que podem ser vistas (ativas, com papel, menos eu) | G | HU50 |
+| POST · DELETE | `/auth/view-as` | `{userId}` liga o "Ver como" (cookie `view_as`, 30 min); DELETE sai. Durante o modo, toda alteração recebe 403 `read_only_view_as` e `/auth/me` traz `viewAs` | G (sair: todos) | HU50 |
+| GET · POST | `/loja/requests` | Peças que o cliente pediu · pedir peça `{description, size?, color?, quantity}` (vira chamado ligado ao cliente; peça com estoque 409 `product_in_stock`) | C | HU57 |
+| GET · POST | `/loja/assistant/status` · `/loja/assistant/chat` | Talita do cliente: `{enabled}` · `{conversationId?, message}` | C | HU57 |
+| GET | `/crm/stock/planning?horizon=` | Reposição: `{today, windowDays, horizonDays, summary, items[]}`; cada item com `dailyAvg`, `daysLeft`, `runOutDate`, `incoming`, `nextArrival`, `openRequestsQty`, `suggestedQty`, `status` (OUT, CRITICAL, ATTENTION, OK, STALE, NEW), `needsOrder`, `covered`, `arrivesAfterRunOut`. `horizon` de 7 a 90 (padrão 30); fora disso 400 `invalid_horizon` | G E | HU51 |
+| GET | `/crm/purchase-orders?status=&late=&page=` · `/{id}` | Pedidos de compra com as peças; `late=true` só os abertos com a data vencida | G E | HU52 |
+| POST | `/crm/purchase-orders` | `{supplier, expectedDate, note?, items:[{productId, quantity}]}`; 400 `date_in_past`, `date_too_far`, `duplicated_product`, `too_many_items`; 409 `product_inactive` | G (`PURCHASING`) | HU52 |
+| POST | `/crm/purchase-orders/{id}/ship` | `{invoiceNumber?}`: saiu do fornecedor → IN_TRANSIT; 409 `wrong_step` | G (`PURCHASING`) | HU55 |
+| POST | `/crm/purchase-orders/{id}/arrive` | Chegou na loja → CHECKING (em conferência); 409 `wrong_step` | G E | HU55 |
+| POST | `/crm/purchase-orders/{id}/receive` | `{invoiceNumber, bonusInvoiceNumber?, note?, items?:[{productId, receivedQuantity}]}` (NF obrigatória; vale a do envio; peça sem contagem = bateu): entrada de cada peça, o extra pela nota de bonificação, fecha os chamados que cobre; devolve `{order, requestsResolved, bonusUnits}`; 400 `invoice_required` · `bonus_invoice_required`; 409 `short_delivery` · `order_closed` | G E | HU53 |
+| POST | `/crm/purchase-orders/{id}/return` | `{note, items?}`: a nota volta ao fornecedor; nada entra; pedido volta a OPEN (`returnCount`+1); 409 `wrong_step` | G E | HU55 |
+| POST | `/crm/purchase-orders/{id}/reschedule` · `/cancel` | `{expectedDate, note}` · `{note}`, motivo obrigatório; 400 `same_date`; 409 `order_closed` | G (`PURCHASING`) | HU54 |
+| GET | `/crm/export/customers.csv` · `products.csv` · `sales.csv` | Exporta a lista com os mesmos filtros da tela (separador `;`, UTF-8 com BOM) | G | HU32 |
+| GET | `/loja/products?name=&categoryId=&size=&page=` · `/loja/categories` | Vitrine: só ativo com estoque, sem estoque exato (`lastUnits`). O gerente também lê, para a Prévia da loja | C G | HU42 |
+| GET · POST · PUT · DELETE | `/loja/cart` · `/loja/cart/items[/{itemId}]` | Carrinho do cliente da sessão (venda aberta online) | C | HU43 |
+| POST | `/loja/checkout` | `{method: PIX\|CARD, cardNumber?}`; 409 `price_changed` (carrinho atualizado), `payment_declined` (final 0002), `cart_empty`, `insufficient_stock` | C | HU44 |
+| GET | `/loja/orders` · `/loja/orders/{id}` | Meus pedidos (online e balcão); de outro cliente: 404 | C | HU45 |
+| GET · PUT | `/loja/me` | Meus dados; nome e CPF não mudam | C | HU45 |
+| GET | `/crm/demo-agent` | Diário do agente de demonstração: `{enabled, aiEnabled, days[14]}`. Fora dos perfis dev/demo, `enabled=false` | G | HU46 |
+| PUT | `/crm/targets/{sellerId}?month=aaaa-mm` | `{amount}` define ou corrige a meta. 409 `month_closed` · `month_too_far` · `not_a_seller` · `target_conflict`; 400 valor ≤ 0 ou mais de 2 casas | G | HU38 |
 
 ### Exemplo de resposta do dashboard
 
@@ -994,13 +1220,14 @@ O fim do período é exclusivo (`< dia seguinte 00:00` no fuso `America/Sao_Paul
 
 ## 7. Telas e navegação
 
-São 11 telas numa SPA React. As internas ficam sob `RequireAuth → RequireActivePassword → AppShell` (menu lateral, topo com usuário e Sair); o menu mostra só o que o papel permite.
+São 13 telas internas numa SPA React (mais as 5 do espaço do cliente). As internas ficam sob `RequireAuth → RequireActivePassword → AppShell` (menu lateral, topo com usuário e Sair); o menu mostra só o que o papel permite.
 
 | Tela | Rota | Conteúdo | Papéis | HU |
 | --- | --- | --- | --- | --- |
 | Entrar | `/login` | Login e senha, mensagem única de erro | público | HU33 |
 | Trocar senha | `/trocar-senha` | Obrigatória no primeiro acesso | logado | HU34 |
-| Dashboard | `/` | Período; 5 cartões com variação; faturamento por dia; mais vendidos; por categoria; estoque baixo e zerado | G | HU27–HU30 |
+| Dashboard | `/` | Período; lista Vendedor(a); 5 cartões com variação; faturamento por dia; mais vendidos; por categoria; estoque baixo e zerado | G | HU27–HU30 |
+| Dashboard (estoque) | `/` | Para Operações e Compras e estoquista: só o bloco Estoque (o gerente vê o mesmo bloco abaixo das vendas) | E | HU56 |
 | Clientes | `/clientes` | Busca, tabela, cadastro em modal, ficha com histórico | G V | HU01–HU06 |
 | Categorias | `/categorias` | Tabela com quantidade de produtos | G (V E leem) | HU07–HU08 |
 | Produtos | `/produtos` | Filtros, etiquetas de situação, cadastro em modal | G E (V lê) | HU09–HU15 |
@@ -1008,7 +1235,14 @@ São 11 telas numa SPA React. As internas ficam sob `RequireAuth → RequireActi
 | Vendas | `/vendas` | Filtros e tabela | G V | HU25 |
 | Nova venda | `/vendas/nova` | Cliente opcional, busca de produto, carrinho, total, Confirmar | G V | HU21–HU23 |
 | Detalhe da venda | `/vendas/:id` | Itens com preço praticado, Cancelar (G), dados do cancelamento | G V | HU24, HU26 |
-| Usuários | `/usuarios` | Contas, papel, ativo | G | HU35 |
+| Usuários | `/usuarios` | Contas, papel, ativo, Resetar senha (senha provisória) | G | HU35 |
+| Meu painel | `/meu-painel` | Tela inicial do vendedor: meta do mês com barra e frases, vendido, hoje, vendas por dia, mais vendidos, últimas vendas; mês escolhível | V | HU37 |
+| Loja (cliente) | `/loja`, `/loja/carrinho`, `/loja/pedidos[/:id]`, `/loja/meus-dados` | Layout próprio, sem o menu da equipe: vitrine, carrinho com Pix ou cartão simulado, pedidos e dados | C | HU40–HU45 |
+| Prévia da loja | `/previa-loja` | O site como qualquer cliente vê (vitrine de verdade, carrinho só na tela, Pix de demonstração, pedidos e dados de exemplo); nada é gravado. Abre pelo "Ver como" → Loja do cliente | G | HU50 |
+| Reposição | `/reposicao` | O que vai faltar: 6 cartões (zerados, acabam em 7 dias, para pedir, pedidos atrasados, chegam em 7 dias, dinheiro parado), filtros, busca, "Pedir" e "Pedir marcadas"; tela inicial de Operações e Compras | G E | HU51 |
+| Pedidos de compra | `/pedidos-compra` | Abas por etapa (pedidos feitos, em trânsito, em conferência, atrasados, entradas, cancelados), novo pedido (vem montado da Reposição), saiu do fornecedor, chegou na loja, dar entrada (conta peça por peça; nota fiscal e, se veio a mais, nota de bonificação), devolver a nota, mudar data, cancelar | G E (registrar e envio: G e Operações e Compras) | HU52–HU55 |
+| Chamados | `/chamados` | Abas por situação, novo chamado (produto e cliente opcionais), resolver ou cancelar com nota; sino no topo com os abertos (G E) ou as novidades dos meus (V) | G V E | HU47–HU49 |
+| Metas | `/metas` | Quadro da equipe no mês: meta editável na linha, vendido, %, projeção, falta, situação; totais | G | HU38, HU39 |
 
 ### Padrões do front
 
@@ -1034,17 +1268,21 @@ São 11 telas numa SPA React. As internas ficam sob `RequireAuth → RequireActi
 
 ## 8. Plano de testes
 
-São 38 casos. Os marcados **(auto)** são testes de integração: sobem um Postgres 16 real com Testcontainers, rodam **todas** as migrations Flyway do zero, fazem login de verdade e chamam a API com MockMvc. Assim a suíte testa também as migrations, os CHECKs e os triggers. Os demais são roteiro manual antes da apresentação.
+São 38 casos. Os marcados **(auto)** são testes de integração: sobem um Postgres 16 real **embutido** (biblioteca zonky, sem Docker), rodam **todas** as migrations Flyway do zero, fazem login de verdade e chamam a API com MockMvc. Assim a suíte testa também as migrations, os CHECKs e os triggers. Os demais são roteiro manual antes da apresentação.
 
 ```java
 @SpringBootTest
 @AutoConfigureMockMvc
-@Testcontainers
 public abstract class IntegrationTest {
 
-    // Banco descartável e real: o mesmo Postgres 16 do docker-compose e do CI, nunca o de desenvolvimento.
-    @Container @ServiceConnection
-    static PostgreSQLContainer<?> db = new PostgreSQLContainer<>("postgres:16");
+    // Banco descartável e real: um Postgres 16 embutido, nunca o de desenvolvimento. Sem Docker, porque
+    // o Docker do laboratório nem sempre está ligado.
+    private static final EmbeddedPostgres PG = EmbeddedPostgres.builder().start();
+
+    @DynamicPropertySource
+    static void props(DynamicPropertyRegistry r) {
+        r.add("spring.datasource.url", () -> PG.getJdbcUrl("postgres", "postgres"));
+    }
 
     @Autowired protected MockMvc mvc;
     @Autowired protected TestUsers users;   // cria usuários por papel com senha conhecida
@@ -1102,9 +1340,57 @@ public abstract class IntegrationTest {
 
 Cobrir também a virada de período no dashboard: venda confirmada às 23:59 do último dia entra; às 00:00 do dia seguinte, não.
 
+### Casos das funções que vieram depois do MVP (29/10/2026)
+
+| ID | Tipo | Cenário | Resultado esperado | Onde |
+| --- | --- | --- | --- | --- |
+| CT39 | Válido (auto) | Gerente define a meta do mês de um vendedor | Salva; mudança na auditoria (de → para) | TargetIT |
+| CT40 | Inválido (auto) | Meta em mês fechado, valor 0 ou para quem não é vendedor ativo | 400 / 409, nada salvo | TargetIT |
+| CT41 | Acesso (auto) | Vendedor abre Meu painel | Vê só os próprios números | TargetIT |
+| CT42 | Válido (auto) | Ritmo e projeção por dia útil (segunda a sábado) | Conta igual à da spec 06 | PaceTest (7) |
+| CT43 | Válido (auto) | Cliente monta carrinho e paga com Pix | Venda com canal Online, estoque baixa | StoreIT |
+| CT44 | Exceção (auto) | Cartão final 0002, preço que mudou no carrinho, peça que acabou | 409 `payment_declined` / `price_changed` / `insufficient_stock`, nada baixado | StoreIT |
+| CT45 | Acesso (auto) | Cliente abre pedido de outro cliente ou rota da equipe | 404 / 403 | StoreIT |
+| CT46 | Válido (auto) | Vendedor abre chamado de peça zerada; entrada da peça resolve | Chamado resolvido e aviso no sino | StockRequestIT |
+| CT47 | Exceção (auto) | Chamado de peça com estoque; fechar chamado já fechado | 409 `product_in_stock` / `request_closed` | StockRequestIT |
+| CT48 | Acesso (auto) | Gerente usa "Ver como" e tenta alterar algo | Vê como a pessoa; alteração 403 `read_only_view_as` | ViewAsIT |
+| CT49 | Válido (auto) | Reposição: vende 15 de 20 em 30 dias | Acaba em 10 dias, pedir 12; com pedido a caminho, pedir 0 | ReplenishmentIT, CoverageTest (7) |
+| CT50 | Inválido (auto) | Pedido de compra com data passada, peça repetida ou sem peças | 400, nada salvo | ReplenishmentIT |
+| CT51 | Exceção (auto) | Receber pedido duas vezes; receber dá entrada e fecha chamado | Segunda 409 `order_closed`; estoque sobe uma vez só | ReplenishmentIT |
+| CT52 | Acesso (auto) | Estoquista tenta registrar pedido; vendedor abre a Reposição | 403 | ReplenishmentIT |
+| CT53 | Válido (auto) | Talita: cada papel recebe só as ferramentas que a tela dele permite | Gerente 15, equipe técnica 16, vendedor sem estoque/faturamento | AssistantIT |
+| CT54 | Válido (auto) | Talita conta a história e recusa assunto fora da loja | Texto pronto, sem inventar | TalitaPersonaTest |
+
+### Onde estão os testes automáticos
+
+Rodada completa em 29/10/2026 com `./mvnw verify`: **106 testes unitários e 97 de integração, todos passando** (rodada final, depois da revisão de 29/10).
+
+| Classe | Testes | O que cobre |
+| --- | --- | --- |
+| `CustomerIT` | 9 | Clientes: cadastro, busca, CPF, exclusão com vínculo |
+| `CatalogStockIT` | 12 | Categorias, produtos e estoque (entrada, ajuste, histórico, alertas) |
+| `SaleIT` | 12 | Vendas: itens, total, confirmação, estoque, cancelamento, concorrência |
+| `DashboardIT` | 10 | Indicadores, período, filtros de vendedor e canal |
+| `AuthIT` | 8 | Login, troca de senha, sessão, papéis |
+| `ViewAsIT` | 5 | "Ver como" só leitura |
+| `TargetIT` | 8 | Metas e Meu painel |
+| `StoreIT` | 12 | Espaço do cliente, Prévia da loja, Talita do cliente, pedido de peça, cliente com login e reset de senha |
+| `StockRequestIT` | 7 | Chamados de peça em falta |
+| `ReplenishmentIT` | 8 | Reposição, pedidos de compra, etapas e conferência (devolver a nota, bonificação) |
+| `DemoAgentIT` | 2 | Agente de vendas da demonstração |
+| `AssistantIT` | 4 | Ferramentas da Talita por papel |
+| `CpfTest` | 12 | Dígito verificador do CPF |
+| `PaceTest` | 7 | Ritmo e projeção da meta |
+| `CoverageTest` | 8 | Conta da Reposição, caso a caso (inclui peça nova) |
+| `HumorDoDiaTest` | 6 | Clima do dia do agente |
+| `TalitaPersonaTest` | 63 | Apresentação, história e recusas da Talita |
+| `AssistantPropertiesTest` · `OpenAiCompatibleProviderTest` | 6 · 4 | Configuração e conexão com a IA |
+
 ## 9. Como executar
 
-Com Java 21, Docker, Node 22 e pnpm instalados, o sistema sobe em 4 comandos. O Flyway aplica as migrations sozinho na subida do back-end, e o front abre em `http://localhost:5173`.
+**Sem Docker (recomendado no laboratório):** na pasta do back-end, `./mvnw spring-boot:test-run` sobe um PostgreSQL 16 embutido (dados em `.data/`) já no perfil `dev`; na pasta do front, `npx pnpm install && npx pnpm dev`. Logins de demonstração: `douglas.vargas`, `guilherme.dower`, `vitor.nunes` (sem @), senha `loja12345`. Detalhes no `README.md` do back-end.
+
+**Com Docker:** com Java 21, Docker, Node 22 e pnpm instalados, o sistema sobe em 4 comandos. O Flyway aplica as migrations sozinho na subida do back-end, e o front abre em `http://localhost:5173`.
 
 1. `docker compose up -d` na pasta do back-end (sobe o Postgres 16).
 2. `cp .env.example .env` e preencher `JWT_SECRET`.
@@ -1198,21 +1484,37 @@ server: {
 | Seed | Quando roda | O que faz |
 | --- | --- | --- |
 | `CoreSeeder` | Sempre | Cria o super admin se não existir; imprime a senha gerada (24 caracteres) uma única vez |
-| `CrmModuleSeeder` | Sempre | Garante o módulo `crm` e os papéis `MANAGER` (admin), `SELLER`, `STOCK_KEEPER`; corrige nome ou flag divergente; nunca remove papel em uso |
-| `DevDataSeeder` | Só no perfil `dev`, se o catálogo estiver vazio | 5 categorias, 6 clientes, 12 produtos e 3 usuários de teste, criados **pelos Services** para gerar as movimentações `ENTRY` corretas |
+| `CrmModuleSeeder` | Sempre | Garante o módulo `crm` e os papéis `MANAGER` (admin), `SELLER`, `STOCK_KEEPER`, `DEVELOPER`, `MARKETING_DEV`, `PURCHASING`; corrige nome ou flag divergente; nunca remove papel em uso |
+| `DevDataSeeder` | Perfis `dev`/`demo`. A equipe (6 contas) é conferida em **todo** boot: login, nome, papel e senha de demonstração; o catálogo (5 categorias, 6 clientes, 12 produtos) só se estiver vazio | Catálogo criado **pelos Services**; produtos nascem com estoque zero (ver abaixo) |
 
 Os seeds rodam dentro de `try/catch`: falha de seed é logada e a aplicação continua no ar.
 
-Dados do `DevDataSeeder`: os 6 clientes usam CPFs válidos de teste, não de pessoas reais (529.982.247-25, 111.444.777-35, 390.533.447-05, 877.482.488-00, 714.287.938-60, 346.085.143-00). Os produtos `CAM-002-G-BR` (3 de mínimo 5) e `CAL-001-40-AZ` (2 de mínimo 4) aparecem como estoque baixo, e `JAQ-001-M-PT` (0) como sem estoque.
+Dados do `DevDataSeeder`: os 6 clientes iniciais usam CPFs válidos de teste, não de pessoas reais
+(529.982.247-25, 111.444.777-35, 390.533.447-05, 877.482.488-00, 714.287.938-60, 346.085.143-00). Os produtos
+nascem com **estoque zero**: quem abre o estoque é o `HistoricoVendasSeeder`, com a carga retrodatada.
 
-### CI (.github/workflows/ci.yml do back-end)
+| `HistoricoVendasSeeder` | Só nos perfis `dev`/`demo`, se não houver venda anterior a hoje | 3 meses de vendas, mais 45 clientes da região de Tubarão, inseridos por SQL com data retroativa |
+| `LojaModuleSeeder` | Sempre | Garante o módulo `loja` (espaço do cliente) e o papel `CUSTOMER` |
+| `ClientesDemoSeeder` | Perfis `dev`/`demo`, em todo boot | Contas dos professores `vitor.freitas` e `matheus.carvalho` (senha `cliente12345`, troca obrigatória); senha já trocada nunca é mexida |
+| `MetasSeeder` | Perfis `dev`/`demo`, só a meta que faltar | Meta de cada vendedor nos últimos 3 meses e no mês atual, a partir do próprio histórico |
+| `PedidosCompraDemoSeeder` | Perfis `dev`/`demo`, só com a tabela vazia | 3 pedidos de compra do Vinicius Clemente com as peças que acabam primeiro (um atrasado) |
+| `AgenteVendasDemo` | Perfis `dev`/`demo`, ao subir e todo dia | Fecha cada dia que passou com vendas de demonstração (spec crm/08) |
+
+Esse seeder gera cerca de 2.000 vendas nos últimos 3 meses, respeitando o horário do shopping (10h–22h de
+segunda a sábado, 14h–21h domingo e feriado), a sazonalidade e o calendário de feriados. O modelo completo está
+em [14-dados-de-demonstracao.md](14-dados-de-demonstracao.md). Os alertas de estoque aparecem nas jaquetas, por
+causa da saída de estação simulada.
+
+### CI (.github/workflows/backend.yml, na raiz do repositório)
 
 ```yaml
-name: ci
+name: backend
 on:
+  push:
+    branches: [main, develop]
+    paths: ['crm-loja-backend/**', '.github/workflows/backend.yml']
   pull_request:
-    paths-ignore: ['**/*.md', 'docs/**']
-concurrency: { group: ci-${{ github.ref }}, cancel-in-progress: true }
+    paths: ['crm-loja-backend/**', '.github/workflows/backend.yml']
 jobs:
   verify:
     runs-on: ubuntu-latest
@@ -1220,10 +1522,10 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with: { distribution: temurin, java-version: '21', cache: maven }
-      - run: ./mvnw -B verify   # Testcontainers sobe o Postgres 16 dentro do runner
+      - run: ./mvnw -B verify   # os testes sobem um Postgres 16 embutido (zonky), sem Docker
 ```
 
-O front tem o mesmo workflow com `pnpm install --frozen-lockfile && pnpm lint && pnpm typecheck && pnpm build`.
+O front tem o mesmo workflow (`frontend.yml`) com `pnpm install --frozen-lockfile && pnpm lint && pnpm typecheck && pnpm build`. Há ainda `docker.yml` (constrói e sobe a imagem como no Render) e `pages.yml` (publica a pasta `site/`).
 
 ## 10. Apresentação e decisões
 
@@ -1258,8 +1560,8 @@ O roteiro segue os 5 passos sugeridos no enunciado e acrescenta o controle de ac
 | Excluir com vínculo | Bloquear (409) e oferecer inativar | Entidade com histórico nunca é apagada |
 | Venda | Nunca excluída; cancelada com motivo | Preserva o histórico e a auditoria |
 | Login | JWT em cookie httpOnly + refresh rotativo | Token nunca fica no navegador |
-| Permissões | Módulo `crm` com 3 papéis semeados; sem escopo por loja | Uma loja só; escopo por unidade não se aplica |
-| Front | Proxy same-origin do Vite em `/api` | Cookie `sameSite=strict` funciona sem CORS |
+| Permissões | Módulo `crm` com 5 papéis semeados (3 de balcão + 2 técnicos com acesso total); sem escopo por loja | Uma loja só; escopo por unidade não se aplica |
+| Front | Proxy same-origin do Vite em `/api` | Cookie `SameSite=Lax` + mesma origem: funciona sem CORS (Strict quebraria o deploy único no Render ao abrir um link) |
 
 ### Fluxo de trabalho (SDD + Git)
 
@@ -1275,3 +1577,41 @@ O roteiro segue os 5 passos sugeridos no enunciado e acrescenta o controle de ac
 
 - O critério "Relacionamentos" cita "animais e tutores": o documento é compartilhado com o projeto da outra equipe. Para este projeto vale "vendas e produtos".
 - A numeração pula de "6. Dashboard" para "3. Critérios gerais"; é só formatação.
+
+## 11. Funções que vieram depois do MVP (29/10/2026)
+
+O MVP do enunciado está completo nas seções 1 a 10. As funções abaixo vieram depois, sem mexer nos módulos
+obrigatórios. Cada uma tem a spec (requisitos, desenho e tarefas) em `crm-loja-docs/specs/crm/`, as histórias na
+seção 4, as regras na seção 5, as rotas na seção 6 e os testes na seção 8.
+
+| Função | Spec | Histórias | Banco |
+| --- | --- | --- | --- |
+| Talita, assistente de IA que consulta os dados reais e só fala da loja | doc 10 | HU36 | — |
+| Meu painel do vendedor e metas | crm/06 | HU37–HU39 | V6 |
+| Espaço do cliente (vitrine, carrinho, Pix ou cartão simulados, meus pedidos, Talita do cliente e pedido de peça) | crm/07 | HU40–HU45, HU57 | V9 |
+| Agente que gera as vendas de demonstração de cada dia | crm/08 | HU46 | V7 |
+| Chamados de peça em falta e sino de avisos | crm/09 | HU47–HU49 | V8 |
+| "Ver como" (o gerente vê o sistema como outra pessoa, só leitura) | crm/10 | HU50 | — |
+| Reposição (o que vai faltar e quanto pedir), pedidos de compra com etapas, nota fiscal e conferência (devolver a nota ou bonificação), estoque no Dashboard | crm/11 | HU51–HU56 | V10, V11, V12 |
+| Exportar listas para planilha (CSV) | api-contract | HU32 | — |
+
+Outros documentos: rastreabilidade (doc 09), guia de comandos (doc 11), roteiro de testes manuais (doc 12), publicar
+online (doc 13), dados de demonstração (doc 14), conferência do enunciado (doc 15), processo de requisitos (doc 16) e
+a história da Orden (doc 17).
+
+
+## Histórico de revisões
+
+- **29/10/2026.** Logins passam a ser `nome.sobrenome` (sem @); a senha de demonstração continua `loja12345`. Papéis novos para a equipe técnica (`DEVELOPER` = Engenheiro(a) de Software, `MARKETING_DEV` = Marketing e Desenvolvimento), com acesso total; Vinicius Muniz passa a vendedor. Dashboard ganha o filtro **Vendedor(a)** (`sellerId`), e a Talita, o parâmetro `vendedor_id`. Texto alinhado ao código: Postgres embutido no lugar de Testcontainers, cookie `SameSite=Lax`, workflows reais do CI, seeds atuais, 70 testes, 36 histórias. Conferência do enunciado em `docs/15-conferencia-enunciado.md`.
+- **29/10/2026 (tarde).** Painel do vendedor e metas de venda (spec 06, adendo na seção 11); espaço do cliente especificado (spec 07); processo de requisitos (doc 16) e modelos de issue do GitHub. 85 testes automáticos.
+- **29/10/2026 (noite).** Agente de vendas da demonstração (spec 08): fecha cada dia que passou com o modelo do histórico, a IA grátis escolhe só o clima do dia, diário no Dashboard, workflow `acordar-demo.yml`. Migration V7. 93 testes automáticos.
+- **29/10/2026 (noite, 2).** Chamados de peça em falta (spec 09, V8, regras RN32 a RN36), sino de avisos, Talita abre chamado com confirmação, conta a história da Orden (doc 17) e só fala da loja. 101 testes automáticos.
+- **29/10/2026 (noite, 3).** História da Orden revisada com a equipe (doc 17): curso Técnico em Desenvolvimento de Sistemas, a dor do estoque sem controle no comércio (sem citar empresa), origem do nome não registrada. Papel novo **Operações e Compras** (`PURCHASING`, vale por estoquista): Vinicius Clemente recebe os chamados de peça em falta e faz o pedido. 102 testes automáticos.
+- **29/10/2026 (noite, 4).** "Ver como" só leitura (spec 10) e exportação CSV pela API (HU32). 107 testes automáticos.
+- **29/10/2026 (fechamento).** "?" de ajuda em todas as telas, aviso de pendências ao entrar, motivo ao lado de botão travado, botões Exportar planilha. Pacote preparado para o computador do curso: ver `PARA-CONTINUAR.md`.
+- **29/10/2026 (final).** Espaço do cliente (spec 07, V9, regras RN37 a RN42): professores como clientes, vitrine, carrinho, Pix ou cartão simulados, meus pedidos, meus dados; filtro de canal no dashboard. `./mvnw verify`: 98 testes unitários e 86 de integração, todos passando.
+- **29/10/2026 (reposição).** Reposição e pedidos de compra (spec 11, V10, regras RN43 a RN48): o que vai faltar, quanto pedir, pedidos a caminho e atrasados, receber com um clique (fecha os chamados); tela inicial de Operações e Compras. Site sempre na paleta clara da marca. `./mvnw verify`: 105 testes unitários e 92 de integração, todos passando.
+- **29/10/2026 (revisão final da documentação).** Este arquivo foi remontado a partir dos documentos de `crm-loja-docs/docs` e do contrato da API: histórias HU36 a HU54, casos CT39 a CT54, seeds novos, dica de porta bloqueada pelo Windows e a seção 11 com as funções que vieram depois do MVP. Comentários explicando o porquê em todos os arquivos de código. Corrigido o `.gitignore` do back-end, que escondia o pacote de Metas.
+- **29/10/2026 (prévia e celular).** Prévia da loja pelo "Ver como" (o site como qualquer cliente vê, nada é gravado), Talita online em verde, roteiro seção 17 (celular, tablet e Talita).
+- **29/10/2026 (estoque no dashboard e Talita do cliente).** Bloco Estoque no Dashboard (gerente, Operações e Compras e estoquista), etapas do pedido de compra com nota fiscal (V11), Talita do cliente e pedido de peça pela loja. `./mvnw verify`: 105 testes unitários e 95 de integração, todos passando.
+- **29/10/2026 (revisão).** Conferência do pedido de compra contada peça por peça: a menos, a nota volta; a mais, nota de bonificação (V12). Produto novo não conta como parado. Resetar senha pela tela (equipe e clientes). Cliente com login não se exclui. `./mvnw verify`: 106 testes unitários e 97 de integração, todos passando.

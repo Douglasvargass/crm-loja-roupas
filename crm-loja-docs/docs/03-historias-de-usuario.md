@@ -1,6 +1,6 @@
 ## 4. Histórias de usuário
 
-São 35 histórias em 8 épicos, todas rastreáveis aos critérios do enunciado. A prioridade usa MoSCoW: **Must** é obrigatório para o MVP, **Should** é desejável e **Could** é extra depois do essencial.
+São 57 histórias em 13 épicos (HU01 a HU35 são o MVP do enunciado; HU36 a HU54 vieram depois, sem mexer no que é obrigatório), todas rastreáveis aos critérios do enunciado. A prioridade usa MoSCoW: **Must** é obrigatório para o MVP, **Should** é desejável e **Could** é extra depois do essencial.
 
 **Personas:** **Vendedor(a)** atende o balcão e registra vendas. **Estoquista** recebe mercadoria e faz ajustes. **Gerente** acompanha resultados e cadastros. Cada persona é um papel do módulo crm; o Gerente é o administrador do módulo.
 
@@ -43,6 +43,28 @@ São 35 histórias em 8 épicos, todas rastreáveis aos critérios do enunciado.
 | HU33 | Entrar no sistema | Todos | Must |
 | HU34 | Trocar a senha | Todos | Must |
 | HU35 | Gerenciar usuários e papéis | Gerente | Should |
+| HU36 | Tirar dúvidas com a Talita (assistente de IA) | Todos | Could |
+| HU37 | Meu painel: minhas vendas e minha meta | Vendedor | Should |
+| HU38 | Definir a meta de cada vendedor | Gerente | Should |
+| HU39 | Quadro de metas da equipe | Gerente | Should |
+| HU40 | Entrar como cliente e trocar a senha | Cliente | Could |
+| HU41 | Vitrine de produtos | Cliente | Could |
+| HU42 | Carrinho | Cliente | Could |
+| HU43 | Pagar (Pix ou cartão simulados) | Cliente | Could |
+| HU44 | Meus pedidos | Cliente | Could |
+| HU45 | Meus dados | Cliente | Could |
+| HU46 | Agente de vendas da demonstração | Equipe | Could |
+| HU47 | Abrir chamado de peça em falta | Vendedor | Should |
+| HU48 | Resolver ou cancelar chamado | Estoquista | Should |
+| HU49 | Sino de avisos | Todos | Should |
+| HU50 | "Ver como" (só leitura) | Gerente | Should |
+| HU51 | Ver o que vai faltar e quanto pedir | Operações e Compras | Should |
+| HU52 | Registrar pedido de compra | Operações e Compras | Should |
+| HU53 | Receber o pedido de compra | Estoquista | Should |
+| HU54 | Mudar a data ou cancelar o pedido de compra | Operações e Compras | Should |
+| HU55 | Acompanhar as etapas do pedido e a nota fiscal | Operações e Compras | Should |
+| HU56 | Ver o estoque no Dashboard | Operações e Compras | Should |
+| HU57 | Falar com a Talita e pedir uma peça (cliente) | Cliente | Could |
 
 ### EP01 · Clientes
 
@@ -198,6 +220,7 @@ São 35 histórias em 8 épicos, todas rastreáveis aos critérios do enunciado.
 
 - Atalhos: Hoje, 7 dias, 30 dias, Este mês, Personalizado. Padrão: Este mês.
 - Contam só vendas `CONFIRMED` (canceladas aparecem num contador à parte).
+- Lista **Vendedor(a)** ("Todos" ou uma pessoa): cartões e gráficos passam a mostrar só as vendas abertas por ela, para saber quanto cada um vendeu.
 
 **HU29 · Mais vendidos.** Como gerente, quero ver o top 5 de produtos por quantidade vendida no período, em gráfico de barras.
 
@@ -209,7 +232,7 @@ São 35 histórias em 8 épicos, todas rastreáveis aos critérios do enunciado.
 
 **HU31 · Navegação e feedback.** Como usuário, quero um menu fixo e mensagens claras, para usar o sistema sem treinamento.
 
-- Menu lateral com os 6 módulos, item ativo destacado.
+- Menu lateral com os módulos que o papel pode usar, item ativo destacado; toda tela tem o "?" de ajuda.
 - Toda operação mostra aviso de sucesso (verde) ou erro (vermelho) que some sozinho em 4 segundos.
 - Exclusões e cancelamentos pedem confirmação.
 - Erros de validação aparecem ao lado do campo.
@@ -220,7 +243,7 @@ São 35 histórias em 8 épicos, todas rastreáveis aos critérios do enunciado.
 
 **HU33 · Entrar no sistema.** Como usuário, quero entrar com login e senha, para usar só o que meu papel permite.
 
-- Login e senha corretos abrem a tela inicial do papel (Gerente: Dashboard; Vendedor: Vendas; Estoquista: Estoque).
+- Login e senha corretos abrem a tela inicial do papel (Gerente e equipe técnica: Dashboard; Vendedor: Meu painel; Estoquista: Estoque; Operações e Compras: Reposição; Cliente: Vitrine).
 - Login ou senha errados, conta inativa ou bloqueada mostram a mesma frase: "Login ou senha incorretos".
 - A sessão dura enquanto a pessoa usa o sistema; parada por mais de 24 h, pede login de novo.
 - Botão Sair encerra a sessão neste navegador.
@@ -235,4 +258,135 @@ São 35 histórias em 8 épicos, todas rastreáveis aos critérios do enunciado.
 
 - Cria conta com senha provisória e troca obrigatória no primeiro acesso.
 - Muda o papel ou inativa a conta; a mudança fica registrada na auditoria.
+- Reseta a senha de quem esqueceu (equipe em Usuários; cliente na ficha dele): senha provisória, troca obrigatória, sessões encerradas.
 - O gerente não muda o próprio papel, e a loja nunca fica sem nenhum gerente ativo (validado dentro da transação).
+
+### EP09 · Assistente de IA
+
+**HU36 · Tirar dúvidas com a Talita (extra).** Como membro da equipe, quero perguntar em linguagem natural sobre vendas, estoque, clientes e uso do sistema, para decidir sem procurar em várias telas.
+
+- As respostas usam dados consultados no banco no momento; nada é inventado.
+- Cada perfil só obtém o que a tela já mostraria a ele.
+- Ela só fala da loja: receita, notícia ou lição de casa ela recusa com simpatia.
+- O assistente só consulta; a única exceção é abrir chamado de peça em falta, e só depois de a pessoa confirmar (HU47).
+- Sem a chave da IA configurada, o assistente aparece desligado e o resto do sistema funciona.
+
+### EP10 · Metas e painel do vendedor (spec crm/06)
+
+**HU37 · Meu painel.** Como vendedor, quero ver as minhas vendas do mês, a minha meta e quanto falta por dia, para saber se estou no caminho.
+
+- Mostra vendido no mês, meta, quanto falta, ritmo por dia útil (segunda a sábado) e a projeção do mês.
+- Cada vendedor vê só os próprios números, sem comparação com colegas.
+- Sem meta definida, o painel mostra as vendas e avisa que a meta ainda não foi definida.
+
+**HU38 · Definir a meta de cada vendedor.** Como gerente, quero definir a meta de cada vendedor por mês, para acompanhar a equipe com um alvo claro.
+
+- Só o mês atual e os próximos 12 meses aceitam meta; mês fechado não muda.
+- Só vendedor ativo recebe meta; valor maior que zero.
+- Toda mudança vai para a auditoria (de quanto para quanto).
+
+**HU39 · Quadro de metas da equipe.** Como gerente, quero ver a equipe toda num quadro, para saber quem precisa de ajuda.
+
+- Uma linha por vendedor com vendido, meta, projeção e a situação (bateu, no ritmo, atenção, abaixo, sem meta).
+
+### EP11 · Espaço do cliente (spec crm/07)
+
+**HU40 · Entrar como cliente.** Como cliente, quero entrar com o meu login, para comprar pela internet.
+
+- A conta do cliente é separada da equipe: ele só vê a loja (`/loja`) e nunca o sistema interno.
+- Primeiro acesso com a senha padrão e troca obrigatória.
+
+**HU41 · Vitrine.** Como cliente, quero ver as peças disponíveis, para escolher o que comprar.
+
+- Só peças ativas e com estoque; "Últimas unidades" quando está no mínimo; a quantidade exata não aparece.
+
+**HU42 · Carrinho.** Como cliente, quero montar um carrinho, para comprar várias peças de uma vez.
+
+- Adicionar, mudar a quantidade e remover; o total é calculado sozinho.
+- Se o preço mudar com a peça no carrinho, vale o preço novo e o cliente confere antes de pagar.
+
+**HU43 · Pagar.** Como cliente, quero pagar com Pix ou cartão, para fechar o pedido.
+
+- Pagamento simulado: nada é cobrado; o Pix mostra um QR code de demonstração; cartão final 0002 é recusado, para testar.
+- Fechar o pedido é tudo ou nada: se faltar estoque de uma peça, nada é baixado.
+- Só os 4 últimos dígitos do cartão são guardados.
+
+**HU44 · Meus pedidos.** Como cliente, quero acompanhar os meus pedidos, para saber o que comprei.
+
+- Lista e detalhe só dos meus pedidos; pedido de outro cliente não existe para mim (404).
+- Pedido cancelado pela loja aparece como estornado.
+
+**HU45 · Meus dados.** Como cliente, quero atualizar telefone, e-mail e endereço, para manter o cadastro certo.
+
+- Nome e CPF só a loja muda.
+
+### EP12 · Dados de demonstração (spec crm/08)
+
+**HU46 · Agente de vendas da demonstração.** Como equipe, quero que a demonstração continue vendendo sozinha todo dia, para o dashboard nunca ficar parado.
+
+- Fecha um dia por vez, sempre no passado, com o mesmo jeito de vender do histórico.
+- A IA grátis só escolhe o "clima" do dia (mais ou menos movimento); os números vêm do sistema.
+- Se houve uso real naquele dia, o agente não mexe; o gerente vê o diário no Dashboard.
+
+### EP04 · Estoque (continuação)
+
+**HU47 · Abrir chamado de peça em falta (spec crm/09).** Como vendedor, quero registrar a peça que o cliente queria e não tinha, para o estoque repor e eu avisar o cliente quando chegar.
+
+- Descrição, tamanho, cor, quantidade (1 a 99), produto e cliente opcionais.
+- Peça com estoque suficiente não abre chamado: é para vender.
+- A Talita também abre, sempre mostrando o resumo e esperando o "sim".
+
+**HU48 · Resolver ou cancelar chamado.** Como estoquista ou gerente, quero fechar o chamado com uma nota, para registrar o que foi feito.
+
+- Resolver: estoque e gerente; cancelar: esses ou quem abriu; sempre com nota.
+- A entrada de estoque da peça resolve sozinha os chamados mais antigos que ela cobre.
+
+**HU49 · Sino de avisos.** Como membro da equipe, quero ver no topo o que precisa da minha atenção.
+
+- Estoque e gerente veem os chamados abertos; o vendedor vê as novidades dos chamados dele.
+
+**HU51 · Ver o que vai faltar (spec crm/11).** Como Operações e Compras, quero ver o que vai faltar antes de faltar e quanto pedir, para comprar na hora certa.
+
+- Média de venda por dia nos últimos 30 dias, dias até acabar, o que está a caminho, chamados abertos e quanto pedir.
+- Situações: zerado, acaba em até 7 dias, até 21 dias, tranquilo e parado (dinheiro empatado).
+- Escolher quantos dias o pedido deve cobrir (7 a 90).
+
+**HU52 · Registrar pedido de compra.** Como Operações e Compras, quero registrar o que pedi ao fornecedor e quando chega, para a loja saber o que está a caminho.
+
+- Fornecedor, data prevista (hoje a 180 dias) e de 1 a 30 peças; o pedido pode vir montado da Reposição.
+- O estoquista não registra pedido: ele recebe a mercadoria.
+
+**HU53 · Receber o pedido.** Como estoquista, quero dar entrada no pedido que chegou com um clique, para o estoque subir e os chamados fecharem.
+
+- Cada peça entra no estoque na mesma transação (tudo ou nada); pedido recebido não recebe de novo.
+
+**HU54 · Mudar a data ou cancelar o pedido.** Como Operações e Compras, quero mudar a data ou cancelar o pedido com o motivo, para a previsão continuar certa.
+
+- Motivo obrigatório; a data antiga fica na auditoria; cancelado não some, vai para a aba Cancelados.
+- Pedido aberto com a data vencida aparece como atrasado.
+
+### EP13 · Acesso (continuação)
+
+**HU50 · "Ver como" (spec crm/10).** Como gerente, quero ver o sistema exatamente como outra pessoa da equipe vê, para tirar dúvidas e conferir permissões.
+
+- Só gerente e equipe técnica usam; dura até 30 minutos.
+- É só para olhar: qualquer alteração é recusada; entrar e sair ficam registrados.
+- Uma faixa no topo mostra o tempo todo de quem é a visão.
+
+### Adendo de 29/10/2026 (fim do dia)
+
+**HU55 · Etapas do pedido e nota fiscal.** Como Operações e Compras, quero saber se o pedido saiu do fornecedor, se chegou e qual nota deu entrada, para cobrar o fornecedor e conferir a mercadoria.
+
+- Pedido feito → em trânsito (eu marco, com a nota se já veio) → em conferência (quem recebe marca) → entrada feita (com a nota fiscal, obrigatória).
+- Depois que chegou, a data não muda; cancelar vale até a entrada; cada etapa fica na auditoria.
+- Na conferência conto peça por peça: chegou a menos, devolvo a nota (nada entra); chegou a mais, o extra entra com a nota de bonificação.
+
+**HU56 · Estoque no Dashboard.** Como Operações e Compras, quero abrir o Dashboard e ver o estoque, para saber na hora o que precisa de atenção.
+
+- Peças e valor em estoque, zerados, acabam em 7 dias, para pedir, pedidos feitos, em trânsito, em conferência e notas que deram entrada.
+- Eu não vejo vendas nem faturamento; o gerente vê vendas e estoque.
+
+**HU57 · Talita do cliente e pedido de peça.** Como cliente, quero perguntar sobre peças e meus pedidos e pedir uma peça que não está na vitrine, para comprar o que procuro.
+
+- A Talita do cliente só fala da vitrine, dos meus pedidos e das peças que pedi; nada da operação da loja.
+- Pedir peça (pela Talita, depois de confirmar, ou pelo botão da vitrine) avisa o gerente e o estoque; acompanho em Meus pedidos.
