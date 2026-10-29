@@ -98,8 +98,9 @@ public class StockService {
             }
             return cb.and(where.toArray(Predicate[]::new));
         };
+        // Data primeiro, id como desempate: o id só acompanha a cronologia quando tudo nasce pela tela.
         var pageable = PageRequest.of(Math.max(page, 0), Math.min(Math.max(size, 1), 100),
-                Sort.by(Sort.Direction.DESC, "id"));
+                Sort.by(Sort.Direction.DESC, "createdAt").and(Sort.by(Sort.Direction.DESC, "id")));
         return PageResponse.of(movements.findAll(spec, pageable), StockMovementResponse::from);
     }
 

@@ -88,7 +88,8 @@ public class ProductService {
     @Transactional(readOnly = true)
     public ProductDetailResponse detail(Long id) {
         Product p = find(id);
-        List<StockMovementResponse> recent = movements.findByProduct_IdOrderByIdDesc(id, PageRequest.of(0, 10))
+        List<StockMovementResponse> recent =
+                movements.findByProduct_IdOrderByCreatedAtDescIdDesc(id, PageRequest.of(0, 10))
                 .stream().map(StockMovementResponse::from).toList();
         return new ProductDetailResponse(ProductResponse.from(p), recent, saleItems.totalSoldOf(id));
     }

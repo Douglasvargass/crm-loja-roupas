@@ -11,8 +11,10 @@ import org.springframework.data.repository.query.Param;
 public interface StockMovementRepository extends JpaRepository<StockMovement, Long>,
         JpaSpecificationExecutor<StockMovement> {
 
+    // Ordena por data, não por id: histórico carregado de uma vez (carga inicial, importação) tem id
+    // crescente mas data antiga, e ordenar por id mostraria o movimento mais velho como o mais recente.
     @EntityGraph(attributePaths = {"product", "sale"})
-    List<StockMovement> findByProduct_IdOrderByIdDesc(Long productId, Pageable pageable);
+    List<StockMovement> findByProduct_IdOrderByCreatedAtDescIdDesc(Long productId, Pageable pageable);
 
     // Só tipo e motivo: carregar as entidades as deixaria presas ao produto que vai ser apagado.
     @Query("select m.type as type, m.reason as reason from StockMovement m where m.product.id = :productId")
