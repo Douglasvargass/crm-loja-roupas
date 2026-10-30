@@ -14,6 +14,7 @@ import { Lightbox } from '../../components/organisms/ProductGallery';
 import { Button } from '../../components/atoms/Button';
 import { Input, Select } from '../../components/atoms/Field';
 import { Modal } from '../../components/molecules/Modal';
+import { CouponField, DiscountLines } from '../../components/molecules/CouponField';
 import { Icon } from '../../components/atoms/Icon';
 import { FakePixQr } from '../../components/molecules/FakePixQr';
 import { Pagination } from '../../components/molecules/Pagination';
@@ -178,7 +179,7 @@ export function CartPage() {
 
 function CustomerCartPage() {
   const cart = useCart();
-  const { change, remove, checkout } = useStoreActions();
+  const { change, remove, checkout, applyCoupon, removeCoupon } = useStoreActions();
   const toast = useToast();
   const navigate = useNavigate();
   const [method, setMethod] = useState<'PIX' | 'CARD'>('PIX');
@@ -231,6 +232,10 @@ function CustomerCartPage() {
             </Card>
             <Card title="Pagamento">
               <form onSubmit={pay} className="flex flex-col gap-3 p-4">
+                <CouponField code={c.couponCode} discount={c.discount}
+                  onApply={(code) => applyCoupon.mutateAsync(code)} onRemove={() => removeCoupon.mutateAsync()}
+                  busy={applyCoupon.isPending || removeCoupon.isPending} />
+                <DiscountLines subtotal={c.subtotal} discount={c.discount} />
                 <p className="flex items-baseline justify-between text-sm">
                   Total <strong className="tabular text-xl">{formatMoney(c.total)}</strong>
                 </p>

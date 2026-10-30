@@ -45,7 +45,8 @@ public class SecurityConfig {
             .logout(l -> l.disable())
             // API exige sessão; o resto são as telas do front (servidas pelo SpaConfig no deploy único).
             .authorizeHttpRequests(a -> a
-                .requestMatchers("/auth/login", "/auth/refresh", "/auth/logout", "/error").permitAll()
+                .requestMatchers("/auth/login", "/auth/refresh", "/auth/logout", "/auth/forgot-password",
+                        "/auth/reset-password", "/error").permitAll()
                 .requestMatchers("/auth/**", "/crm/**", "/admin/**").authenticated()
                 .anyRequest().permitAll())
             .exceptionHandling(e -> e

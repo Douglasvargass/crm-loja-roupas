@@ -2,6 +2,8 @@ import { keepPreviousData, useMutation, useQuery, useQueryClient, type QueryKey 
 import { http } from './http';
 import { qk } from './queryKeys';
 import type {
+  CouponDto,
+  CouponInput,
   ProductImageDto,
   ProductImageView,
   SalesForecastDto,
@@ -261,6 +263,8 @@ export function useSaleActions(saleId?: number) {
       mutationFn: (p: { productId: number; quantity: number }) => http.post<SaleDto>(`/crm/sales/${saleId}/items`, p),
       onSuccess: put,
     }),
+    applyCoupon: useMutation({ mutationFn: (code: string) => http.post<SaleDto>(`/crm/sales/${saleId}/coupon`, { code }), onSuccess: put }),
+    removeCoupon: useMutation({ mutationFn: () => http.del<SaleDto>(`/crm/sales/${saleId}/coupon`), onSuccess: put }),
     updateItem: useMutation({
       mutationFn: (p: { itemId: number; quantity: number }) =>
         http.put<SaleDto>(`/crm/sales/${saleId}/items/${p.itemId}`, { quantity: p.quantity }),
@@ -365,6 +369,8 @@ export function useStoreActions() {
     add: useMutation({ mutationFn: (p: { productId: number; quantity: number }) => http.post<CartDto>('/loja/cart/items', p), onSuccess: done }),
     change: useMutation({ mutationFn: (p: { itemId: number; quantity: number }) => http.put<CartDto>(`/loja/cart/items/${p.itemId}`, { quantity: p.quantity }), onSuccess: done }),
     remove: useMutation({ mutationFn: (itemId: number) => http.del<CartDto>(`/loja/cart/items/${itemId}`), onSuccess: done }),
+    applyCoupon: useMutation({ mutationFn: (code: string) => http.post<CartDto>('/loja/cart/coupon', { code }), onSuccess: done }),
+    removeCoupon: useMutation({ mutationFn: () => http.del<CartDto>('/loja/cart/coupon'), onSuccess: done }),
     // Também em erro: o 409 "preço mudou" atualiza o carrinho no servidor, e a tela precisa mostrar o novo total.
     checkout: useMutation({ mutationFn: (p: { method: 'PIX' | 'CARD'; cardNumber?: string }) => http.post<OrderDetailDto>('/loja/checkout', p), onSettled: done }),
     saveMyData: useMutation({ mutationFn: (d: MyDataInput) => http.put<CustomerDto>('/loja/me', d), onSuccess: done }),
@@ -567,4 +573,21 @@ export function useProductImageActions(productId: number) {
   const remove = useMutation({ mutationFn: (imageId: number) => http.del<void>(`/crm/products/${productId}/images/${imageId}`), onSuccess: done });
   const cover = useMutation({ mutationFn: (imageId: number) => http.post<void>(`/crm/products/${productId}/images/${imageId}/cover`), onSuccess: done });
   return { upload, remove, cover };
+}
+
+// Cupons de desconto (gerente).
+export function useCoupons() {
+  return useQuery({ queryKey: ['coupons'], queryFn: () => http.get<CouponDto[]>('/crm/coupons') });
+}
+
+export function useCouponActions() {
+  const invalidate = useInvalidate();
+  const done = () => invalidate(['coupons']);
+  return {
+    create: useMutation({ mutationFn: (c: CouponInput) => http.post<CouponDto>('/crm/coupons', c), onSuccess: done }),
+    setActive: useMutation({
+      mutationFn: (p: { id: number; active: boolean }) => http.patch<CouponDto>(`/crm/coupons/${p.id}/active?value=${p.active}`),
+      onSuccess: done,
+    }),
+  };
 }

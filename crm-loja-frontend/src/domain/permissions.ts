@@ -27,6 +27,8 @@ export const can = {
   // Meu painel é de quem vende; a equipe técnica e o gerente acompanham pela tela Metas.
   myPanel: (r: Role) => r === 'SELLER',
   targets: asManager,
+  // Cupons de desconto (V14): o gerente cria e desliga.
+  coupons: asManager,
   // Previsão de vendas (spec crm/12).
   forecast: asManager,
   // HU32: baixar listas em planilha.

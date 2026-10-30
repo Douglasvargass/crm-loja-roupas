@@ -21,6 +21,7 @@ import { StockPage } from '@/presentation/pages/StockPage';
 import { TargetsPage } from '@/presentation/pages/TargetsPage';
 import { ForecastPage } from '@/presentation/pages/ForecastPage';
 import { CatalogPage } from '@/presentation/pages/CatalogPage';
+import { CouponsPage } from '@/presentation/pages/CouponsPage';
 import { UsersPage } from '@/presentation/pages/UsersPage';
 import { RequireActivePassword, RequireAuth, RequireCustomer, RequireRole, RequireStaff } from './guards';
 import { StoreShell } from '@/presentation/components/templates/StoreShell';
@@ -83,6 +84,7 @@ export const router = createBrowserRouter([
               { path: 'meu-painel', element: <RequireRole allow={can.myPanel}><MyPanelPage /></RequireRole> },
               { path: 'metas', element: <RequireRole allow={can.targets}><TargetsPage /></RequireRole> },
               { path: 'catalogo', element: <CatalogPage /> },
+              { path: 'cupons', element: <RequireRole allow={can.coupons}><CouponsPage /></RequireRole> },
               { path: 'previsao', element: <RequireRole allow={can.forecast}><ForecastPage /></RequireRole> },
               { path: 'chamados', element: <RequireRole allow={can.requests}><RequestsPage /></RequireRole> },
               { path: 'reposicao', element: <RequireRole allow={can.replenishment}><ReplenishmentPage /></RequireRole> },

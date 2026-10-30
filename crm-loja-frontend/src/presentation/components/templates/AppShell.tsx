@@ -26,6 +26,7 @@ const NAV: NavItem[] = [
   { to: '/metas', label: 'Metas', icon: 'target', allow: can.targets },
   { to: '/previsao', label: 'Previsão de vendas', icon: 'forecast', allow: can.forecast },
   { to: '/vendas', label: 'Vendas', icon: 'sales', allow: can.sales },
+  { to: '/cupons', label: 'Cupons', icon: 'coupon', allow: can.coupons },
   { to: '/clientes', label: 'Clientes', icon: 'customers', allow: can.customers },
   { to: '/catalogo', label: 'Catálogo', icon: 'catalog', allow: can.catalog },
   { to: '/produtos', label: 'Produtos', icon: 'products', allow: can.products },

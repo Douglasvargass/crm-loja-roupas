@@ -270,6 +270,10 @@ export interface SaleDto {
   cancelReason: string | null;
   items: SaleItemDto[];
   channel: SaleChannel;
+  // Cupom (V14): subtotal = peças; discount = desconto; total = líquido.
+  subtotal: number;
+  discount: number;
+  couponCode: string | null;
 }
 
 // ---------------------------------------------------------------- espaço do cliente (spec crm/07)
@@ -281,7 +285,7 @@ export interface CartItemDto {
   itemId: number; productId: number; code: string; name: string; unitPrice: number; quantity: number;
   subtotal: number; available: boolean;
 }
-export interface CartDto { saleId: number | null; items: CartItemDto[]; total: number; count: number }
+export interface CartDto { saleId: number | null; items: CartItemDto[]; total: number; count: number; subtotal: number; discount: number; couponCode: string | null }
 export interface OrderDto {
   id: number; status: SaleStatus; channel: SaleChannel; createdAt: string; confirmedAt: string | null; total: number;
   items: number; paymentMethod: 'PIX' | 'CARD' | null; paymentStatus: 'APPROVED' | 'REFUNDED' | null; cardLast4: string | null;
@@ -512,4 +516,14 @@ export interface ProductImageDto {
   source: string;
   license: string;
   illustration: boolean;
+}
+
+// Cupom de desconto (V14).
+export type CouponKind = 'PERCENT' | 'FIXED';
+export interface CouponDto {
+  id: number; code: string; kind: CouponKind; value: number; minOrder: number; validFrom: string; validUntil: string;
+  maxUses: number | null; uses: number; active: boolean; createdAt: string;
+}
+export interface CouponInput {
+  code: string; kind: CouponKind; value: number; minOrder: number; validFrom: string; validUntil: string; maxUses: number | null;
 }
