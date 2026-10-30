@@ -6,6 +6,7 @@ export const qk = {
   categories: ['categories'] as const,
   products: ['products'] as const,
   product: (id: number) => ['products', id] as const,
+  productImages: (id: number) => ['products', id, 'images'] as const,
   stockMovements: ['stockMovements'] as const,
   stockAlerts: ['stockAlerts'] as const,
   sales: ['sales'] as const,

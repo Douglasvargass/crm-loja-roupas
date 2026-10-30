@@ -2,6 +2,8 @@ import { keepPreviousData, useMutation, useQuery, useQueryClient, type QueryKey 
 import { http } from './http';
 import { qk } from './queryKeys';
 import type {
+  ProductImageDto,
+  ProductImageView,
   SalesForecastDto,
   TargetSuggestionsDto,
   AvailabilityFilter,
@@ -539,4 +541,30 @@ export function useTargetSuggestions(month: string, growth: number, enabled: boo
     placeholderData: keepPreviousData,
     enabled,
   });
+}
+
+// Galeria de imagens do produto.
+export function useProductImages(productId: number) {
+  return useQuery({
+    queryKey: qk.productImages(productId),
+    queryFn: () => http.get<ProductImageDto[]>(`/crm/products/${productId}/images`),
+    enabled: productId > 0,
+  });
+}
+
+export function useProductImageActions(productId: number) {
+  const invalidate = useInvalidate();
+  const done = () => invalidate(qk.productImages(productId), qk.products);
+  const upload = useMutation({
+    mutationFn: ({ file, view }: { file: File; view: ProductImageView }) => {
+      const form = new FormData();
+      form.append('file', file);
+      form.append('view', view);
+      return http.post<ProductImageDto>(`/crm/products/${productId}/images`, form);
+    },
+    onSuccess: done,
+  });
+  const remove = useMutation({ mutationFn: (imageId: number) => http.del<void>(`/crm/products/${productId}/images/${imageId}`), onSuccess: done });
+  const cover = useMutation({ mutationFn: (imageId: number) => http.post<void>(`/crm/products/${productId}/images/${imageId}/cover`), onSuccess: done });
+  return { upload, remove, cover };
 }

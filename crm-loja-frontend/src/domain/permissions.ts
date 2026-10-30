@@ -16,6 +16,8 @@ export const can = {
   categories: () => true,
   manageCategories: asManager,
   products: () => true,
+  // Catálogo visual com fotos: toda a equipe.
+  catalog: () => true,
   manageProducts: (r: Role) => asManager(r) || asStock(r),
   deleteProduct: asManager,
   stock: (r: Role) => asManager(r) || asStock(r),

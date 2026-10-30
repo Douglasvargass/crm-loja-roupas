@@ -14,6 +14,7 @@ import { KpiCard } from '../../components/molecules/KpiCard';
 import { QueryState } from '../../components/molecules/QueryState';
 import { DataTable } from '../../components/organisms/DataTable';
 import { Card, Detail, PageHeader } from '../../components/templates/Page';
+import { ProductGallery } from '../../components/organisms/ProductGallery';
 import { ProductFormModal } from './ProductFormModal';
 import { StockBadge } from './ProductsPage';
 
@@ -83,6 +84,9 @@ function ProductDetail({ d }: { d: ProductDetailDto }) {
         }
       />
       <div className="grid gap-4 lg:grid-cols-3">
+        <Card title="Fotos">
+          <div className="p-4"><ProductGallery productId={p.id} name={p.name} editable={!!role && can.manageProducts(role)} /></div>
+        </Card>
         <Card title="Dados" className="lg:col-span-2">
           <dl className="grid grid-cols-2 gap-4 p-4 sm:grid-cols-3">
             <Detail label="Situação"><StockBadge p={p} /></Detail>
@@ -93,7 +97,7 @@ function ProductDetail({ d }: { d: ProductDetailDto }) {
             <Detail label="Descrição">{p.description ?? '—'}</Detail>
           </dl>
         </Card>
-        <div className="grid grid-cols-2 gap-3 lg:grid-cols-1">
+        <div className="grid grid-cols-2 gap-3 lg:col-span-3 lg:grid-cols-2">
           <KpiCard label="Em estoque" value={p.stockQty} tone={p.stockQty === 0 ? 'error' : p.lowStock ? 'warning' : 'default'} />
           <KpiCard label="Total vendido" value={`${d.totalSold} un.`} hint="Em vendas confirmadas" />
         </div>

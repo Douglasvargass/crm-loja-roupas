@@ -501,3 +501,15 @@ export interface TargetSuggestionsDto {
   storeRevenue: number;
   rows: TargetSuggestionRowDto[];
 }
+
+// Galeria de imagens do produto (V13). url é relativa à API: use mediaUrl(url).
+export type ProductImageView = 'FRONT' | 'BACK' | 'SIDE' | 'DETAIL' | 'OTHER';
+export interface ProductImageDto {
+  id: number;
+  view: ProductImageView;
+  position: number;
+  url: string;
+  source: string;
+  license: string;
+  illustration: boolean;
+}

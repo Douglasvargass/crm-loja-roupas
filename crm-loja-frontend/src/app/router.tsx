@@ -20,6 +20,7 @@ import { ReplenishmentPage } from '@/presentation/pages/ReplenishmentPage';
 import { StockPage } from '@/presentation/pages/StockPage';
 import { TargetsPage } from '@/presentation/pages/TargetsPage';
 import { ForecastPage } from '@/presentation/pages/ForecastPage';
+import { CatalogPage } from '@/presentation/pages/CatalogPage';
 import { UsersPage } from '@/presentation/pages/UsersPage';
 import { RequireActivePassword, RequireAuth, RequireCustomer, RequireRole, RequireStaff } from './guards';
 import { StoreShell } from '@/presentation/components/templates/StoreShell';
@@ -81,6 +82,7 @@ export const router = createBrowserRouter([
               { path: 'usuarios', element: <RequireRole allow={can.users}><UsersPage /></RequireRole> },
               { path: 'meu-painel', element: <RequireRole allow={can.myPanel}><MyPanelPage /></RequireRole> },
               { path: 'metas', element: <RequireRole allow={can.targets}><TargetsPage /></RequireRole> },
+              { path: 'catalogo', element: <CatalogPage /> },
               { path: 'previsao', element: <RequireRole allow={can.forecast}><ForecastPage /></RequireRole> },
               { path: 'chamados', element: <RequireRole allow={can.requests}><RequestsPage /></RequireRole> },
               { path: 'reposicao', element: <RequireRole allow={can.replenishment}><ReplenishmentPage /></RequireRole> },

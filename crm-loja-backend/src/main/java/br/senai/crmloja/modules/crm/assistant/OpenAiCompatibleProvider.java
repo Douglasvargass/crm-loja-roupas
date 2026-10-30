@@ -90,7 +90,52 @@ class OpenAiCompatibleProvider implements LlmProvider {
         return "A pergunta exigiu consultas demais. Tente algo mais específico (um período, um produto, um cliente).";
     }
 
+    // Plano grátis (Groq): limite de tokens POR MINUTO. Uma pergunta com consulta faz 2 pedidos e pode passar do
+    // limite; o provedor diz quanto esperar ("try again in 7.5s" ou o cabeçalho retry-after). Esperamos e tentamos de
+    // novo, até MAX_WAIT_MS no total. Espera maior (limite do DIA) vira a mensagem de limite na hora.
+    static final long MAX_WAIT_MS = 45_000;
+    private static final java.util.regex.Pattern TRY_AGAIN =
+            java.util.regex.Pattern.compile("try again in (?:([0-9]+)m)?([0-9.]+)(ms|s)");
+
     private JsonNode call(Map<String, Object> body) {
+        long waited = 0;
+        while (true) {
+            try {
+                return callOnce(body);
+            } catch (RestClientResponseException e) {
+                long wait = e.getStatusCode().value() == 429 ? retryAfterMs(e) : -1;
+                if (wait < 0 || waited + wait > MAX_WAIT_MS) throw translate(e);
+                log.warn("Limite por minuto do provedor {}: esperando {} ms e tentando de novo", props.provider(), wait);
+                try {
+                    Thread.sleep(wait);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    throw translate(e);
+                }
+                waited += wait;
+            }
+        }
+    }
+
+    // Quanto o provedor pediu para esperar, em ms (com folga de 300 ms); -1 se ele não disse.
+    static long retryAfterMs(RestClientResponseException e) {
+        String header = e.getResponseHeaders() == null ? null : e.getResponseHeaders().getFirst("retry-after");
+        if (header != null) {
+            try {
+                return (long) (Double.parseDouble(header.trim()) * 1000) + 300;
+            } catch (NumberFormatException ignored) {
+                // cabeçalho em formato de data: cai para a mensagem
+            }
+        }
+        var m = TRY_AGAIN.matcher(e.getResponseBodyAsString());
+        if (!m.find()) return -1;
+        double minutes = m.group(1) == null ? 0 : Double.parseDouble(m.group(1));
+        double value = Double.parseDouble(m.group(2));
+        double ms = minutes * 60_000 + ("ms".equals(m.group(3)) ? value : value * 1000);
+        return (long) ms + 300;
+    }
+
+    private JsonNode callOnce(Map<String, Object> body) {
         try {
             String raw = http.post().uri("/chat/completions").body(body).retrieve().body(String.class);
             JsonNode root = json.readTree(raw == null ? "{}" : raw);
@@ -100,25 +145,31 @@ class OpenAiCompatibleProvider implements LlmProvider {
             }
             return root;
         } catch (RestClientResponseException e) {
-            int status = e.getStatusCode().value();
-            log.error("Erro do provedor {} ({}): status {} {}", props.provider(), props.model(), status,
-                    abbreviate(e.getResponseBodyAsString()));
-            throw switch (status) {
-                case 401, 403 -> new BusinessRuleException("assistant_auth", "A chave de API do assistente é inválida.");
-                case 402 -> new BusinessRuleException("assistant_credits",
-                        "A conta da chave do assistente está sem créditos. Adicione créditos no provedor ou use um modelo mais barato.");
-                case 429 -> new BusinessRuleException("assistant_busy",
-                        "O limite gratuito do provedor foi atingido por enquanto. Tente de novo em um minuto.");
-                case 404 -> new BusinessRuleException("assistant_model",
-                        "O modelo '" + props.model() + "' não existe neste provedor. Confira ASSISTANT_MODEL.");
-                default -> new BusinessRuleException("assistant_error", "O assistente não conseguiu responder agora. Tente de novo.");
-            };
+            throw e;   // tratado em call(): 429 espera e tenta de novo; o resto vira mensagem clara
         } catch (ResourceAccessException e) {
             log.error("Sem conexão com o provedor {}", props.provider(), e);
             throw new BusinessRuleException("assistant_offline", "Sem conexão com o serviço de IA. Verifique a internet do servidor.");
         } catch (java.io.IOException e) {
             throw new BusinessRuleException("assistant_error", "O assistente devolveu uma resposta que não consegui ler.");
         }
+    }
+
+    private BusinessRuleException translate(RestClientResponseException e) {
+        int status = e.getStatusCode().value();
+        log.error("Erro do provedor {} ({}): status {} {}", props.provider(), props.model(), status,
+                abbreviate(e.getResponseBodyAsString()));
+        return switch (status) {
+                case 401, 403 -> new BusinessRuleException("assistant_auth", "A chave de API do assistente é inválida.");
+                case 402 -> new BusinessRuleException("assistant_credits",
+                        "A conta da chave do assistente está sem créditos. Adicione créditos no provedor ou use um modelo mais barato.");
+                case 429 -> new BusinessRuleException("assistant_busy",
+                        e.getResponseBodyAsString().contains("per day")
+                                ? "O limite gratuito de hoje do provedor de IA acabou. Volta a funcionar amanhã."
+                                : "O limite gratuito do provedor foi atingido por enquanto. Tente de novo em um minuto.");
+                case 404 -> new BusinessRuleException("assistant_model",
+                        "O modelo '" + props.model() + "' não existe neste provedor. Confira ASSISTANT_MODEL.");
+                default -> new BusinessRuleException("assistant_error", "O assistente não conseguiu responder agora. Tente de novo.");
+            };
     }
 
     private AssistantTools.Result runTool(String name, String arguments, ToolRunner runner) {

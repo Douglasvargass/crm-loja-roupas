@@ -2,6 +2,11 @@
 server:
   port: ${PORT:8080}
 spring:
+  # Fotos dos produtos: até 2 MB cada (a regra fica no ProductImageService; aqui só a folga do formulário).
+  servlet:
+    multipart:
+      max-file-size: 3MB
+      max-request-size: 4MB
   datasource:
     # DB_URL completo, ou as partes separadas (como o Render entrega).
     url: ${DB_URL:jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:crm_loja}}

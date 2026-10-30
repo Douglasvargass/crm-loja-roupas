@@ -62,4 +62,4 @@ body {
 
 /* MODO TESTE PRETO E BRANCO: logo e imagens em tons de cinza. */
 img, svg { filter: grayscale(1); }
-.thalita-photo { filter: none !important; }  /* a foto da Thalita fica sempre colorida */
+.thalita-photo, .product-photo { filter: none !important; }  /* fotos sempre coloridas */  /* a foto da Thalita fica sempre colorida */
