@@ -155,3 +155,19 @@ docker run --rm -p 8080:8080 --add-host=host.docker.internal:host-gateway \
   -e JWT_SECRET=$(openssl rand -hex 48) crm-loja
 # abra http://localhost:8080
 ```
+
+## E-mail de "Esqueci minha senha" (opcional)
+
+Sem estas variáveis o sistema funciona, mas o link de recuperação não chega ao cliente. Em render.com → serviço →
+**Environment**, cadastre:
+
+| Variável | Exemplo | Para quê |
+| --- | --- | --- |
+| `PUBLIC_URL` | `https://crm-loja-app.onrender.com` | Endereço usado no link do e-mail |
+| `SMTP_HOST` | `smtp-relay.brevo.com` (grátis, 300 e-mails/dia) ou `smtp.gmail.com` | Servidor de envio |
+| `SMTP_PORT` | `587` | Porta com STARTTLS |
+| `SMTP_USER` | o login do serviço de e-mail | |
+| `SMTP_PASSWORD` | a chave SMTP do serviço (no Gmail, uma "senha de app") | Nunca no Git |
+| `MAIL_FROM` | `Orden <nao-responda@seudominio.com>` | Remetente |
+
+No localhost, sem `SMTP_HOST`, o link aparece no terminal do back-end (só no perfil `dev`).

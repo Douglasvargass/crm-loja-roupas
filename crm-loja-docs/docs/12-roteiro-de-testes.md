@@ -247,3 +247,15 @@ A Thalita é o botão redondo no canto inferior direito, em todas as telas. Não
 - [ ] **Aplicar a todos** → **Confirmar N meta(s)** → todas as metas ficam iguais às sugestões, cada mudança registrada na auditoria.
 - [ ] Mês que já fechou → o bloco de sugestão não aparece.
 - [ ] Thalita (gerente): "quanto vamos vender em novembro?" responde com a faixa e o que pesou; "qual meta você sugere para o Vitor com 10% de crescimento?" responde com a sugestão e orienta a aplicar na tela Metas.
+
+## 21. Fotos, cupom, criar conta e esqueci minha senha (30/10/2026)
+
+- [ ] Menu **Catálogo** → 12 peças com foto; clicar numa peça → galeria com 4 fotos (frente, costas, lateral, detalhe); **Ampliar** → tela cheia; setas ← → e Esc funcionam; no celular, deslizar troca a foto.
+- [ ] Ficha do produto (gerente) → **Enviar foto** (JPG/PNG até 2 MB) → aparece na galeria; **Usar como capa** → vira a foto do catálogo; **Excluir esta foto**. Arquivo que não é imagem → "Use uma imagem JPG, PNG ou WEBP".
+- [ ] Loja online: cada peça da vitrine com foto; tocar abre as fotos em tela cheia.
+- [ ] Menu **Cupons** (gerente) → BEMVINDO10 (10%) e ORDEN50 (R$ 50 acima de R$ 300) → **Novo cupom** → aparece na lista; **Desligar** / **Ligar**.
+- [ ] Venda aberta (balcão) com peças → digitar `bemvindo10` → **Aplicar** → aparecem Peças, Desconto do cupom e o Total menor; **Confirmar** → em Cupons, Usos sobe 1.
+- [ ] Carrinho do cliente abaixo de R$ 300 → `ORDEN50` → "Este cupom vale para pedidos a partir de R$ 300,00."; **Tirar** volta ao total cheio.
+- [ ] Tela de entrada: "Bem-vindo(a) à Orden"; abas **Sou da equipe** e **Sou cliente**; em Sou cliente, **Criar conta** → preencher (o CEP completa o endereço) → já entra na vitrine.
+- [ ] Criar conta com o mesmo e-mail → "Já existe uma conta com este e-mail"; sem marcar o aceite → pede o aceite.
+- [ ] **Esqueci minha senha** → e-mail → mensagem "Se este e-mail tiver conta, enviamos um link…" (igual para e-mail sem conta). No localhost, sem SMTP, o link aparece no terminal do back-end; abrir → **Criar uma senha nova** → entrar com a nova. Abrir o mesmo link de novo → "não vale mais".

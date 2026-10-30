@@ -56,6 +56,10 @@ Situação em 27/10/2026. **Feito** = implementado e coberto por teste automáti
 | HU57 | Thalita do cliente e pedido de peça | Loja: Thalita, "Não achou? Peça à loja", Meus pedidos | `/loja/assistant/**`, `/loja/requests` | StoreIT (`clientePedePeca…`) | Feito (spec 07) |
 | HU58 | Previsão de vendas com sazonalidade | `/previsao` | `GET /crm/forecast?months=` | ForecastModelTest (8), ForecastIT (`gerenteVePrevisao…`, `mesesForaDoLimite…`) | Feito (spec 12) |
 | HU59 | Meta sugerida pela previsão | `/metas` (coluna Sugestão, Usar, Aplicar a todos) | `GET /crm/targets/suggestions?month=&growth=` | ForecastIT (`metaSugerida…`, `sugestaoRecusa…`) | Feito (spec 12) |
+| HU60 | Catálogo visual com galeria | `/catalogo`, ficha do produto (Fotos), vitrine da loja | `GET/POST/DELETE /crm/products/{id}/images` · `/media/**` | ProductImageIT (3) | Feito |
+| HU61 | Cupom de desconto | `/cupons`, venda aberta, carrinho | `/crm/coupons` · `/crm/sales/{id}/coupon` · `/loja/cart/coupon` | CouponIT (3) | Feito |
+| HU62 | Criar conta de cliente | `/login` (Sou cliente) → `/cadastro` | `POST /loja/signup` | AccountIT (`clienteCriaConta…`, `cadastroRecusa…`) | Feito |
+| HU63 | Esqueci minha senha | `/recuperar-senha` → `/redefinir-senha` | `POST /auth/forgot-password` · `/auth/reset-password` | AccountIT (`esqueciASenha…`) | Feito |
 | HU54 | Mudar data ou cancelar o pedido, com motivo | `/pedidos-compra` → Mudar data / Cancelar | `/reschedule` · `/cancel` | ReplenishmentIT | Feito (spec 11) |
 | HU40–HU45 | Espaço do cliente: conta e troca de senha, vitrine, carrinho, pagamento simulado, meus pedidos, meus dados | `/loja/...` | `/loja/**` | StoreIT | Feito (spec 07) |
 

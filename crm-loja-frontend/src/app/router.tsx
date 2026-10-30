@@ -21,6 +21,7 @@ import { StockPage } from '@/presentation/pages/StockPage';
 import { TargetsPage } from '@/presentation/pages/TargetsPage';
 import { ForecastPage } from '@/presentation/pages/ForecastPage';
 import { CatalogPage } from '@/presentation/pages/CatalogPage';
+import { ForgotPasswordPage, ResetPasswordPage, SignupPage } from '@/presentation/pages/AccountPages';
 import { CouponsPage } from '@/presentation/pages/CouponsPage';
 import { UsersPage } from '@/presentation/pages/UsersPage';
 import { RequireActivePassword, RequireAuth, RequireCustomer, RequireRole, RequireStaff } from './guards';
@@ -31,6 +32,9 @@ import { StorePreviewLayout } from '@/presentation/pages/store/StorePreview';
 // Telas internas: RequireAuth → RequireActivePassword → AppShell (seção 7 da documentação).
 export const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
+  { path: '/cadastro', element: <SignupPage /> },
+  { path: '/recuperar-senha', element: <ForgotPasswordPage /> },
+  { path: '/redefinir-senha', element: <ResetPasswordPage /> },
   {
     element: <RequireAuth />,
     children: [

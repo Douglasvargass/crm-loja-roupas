@@ -76,6 +76,15 @@ O back-end expõe as rotas **sem** prefixo; o front chama `/api/...` e o proxy d
 | PUT | `/crm/targets/{sellerId}?month=aaaa-mm` | `{amount}` define ou corrige a meta. 409 `month_closed` · `month_too_far` · `not_a_seller` · `target_conflict`; 400 valor ≤ 0 ou mais de 2 casas | G | HU38 |
 | GET | `/crm/forecast?months=` | Previsão de vendas: `{today, historyFrom, historyDays, model, periods[], days[]}`. `periods`: NEXT_7, NEXT_30, THIS_MONTH (com `realized`) e um por mês (`months` de 1 a 12, padrão 3), cada um com `revenue`, `low`, `high`, `sales`. `model`: `weekday[]`, `payday`, `holiday`, `monthSeasonality`, `events[]` (`learned`), `accuracy`. `days`: 28 realizados (`actual`) + 60 previstos. 400 `invalid_months`; 409 `not_enough_history` | G | HU58 |
 | GET | `/crm/targets/suggestions?month=aaaa-mm&growth=` | Metas sugeridas: `{month, monthForecast, growthPercent, basisFrom, basisTo, storeRevenue, rows[]}`; cada linha com `revenue` e `sharePercent` (90 dias), `currentTarget`, `suggested` (null + `reason` sem venda). 400 `invalid_growth` · `invalid_month`; 409 `month_closed` · `not_enough_history` | G | HU59 |
+| GET | `/crm/products/{id}/images` | Galeria do produto: `[{id, view (FRONT, BACK, SIDE, DETAIL, OTHER), position, url, source, license, illustration}]` | todos | HU60 |
+| POST | `/crm/products/{id}/images` | multipart `file` + `view`: envia foto. 400 `invalid_image` · `image_too_large`; 409 `too_many_images` | G | HU60 |
+| DELETE | `/crm/products/{id}/images/{imageId}` · POST `…/{imageId}/cover` | Exclui a foto · faz dela a capa | G | HU60 |
+| GET | `/media/images/{imageId}` · `/media/products/{id}/cover` | A imagem em si (sem login, com cache) · a capa do produto (404 sem foto) | público | HU60 |
+| GET · POST | `/crm/coupons` · PATCH `/crm/coupons/{id}/active?value=` | Lista e cria cupons `{code, kind (PERCENT, FIXED), value, minOrder, validFrom, validUntil, maxUses}` · liga ou desliga | G | HU61 |
+| POST · DELETE | `/crm/sales/{id}/coupon` | `{code}` aplica ou troca · tira o cupom da venda aberta; a venda traz `subtotal`, `discount`, `couponCode` | G V | HU61 |
+| POST · DELETE | `/loja/cart/coupon` | O mesmo no carrinho do cliente | C | HU61 |
+| POST | `/loja/signup` | Cria cliente + conta `{fullName, cpf, email, phone, zipCode, street, number, complement, district, city, state, password, acceptTerms}` → `{login}`. 400 `terms_required` · `weak_password` · `invalid_signup`; 409 `email_in_use` · `cpf_registered` · `cpf_has_account` | público | HU62 |
+| POST | `/auth/forgot-password` · `/auth/reset-password` | `{email}` → mensagem igual sempre · `{token, password}`. 409 `invalid_reset_link` | público | HU63 |
 
 ### Exemplo de resposta do dashboard
 

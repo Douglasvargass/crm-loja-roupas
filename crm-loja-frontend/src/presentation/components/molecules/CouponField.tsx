@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useState } from 'react';
 import { useToast } from '@/app/context/ToastContext';
 import { formatMoney } from '@/lib/format';
 import { Button } from '../atoms/Button';
@@ -17,8 +17,9 @@ export function CouponField({ code, discount, onApply, onRemove, busy, disabled 
   const [value, setValue] = useState('');
   const [error, setError] = useState<string>();
 
-  async function submit(e: FormEvent) {
-    e.preventDefault();
+  // Sem <form> próprio: no carrinho o campo fica dentro do formulário de pagamento, e formulário dentro de
+  // formulário não funciona. Enter e o botão aplicam o cupom sem enviar o pagamento.
+  async function submit() {
     if (!value.trim()) {
       setError('Digite o código do cupom.');
       return;
@@ -40,7 +41,7 @@ export function CouponField({ code, discount, onApply, onRemove, busy, disabled 
           Cupom <strong className="font-mono">{code}</strong>
           {discount > 0 ? <> · <span className="tabular">−{formatMoney(discount)}</span></> : ' · abaixo do valor mínimo'}
         </span>
-        <Button size="sm" variant="ghost" loading={busy} disabled={disabled}
+        <Button size="sm" variant="ghost" type="button" loading={busy} disabled={disabled}
           onClick={async () => { try { await onRemove(); } catch (err) { toast.error(err); } }}>
           Tirar
         </Button>
@@ -48,15 +49,16 @@ export function CouponField({ code, discount, onApply, onRemove, busy, disabled 
     );
   }
   return (
-    <form onSubmit={submit} className="flex flex-col gap-1" noValidate>
+    <div className="flex flex-col gap-1">
       <span className="flex gap-2">
         <input aria-label="Código do cupom" placeholder="Tem cupom? Digite aqui" value={value} disabled={disabled}
           onChange={(e) => setValue(e.target.value.toUpperCase())}
+          onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); void submit(); } }}
           className="h-9 min-w-0 flex-1 rounded-md border border-border bg-surface px-3 font-mono text-sm uppercase placeholder:font-sans placeholder:normal-case" />
-        <Button size="sm" variant="secondary" type="submit" loading={busy} disabled={disabled}>Aplicar</Button>
+        <Button size="sm" variant="secondary" type="button" loading={busy} disabled={disabled} onClick={() => void submit()}>Aplicar</Button>
       </span>
       {error && <span role="alert" className="text-xs text-error">{error}</span>}
-    </form>
+    </div>
   );
 }
 
