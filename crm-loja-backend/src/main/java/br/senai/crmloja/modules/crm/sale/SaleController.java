@@ -75,6 +75,18 @@ public class SaleController {
         return service.removeItem(id, itemId);
     }
 
+    public record CouponBody(String code) {}
+
+    @PostMapping("/{id}/coupon")
+    public SaleResponse applyCoupon(@PathVariable Long id, @RequestBody CouponBody body) {
+        return service.applyCoupon(id, body == null ? null : body.code());
+    }
+
+    @DeleteMapping("/{id}/coupon")
+    public SaleResponse removeCoupon(@PathVariable Long id) {
+        return service.removeCoupon(id);
+    }
+
     @PostMapping("/{id}/confirm")
     public SaleResponse confirm(@PathVariable Long id, @AuthenticationPrincipal CurrentUser user) {
         return service.confirm(id, user.id());

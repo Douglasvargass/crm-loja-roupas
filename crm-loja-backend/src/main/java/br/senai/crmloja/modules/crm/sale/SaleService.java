@@ -40,10 +40,13 @@ public class SaleService {
     private final AuditService audit;
     private final AppProperties props;
     private final JdbcTemplate jdbc;
+    private final br.senai.crmloja.modules.crm.coupon.CouponService coupons;
 
     public SaleService(SaleRepository sales, ProductRepository products, CustomerRepository customers,
-                       StockService stock, AuditService audit, AppProperties props, JdbcTemplate jdbc) {
+                       StockService stock, AuditService audit, AppProperties props, JdbcTemplate jdbc,
+                       br.senai.crmloja.modules.crm.coupon.CouponService coupons) {
         this.jdbc = jdbc;
+        this.coupons = coupons;
         this.sales = sales;
         this.products = products;
         this.customers = customers;
@@ -137,6 +140,8 @@ public class SaleService {
                 throw new BusinessRuleException("insufficient_stock", "Estoque insuficiente para " + p.getName()
                         + ": disponível " + p.getStockQty() + ", pedido " + item.getQuantity() + ".");
         }
+        // Cupom (RN63): confere de novo e conta o uso; se não vale mais, nada foi baixado ainda.
+        coupons.redeem(sale);
         // 2º baixa e registra a movimentação ligada à venda.
         for (SaleItem item : sale.getItems()) {
             stock.move(locked.get(item.getProduct().getId()), -item.getQuantity(),
@@ -146,6 +151,24 @@ public class SaleService {
         sale.markConfirmed(OffsetDateTime.now()); // CONFIRMED + confirmed_at
         audit.record(actorId, "crm", "sale_confirmed", "sale", sale.getId(),
                 Map.of("total", sale.getTotal(), "items", sale.getItems().size()));
+        return SaleResponse.from(sale);
+    }
+
+    // RN61/RN62: aplica ou troca o cupom na venda aberta (balcão ou carrinho).
+    @Transactional
+    public SaleResponse applyCoupon(Long saleId, String code) {
+        Sale sale = sales.findByIdForUpdate(saleId).orElseThrow(() -> new NotFoundException("Venda não encontrada."));
+        coupons.apply(sale, code);
+        return SaleResponse.from(sale);
+    }
+
+    @Transactional
+    public SaleResponse removeCoupon(Long saleId) {
+        Sale sale = sales.findByIdForUpdate(saleId).orElseThrow(() -> new NotFoundException("Venda não encontrada."));
+        if (sale.getStatus() != SaleStatus.DRAFT) {
+            throw new BusinessRuleException("sale_not_draft", "Só dá para mexer no cupom antes de fechar o pedido.");
+        }
+        sale.removeCoupon();
         return SaleResponse.from(sale);
     }
 

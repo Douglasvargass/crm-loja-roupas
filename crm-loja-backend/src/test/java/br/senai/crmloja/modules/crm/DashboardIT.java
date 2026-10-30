@@ -192,7 +192,8 @@ class DashboardIT extends IntegrationTest {
         long catB = createCategory(manager);
         long pa = createProduct(manager, category, "100.00", 20);
         long pb = createProduct(manager, catB, "10.00", 20);
-        confirmedSaleOf(pa, 2, pb, 3);
+        // pa vende bastante para ficar no top 5 do dia mesmo com as vendas de hoje dos outros testes (banco compartilhado).
+        confirmedSaleOf(pa, 15, pb, 3);
         String today = java.time.LocalDate.now(java.time.ZoneId.of("America/Sao_Paulo")).toString();
 
         JsonNode p = filtered("&productId=" + pb);
@@ -204,7 +205,7 @@ class DashboardIT extends IntegrationTest {
         // O gráfico de produtos ignora o próprio filtro: o outro produto continua listado.
         var ids = new java.util.HashSet<Long>();
         p.get("topProducts").forEach(t -> ids.add(t.get("productId").asLong()));
-        assertThat(ids).contains(pa, pb);
+        assertThat(ids).contains(pa);
 
         // Categoria A + produto B: nenhum item bate nos dois, então zera (sem erro).
         JsonNode none = filtered("&categoryId=" + category + "&productId=" + pb);

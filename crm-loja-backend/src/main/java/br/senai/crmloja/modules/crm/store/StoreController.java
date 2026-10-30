@@ -122,6 +122,18 @@ public class StoreController {
         return store.remove(me.id(), itemId);
     }
 
+    public record CouponBody(String code) {}
+
+    @PostMapping("/cart/coupon")
+    public Cart applyCoupon(@RequestBody CouponBody body, @AuthenticationPrincipal CurrentUser me) {
+        return store.applyCoupon(me.id(), body == null ? null : body.code());
+    }
+
+    @DeleteMapping("/cart/coupon")
+    public Cart removeCoupon(@AuthenticationPrincipal CurrentUser me) {
+        return store.removeCoupon(me.id());
+    }
+
     @PostMapping("/checkout")
     public OrderDetail checkout(@Valid @RequestBody Checkout body, @AuthenticationPrincipal CurrentUser me) {
         return store.checkout(me.id(), body.method(), body.cardNumber());
