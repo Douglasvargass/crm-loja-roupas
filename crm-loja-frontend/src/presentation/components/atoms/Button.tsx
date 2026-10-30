@@ -7,7 +7,7 @@ const styles: Record<Variant, string> = {
   primary: 'bg-primary text-on-primary hover:bg-primary-hover',
   secondary: 'border border-border bg-surface text-text hover:bg-surface-2',
   ghost: 'text-text hover:bg-surface-2',
-  danger: 'bg-error text-white hover:opacity-90',
+  danger: 'bg-error text-on-error hover:opacity-90',
 };
 
 interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {

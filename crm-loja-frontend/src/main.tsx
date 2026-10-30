@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router';
 import { Providers } from './app/providers';
 import { router } from './app/router';
+import './lib/appearance';   // aplica a aparência escolhida (tema, letra, contraste, movimento) assim que o app carrega
 import './presentation/styles/global.css';
 
 // Ponto de entrada do front. StrictMode roda verificações extras só em desenvolvimento; as rotas ficam em app/router.tsx.

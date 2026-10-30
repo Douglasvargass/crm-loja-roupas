@@ -50,6 +50,7 @@ Nunca use outra conta para enviar.
 | 22 | **Sugestão de pedido no Dashboard** (lista com quantidades e botão que monta o pedido de compra) | roteiro seção 18 | — |
 | 23 | **Previsão de vendas** com sazonalidade (dia da semana, salário, feriados, datas comerciais, mês do ano) e **metas sugeridas pela previsão** na tela Metas; Thalita com `previsao_vendas` e `sugestao_metas` | specs/crm/12, RN55–RN60, roteiro seção 20 | — |
 | 24 | **Banco de imagens** (48 ilustrações próprias, 4 vistas de cada peça), **Catálogo** com galeria e tela cheia, fotos na vitrine; **Cupons** de desconto no balcão e no carrinho; tela de entrada com boas-vindas, **Sou cliente / Criar conta** e **Esqueci minha senha** por e-mail; Thalita espera o limite por minuto do Groq | RN61–RN69, roteiro seção 21 | **V13, V14, V15** |
+| 25 | **Acessibilidade**: botão Aparência (tema claro/escuro/automático, letra Normal/Grande/Maior, alto contraste, reduzir movimento), tradutor de Libras (VLibras), avisos mais longos com ×, "Pular para o conteúdo" e nomes para leitor de tela. Só front-end; o visual claro oficial não muda | specs/crm/13, HU64–HU66, RN70–RN72, roteiro seção 22 | — |
 
 O detalhe de cada passo está em `HISTORICO-DE-COMMITS.txt` (os commits feitos neste pacote) e no fim de
 `DOCUMENTACAO_COMPLETA.md` ("Histórico de revisões").
@@ -139,3 +140,9 @@ Clientes (senha inicial `cliente12345`, troca obrigatória no primeiro acesso):
 | --- | --- | --- |
 | `vitor.freitas` | Vitor Freitas (professor) | Vitrine |
 | `matheus.carvalho` | Matheus Carvalho (professor) | Vitrine |
+
+## 10. Visual oficial (decisão do Douglas, 30/10/2026)
+
+O site é **preto e branco, com o Dashboard na paleta "Ice"**. Isto é o visual oficial, não um teste: o comentário antigo no
+`tokens.css` ("modo teste, só local, não commitar") foi trocado. **Não volte à paleta bege** (Creme, Areia, Caramelo, Café) por
+conta própria: ela foi a anterior. O botão Aparência (spec 13) só acrescenta tema escuro, alto contraste e letra maior por cima.

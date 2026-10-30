@@ -72,6 +72,9 @@ As regras ficam no Service e, sempre que possível, também no banco (CHECK, UNI
 | RN67 | Esqueci minha senha: resposta sempre igual (não revela se o e-mail tem conta); até 3 pedidos por hora; o banco guarda só o hash do link | `password_reset_token` | 400 `invalid_email` |
 | RN68 | O link vale 30 minutos e uma vez só; trocar a senha invalida os outros links e encerra as sessões abertas | — | 409 `invalid_reset_link` |
 | RN69 | Galeria do produto: até 8 imagens de até 2 MB (JPG, PNG ou WEBP, conferido pelos primeiros bytes do arquivo); a primeira é a capa; só o gerente envia, troca a capa e exclui; as imagens são públicas, como numa vitrine | `ck_product_image_*` | 400 `invalid_image` · `image_too_large` · 409 `too_many_images` |
+| RN70 | Aparência (tema, letra, contraste, movimento) é escolha da pessoa, guardada no navegador; nos modos escuro e de alto contraste, texto com 4,5:1 (7:1 no alto contraste) e borda de campo com 3:1; o visual claro oficial não muda | `appearance.ts`, `tokens.css` | — |
+| RN71 | Avisos ficam 8 s (12 s se erro), pausam com mouse ou foco e têm botão para fechar | `ToastContext` | — |
+| RN72 | O tradutor VLibras (versão fixa 7.12.2) vem ligado, pode ser desligado em Aparência, e a janela avisa que o texto selecionado vai ao servidor do governo | `VLibras.tsx` | — |
 | RN48 | Receber dá entrada de todas as peças na mesma transação (tudo ou nada) e fecha os chamados que a entrada cobre (RN35); aberto com data vencida = atrasado | Mesma transação da entrada | 409 `order_closed` |
 
 ### Ciclo de vida da venda

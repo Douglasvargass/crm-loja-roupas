@@ -1,14 +1,17 @@
-/* MODO TESTE PRETO E BRANCO (30/10/2026, só local, não commitar). Para voltar: git checkout -- este arquivo e global.css.
-   Paleta da loja: Creme #F6F1E9, Areia #D8C7B0, Caramelo #6B4F3A, Café #29231F.
-   Num projeto novo só estes valores mudam; os componentes usam as classes do @theme.
-   29/10/2026: a pedido do Douglas, o site fica sempre na paleta clara da marca (antes ele trocava sozinho para o
-   escuro quando o computador estava no modo escuro, e a tela ficava toda café). O fundo puxa para a Areia, os
-   cartões ficam quase brancos e a moldura (menu e barra de cima) fica Creme. */
+/* VISUAL OFICIAL (confirmado pelo Douglas em 30/10/2026): preto e branco, com o Dashboard na paleta "Ice".
+   Este arquivo NÃO é um teste e PODE ser enviado ao GitHub: não volte à paleta bege (Creme, Areia, Caramelo, Café),
+   que foi a anterior. Os componentes usam as classes do @theme (global.css); só os valores mudam aqui.
+
+   Aparência (30/10/2026, acessibilidade): quem escolhe é a pessoa, no botão "Aparência" do topo (lib/appearance.ts grava
+   as escolhas em <html data-theme data-contrast data-font data-motion>). O padrão é o claro oficial abaixo. Os quatro
+   conjuntos (claro, escuro, claro com alto contraste, escuro com alto contraste) tiveram o contraste conferido
+   (WCAG 2.1): texto 4,5:1 ou mais (7:1 no alto contraste) e borda de campo 3:1 ou mais. */
 :root {
-  --bg: #f6f6f6;            /* fundo quase branco (pedido de 30/10/2026) */            /* creme bem clarinho (pedido do Douglas, 30/10/2026) */
+  --bg: #f6f6f6;            /* fundo quase branco */
   --surface: #ffffff;
   --surface-2: #f0f0f0;
-  --border: #e3e3e3;
+  --border: #e3e3e3;        /* divisórias discretas */
+  --border-input: #858585;  /* borda de campo digitável: precisa 3:1 sobre o fundo (WCAG 1.4.11) */
   --text: #111111;
   --text-muted: #5c5c5c;
   --primary: #111111;
@@ -20,46 +23,87 @@
   --warning: #3d3d3d;
   --warning-soft: #ededed;
   --error: #000000;
+  --on-error: #ffffff;      /* texto sobre fundo de erro (botão de perigo) */
   --error-soft: #dcdcdc;
   --info: #4a4a4a;
   --info-soft: #eeeeee;
   --chart: #111111;
   --chart-2: #9a9a9a;
-  --logo-plate: transparent;   /* a logo é marrom: no escuro ela precisa de uma placa creme */
+  --logo-plate: transparent;   /* no tema escuro a logo escura ganha uma placa clara */
   color-scheme: light;
 }
 
-/* Tema escuro guardado, mas desligado: só vale se alguém colocar data-theme="dark" no <html>. Não segue mais o
-   modo escuro do computador. */
+/* Tema escuro: cinza bem escuro, nunca preto puro (menos ofuscamento para quem tem sensibilidade à luz). */
 :root[data-theme="dark"] {
-    --bg: #1f1a17;
-    --surface: #29231f;       /* Café */
-    --surface-2: #342d28;
-    --border: #4a3f37;
-    --text: #f6f1e9;          /* Creme */
-    --text-muted: #c4b5a3;
-    --primary: #d8c7b0;       /* Areia: no escuro o destaque claro lê melhor */
-    --primary-hover: #e6d9c6;
-    --primary-soft: #3e332b;
-    --on-primary: #29231f;
-    --success: #9cc48e;
-    --success-soft: #26301f;
-    --warning: #e3b06b;
-    --warning-soft: #3a2c19;
-    --error: #e59384;
-    --error-soft: #3d221d;
-    --info: #a9bccd;
-    --info-soft: #232b33;
-    --chart: #d8c7b0;
-    --chart-2: #6b4f3a;
-    --logo-plate: #f6f1e9;
-    color-scheme: dark;
+  --bg: #161616;
+  --surface: #1f1f1f;
+  --surface-2: #2a2a2a;
+  --border: #3a3a3a;
+  --border-input: #8f8f8f;
+  --text: #f2f2f2;
+  --text-muted: #b8b8b8;
+  --primary: #f2f2f2;
+  --primary-hover: #ffffff;
+  --primary-soft: #333333;
+  --on-primary: #111111;
+  --success: #dcdcdc;
+  --success-soft: #2e2e2e;
+  --warning: #cfcfcf;
+  --warning-soft: #333333;
+  --error: #ffffff;
+  --on-error: #111111;
+  --error-soft: #3d3d3d;
+  --info: #c4c4c4;
+  --info-soft: #2e2e2e;
+  --chart: #f2f2f2;
+  --chart-2: #6a6a6a;
+  --logo-plate: #f2f2f2;    /* a logo escura precisa de fundo claro no escuro */
+  color-scheme: dark;
 }
 
-/* Menu lateral e barra superior sempre claros, em bege (pedido do Douglas em 29/10/2026), inclusive no tema
-   escuro: a moldura fica com a cor da marca e só o conteúdo segue o tema. A classe redefine as cores dentro
-   dela, então ícones, sino, "Ver como" e a logo (sem placa) acompanham sozinhos. */
-.chrome-light {
+/* Alto contraste, claro: texto preto, bordas fortes. */
+:root[data-contrast="high"] {
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --surface-2: #f0f0f0;
+  --border: #1a1a1a;
+  --border-input: #1a1a1a;
+  --text: #000000;
+  --text-muted: #2e2e2e;
+  --primary: #000000;
+  --primary-hover: #1a1a1a;
+  --primary-soft: #e4e4e4;
+  --on-primary: #ffffff;
+  --success: #000000;
+  --warning: #1a1a1a;
+  --error: #000000;
+  --info: #1a1a1a;
+}
+
+/* Alto contraste, escuro: texto branco sobre quase preto, bordas claras. */
+:root[data-theme="dark"][data-contrast="high"] {
+  --bg: #0b0b0b;
+  --surface: #121212;
+  --surface-2: #1c1c1c;
+  --border: #d9d9d9;
+  --border-input: #d9d9d9;
+  --text: #ffffff;
+  --text-muted: #e6e6e6;
+  --primary: #ffffff;
+  --primary-hover: #ffffff;
+  --primary-soft: #333333;
+  --on-primary: #000000;
+  --success: #ffffff;
+  --warning: #ffffff;
+  --error: #ffffff;
+  --on-error: #000000;
+  --info: #ffffff;
+}
+
+/* Menu lateral e barra superior brancos (visual oficial). A classe redefine as cores dentro dela, então ícones, sino,
+   "Ver como" e a logo acompanham sozinhos. No tema escuro ela NÃO vale: uma barra branca numa tela escura estraga o efeito
+   para quem tem sensibilidade à luz, e aí a moldura escurece junto. */
+:root:not([data-theme="dark"]) .chrome-light {
   --surface: #ffffff;
   --surface-2: #f0f0f0;
   --border: #e3e3e3;
@@ -108,3 +152,74 @@
 
 /* Dashboard limpo: sem sombras, bordas leves, cartões de indicador sem moldura pesada. */
 .cores-dashboard * { box-shadow: none; }
+
+/* Alto contraste no claro: a moldura também ganha texto preto e bordas fortes. */
+:root[data-contrast="high"]:not([data-theme="dark"]) .chrome-light {
+  --border: #1a1a1a;
+  --text: #000000;
+  --text-muted: #2e2e2e;
+  --primary: #000000;
+  --primary-hover: #1a1a1a;
+  --on-primary: #ffffff;
+  --success: #000000;
+  --warning: #1a1a1a;
+  --error: #000000;
+  --info: #1a1a1a;
+}
+
+/* Dashboard na paleta Ice no tema escuro: mesmos tons, mais claros sobre o fundo escuro. */
+:root[data-theme="dark"] .cores-dashboard {
+  --chart: #86e5d8;
+  --chart-2: #217e8f;
+  --chart-soft: #4aaeb3;
+  --g1: #1f5662;
+  --g2: #4aaeb3;
+  --g3: #86e5d8;
+  --primary: #86e5d8;
+  --primary-hover: #b6f0e8;
+  --primary-soft: #12343a;
+  --on-primary: #00183d;
+  --success: #6fd38d;
+  --success-soft: #16301f;
+  --warning: #e0b84f;
+  --warning-soft: #33290f;
+  --error: #ff9a8d;
+  --on-error: #111111;
+  --error-soft: #3a1c18;
+  --info: #7fd0dd;
+  --info-soft: #12343a;
+}
+
+/* Dashboard Ice com alto contraste: verdes, amarelos e vermelhos mais escuros (claro) ou mais claros (escuro). */
+:root[data-contrast="high"] .cores-dashboard {
+  --primary: #00183d;
+  --primary-hover: #000000;
+  --success: #0d5a26;
+  --warning: #6b4a00;
+  --error: #8a1f12;
+  --info: #0c4a6e;
+}
+:root[data-theme="dark"][data-contrast="high"] .cores-dashboard {
+  --primary: #b6f0e8;
+  --success: #b5f0c6;
+  --warning: #ffe08a;
+  --error: #ffc2b8;
+  --info: #b6e8f0;
+}
+
+/* Tamanho da letra: todo o sistema usa rem, então mudar a base aumenta tudo junto (textos, botões, espaços). */
+html[data-font="large"] { font-size: 112.5%; }
+html[data-font="xlarge"] { font-size: 125%; }
+
+/* Reduzir movimento: desliga animações e transições (menu, Thalita, janelas, carregando). */
+html[data-motion="reduce"] *,
+html[data-motion="reduce"] *::before,
+html[data-motion="reduce"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* Alto contraste: links dentro do conteúdo sempre sublinhados (a cor sozinha não basta para quem não distingue cores). */
+html[data-contrast="high"] main a { text-decoration: underline; }
