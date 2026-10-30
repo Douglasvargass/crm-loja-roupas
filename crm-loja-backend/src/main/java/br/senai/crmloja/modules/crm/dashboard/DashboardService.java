@@ -113,7 +113,7 @@ public class DashboardService {
 
     private Totals salesTotals(LocalDate from, LocalDate to, Long categoryId, Long productId, Who who) {
         return jdbc.queryForObject("""
-                select count(distinct s.id) as qty, coalesce(sum(si.subtotal), 0) as revenue
+                select count(distinct s.id) as qty, coalesce(sum(si.subtotal * (case when s.discount > 0 then s.total / (s.total + s.discount) else 1 end)), 0) as revenue
                   from sale s
                   join sale_item si on si.sale_id = s.id
                   join product p on p.id = si.product_id
@@ -137,7 +137,7 @@ public class DashboardService {
 
     private List<TopProduct> topProducts(LocalDate from, LocalDate to, Long categoryId, Who who) {
         return jdbc.query("""
-                select si.product_id, p.code, p.name, sum(si.quantity) as qty, sum(si.subtotal) as revenue
+                select si.product_id, p.code, p.name, sum(si.quantity) as qty, sum(si.subtotal * (case when s.discount > 0 then s.total / (s.total + s.discount) else 1 end)) as revenue
                   from sale_item si
                   join sale s on s.id = si.sale_id
                   join product p on p.id = si.product_id
@@ -157,7 +157,7 @@ public class DashboardService {
         var params = params(from, to, categoryId, productId, who).addValue("tz", props.timeZone());
         Map<LocalDate, DailyRevenue> byDay = new HashMap<>();
         jdbc.query("""
-                select (s.confirmed_at at time zone :tz)::date as day, count(distinct s.id) as qty, sum(si.subtotal) as revenue
+                select (s.confirmed_at at time zone :tz)::date as day, count(distinct s.id) as qty, sum(si.subtotal * (case when s.discount > 0 then s.total / (s.total + s.discount) else 1 end)) as revenue
                   from sale s
                   join sale_item si on si.sale_id = s.id
                   join product p on p.id = si.product_id
@@ -178,7 +178,7 @@ public class DashboardService {
 
     private List<CategorySales> salesByCategory(LocalDate from, LocalDate to, Long productId, Who who) {
         return jdbc.query("""
-                select c.id, c.name, sum(si.quantity) as qty, sum(si.subtotal) as revenue
+                select c.id, c.name, sum(si.quantity) as qty, sum(si.subtotal * (case when s.discount > 0 then s.total / (s.total + s.discount) else 1 end)) as revenue
                   from sale_item si
                   join sale s on s.id = si.sale_id
                   join product p on p.id = si.product_id

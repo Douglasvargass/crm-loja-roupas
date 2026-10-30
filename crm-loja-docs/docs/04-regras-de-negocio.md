@@ -63,6 +63,15 @@ As regras ficam no Service e, sempre que possível, também no banco (CHECK, UNI
 | RN58 | Datas comerciais (Mães, Namorados, Pais, Cliente, Crianças, Black Friday, Natal) sobem aos poucos nos dias antes; aumento aprendido quando o histórico tem a janela inteira, senão estimativa padrão marcada; mês do ano só com 1 ano de histórico | — | — |
 | RN59 | Faixa provável (~80%) pelo erro diário dos últimos 56 dias; acerto = erro médio por semana refazendo a previsão 28 dias atrás (precisa de 56 dias) | — | — |
 | RN60 | Meta sugerida = previsão do mês da loja (mês atual: vendido até ontem + previsão) × parte do vendedor no faturamento da loja nos últimos 90 dias × (1 + crescimento de −20% a +50%), arredondada para a centena; sem venda em 90 dias, sem sugestão; aplicar passa pela regra e auditoria da meta | `/crm/targets/suggestions` G | 400 `invalid_growth` · 409 `month_closed` |
+| RN61 | Cupom em % (até 90%) ou em R$, com pedido mínimo, validade e limite de usos; um cupom por venda; a venda guarda a cópia da regra e o total líquido (peças − desconto) é sempre recalculado no servidor | `ck_coupon_*`, `ck_sale_discount` | 400 `invalid_code` · `invalid_value` |
+| RN62 | Aplicar exige cupom ativo, dentro da validade, com uso disponível e pedido no mínimo; o código vale em maiúsculas ou minúsculas | — | 409 `coupon_not_found` · `coupon_inactive` · `coupon_expired` · `coupon_exhausted` · `coupon_min_order` |
+| RN63 | O uso do cupom só conta na confirmação, com o cupom travado e conferido de novo; se não vale mais, nada é baixado do estoque | `FOR UPDATE` | 409 (mesmos códigos) |
+| RN64 | Cupom não se apaga: o gerente desliga; o painel soma o faturamento líquido, com o desconto rateado entre as peças | — | — |
+| RN65 | Cliente cria a própria conta pelo site (Sou cliente → Criar conta): mesmos dados do cadastro do balcão, senha de 8+ caracteres e aceite do uso dos dados; o login é o e-mail | `ux_app_user_email` | 400 `terms_required` · `weak_password` · 409 `email_in_use` |
+| RN66 | CPF que já é cliente do balcão só vira conta com o mesmo e-mail do cadastro; CPF com conta não cria outra | — | 409 `cpf_registered` · `cpf_has_account` |
+| RN67 | Esqueci minha senha: resposta sempre igual (não revela se o e-mail tem conta); até 3 pedidos por hora; o banco guarda só o hash do link | `password_reset_token` | 400 `invalid_email` |
+| RN68 | O link vale 30 minutos e uma vez só; trocar a senha invalida os outros links e encerra as sessões abertas | — | 409 `invalid_reset_link` |
+| RN69 | Galeria do produto: até 8 imagens de até 2 MB (JPG, PNG ou WEBP, conferido pelos primeiros bytes do arquivo); a primeira é a capa; só o gerente envia, troca a capa e exclui; as imagens são públicas, como numa vitrine | `ck_product_image_*` | 400 `invalid_image` · `image_too_large` · 409 `too_many_images` |
 | RN48 | Receber dá entrada de todas as peças na mesma transação (tudo ou nada) e fecha os chamados que a entrada cobre (RN35); aberto com data vencida = atrasado | Mesma transação da entrada | 409 `order_closed` |
 
 ### Ciclo de vida da venda

@@ -139,4 +139,28 @@ class OpenAiCompatibleProviderTest {
         assertThat(ollama.ask(new ArrayList<>(), "sys", "oi", List.of(), (n, a) -> null)).isEqualTo("Olá");
         local.verify();
     }
+
+    @Test
+    void limitePorMinutoEsperaOTempoPedidoETentaDeNovo() {
+        server.expect(requestTo(BASE + "/chat/completions"))
+                .andRespond(withStatus(HttpStatus.TOO_MANY_REQUESTS).body(
+                        "{\"error\":{\"message\":\"Rate limit reached on tokens per minute (TPM): Limit 8000. Please try again in 20ms.\"}}"));
+        server.expect(requestTo(BASE + "/chat/completions"))
+                .andRespond(withSuccess("""
+                        {"choices":[{"finish_reason":"stop","message":{"role":"assistant","content":"Vendemos R$ 10."}}]}""",
+                        MediaType.APPLICATION_JSON));
+        String answer = provider.ask(new ArrayList<>(), "sys", "Quanto vendemos?", tools, (n, a) -> null);
+        assertThat(answer).isEqualTo("Vendemos R$ 10.");
+        server.verify();
+    }
+
+    @Test
+    void limiteDoDiaNaoEsperaEAvisa() {
+        server.expect(requestTo(BASE + "/chat/completions"))
+                .andRespond(withStatus(HttpStatus.TOO_MANY_REQUESTS).body(
+                        "{\"error\":{\"message\":\"Rate limit reached on tokens per day (TPD). Please try again in 7m12.5s.\"}}"));
+        assertThatThrownBy(() -> provider.ask(new ArrayList<>(), "sys", "Oi?", tools, (n, a) -> null))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessageContaining("limite gratuito de hoje");
+    }
 }

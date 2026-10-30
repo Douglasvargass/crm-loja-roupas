@@ -20,7 +20,7 @@ Nunca use outra conta para enviar.
 3. Front-end: na pasta `crm-loja-frontend`, rode `npx pnpm install`, depois `npx pnpm lint`, `npx pnpm typecheck` e `npx pnpm build`.
 4. Suba local (`mvnw spring-boot:test-run` + `npx pnpm dev`) e passe o roteiro da seção 6. Se o banco embutido não subir com "Permission denied", o Windows reservou a porta: use `EMBEDDED_PG_PORT=55432` (detalhes em `crm-loja-docs/docs/11-guia-de-comandos.md`).
 5. Só então siga as seções 4 (GitHub) e 5 (Render), sempre com a conta pessoal do Douglas.
-6. Pedido novo do Douglas: siga o processo do doc 16 (spec em `crm-loja-docs/specs/crm/12-nome/`), migration **V13**, teste, roteiro e este arquivo atualizados.
+6. Pedido novo do Douglas: siga o processo do doc 16 (spec em `crm-loja-docs/specs/crm/12-nome/`), migration **V16**, teste, roteiro e este arquivo atualizados.
 
 ## 2. O que mudou, em ordem
 
@@ -49,6 +49,7 @@ Nunca use outra conta para enviar.
 | 21 | **Conferência do pedido** (conta peça por peça: a menos → devolver a nota; a mais → nota de bonificação), produto novo não é "parado", **Resetar senha** pela tela (equipe e clientes) e cliente com login não se exclui | specs/crm/11 (REQ-08), RN52–RN54, roteiro seção 19 | **V12** |
 | 22 | **Sugestão de pedido no Dashboard** (lista com quantidades e botão que monta o pedido de compra) | roteiro seção 18 | — |
 | 23 | **Previsão de vendas** com sazonalidade (dia da semana, salário, feriados, datas comerciais, mês do ano) e **metas sugeridas pela previsão** na tela Metas; Thalita com `previsao_vendas` e `sugestao_metas` | specs/crm/12, RN55–RN60, roteiro seção 20 | — |
+| 24 | **Banco de imagens** (48 ilustrações próprias, 4 vistas de cada peça), **Catálogo** com galeria e tela cheia, fotos na vitrine; **Cupons** de desconto no balcão e no carrinho; tela de entrada com boas-vindas, **Sou cliente / Criar conta** e **Esqueci minha senha** por e-mail; Thalita espera o limite por minuto do Groq | RN61–RN69, roteiro seção 21 | **V13, V14, V15** |
 
 O detalhe de cada passo está em `HISTORICO-DE-COMMITS.txt` (os commits feitos neste pacote) e no fim de
 `DOCUMENTACAO_COMPLETA.md` ("Histórico de revisões").
@@ -113,7 +114,7 @@ Tudo o que foi combinado está feito. Sobrou só o que depende de você ou é me
 
 ## 8. Regras do projeto que valem sempre
 
-- Leia o `CLAUDE.md` da raiz, do back-end e do front-end. Resumo: regra de negócio só no Service; banco muda só por migration nova (a próxima é **V13**); nada se apaga (cancela ou inativa); código em inglês, tela e documentos em português simples; todo comportamento novo tem teste.
+- Leia o `CLAUDE.md` da raiz, do back-end e do front-end. Resumo: regra de negócio só no Service; banco muda só por migration nova (a próxima é **V16**); nada se apaga (cancela ou inativa); código em inglês, tela e documentos em português simples; todo comportamento novo tem teste.
 - Antes de dar algo por pronto: `./mvnw verify` e `pnpm lint && pnpm typecheck && pnpm build`.
 - Pedido novo segue o processo do doc 16 (história, DADO/QUANDO/ENTÃO com o negativo, regras R1..Rn, spec em `specs/crm/NN-nome/`).
 - A história da Orden (doc 17) foi revisada com a equipe: **não** citar empresa nem pessoa como origem da dor do estoque; a origem do nome "Orden" não foi registrada.

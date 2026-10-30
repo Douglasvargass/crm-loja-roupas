@@ -14,6 +14,7 @@ import { Icon } from '../../components/atoms/Icon';
 import { ConfirmDialog } from '../../components/molecules/ConfirmDialog';
 import { ProductPicker } from '../../components/molecules/ProductPicker';
 import { QueryState } from '../../components/molecules/QueryState';
+import { CouponField, DiscountLines } from '../../components/molecules/CouponField';
 import { Card, Detail, PageHeader } from '../../components/templates/Page';
 
 export function SaleDetailPage() {
@@ -97,9 +98,18 @@ function SaleView({ sale }: { sale: SaleDto }) {
                 {sale.items.map((i) => <ItemRow key={i.id} saleId={sale.id} item={i} editable={draft} />)}
               </ul>
             )}
-            <div className="flex items-center justify-between border-t border-border px-4 py-3">
-              <span className="text-sm text-muted">Total</span>
-              <span className="tabular text-xl font-semibold">{formatMoney(sale.total)}</span>
+            <div className="flex flex-col gap-2 border-t border-border px-4 py-3">
+              {draft && sale.items.length > 0 && (
+                <CouponField code={sale.couponCode} discount={sale.discount}
+                  onApply={(c) => actions.applyCoupon.mutateAsync(c)} onRemove={() => actions.removeCoupon.mutateAsync()}
+                  busy={actions.applyCoupon.isPending || actions.removeCoupon.isPending} />
+              )}
+              {!draft && sale.couponCode && <span className="text-sm text-muted">Cupom <strong className="font-mono">{sale.couponCode}</strong></span>}
+              <DiscountLines subtotal={sale.subtotal} discount={sale.discount} />
+              <span className="flex items-center justify-between">
+                <span className="text-sm text-muted">Total</span>
+                <span className="tabular text-xl font-semibold">{formatMoney(sale.total)}</span>
+              </span>
             </div>
           </Card>
         </div>

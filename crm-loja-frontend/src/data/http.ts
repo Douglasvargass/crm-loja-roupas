@@ -98,11 +98,13 @@ export async function request<T>(
   path: string,
   options: { body?: unknown; query?: Query; retry?: boolean } = {},
 ): Promise<T> {
+  // FormData (envio de arquivo) vai como está: o navegador monta o multipart com o boundary.
+  const isForm = options.body instanceof FormData;
   const init: RequestInit = {
     method,
     credentials: 'include',
-    headers: options.body !== undefined ? { 'Content-Type': 'application/json' } : undefined,
-    body: options.body !== undefined ? JSON.stringify(options.body) : undefined,
+    headers: options.body !== undefined && !isForm ? { 'Content-Type': 'application/json' } : undefined,
+    body: options.body === undefined ? undefined : isForm ? (options.body as FormData) : JSON.stringify(options.body),
   };
   let res: Response;
   try {
@@ -127,3 +129,7 @@ export const http = {
   patch: <T>(path: string, body?: unknown) => request<T>('PATCH', path, { body }),
   del: <T>(path: string) => request<T>('DELETE', path),
 };
+
+// Endereço de uma imagem do catálogo (/media/**), com o mesmo prefixo das chamadas da API.
+export const mediaUrl = (path: string) => apiUrl(path);
+export const productCoverUrl = (productId: number) => apiUrl(`/media/products/${productId}/cover`);

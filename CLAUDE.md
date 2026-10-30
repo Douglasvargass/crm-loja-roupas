@@ -14,7 +14,7 @@ Monorepo do Orden: `crm-loja-backend/` (Java 21, Spring Boot), `crm-loja-fronten
 
 - Nunca enviar ao Git com outra conta que não a do Douglas (`Douglasvargass`).
 - Regra de negócio só no Service; o front esconde, quem barra é o back-end.
-- Banco muda só por migration nova (próxima: **V13**), com o reverso em `db/undo`.
+- Banco muda só por migration nova (próxima: **V16**), com o reverso em `db/undo`.
 - Nada se apaga: venda se cancela, cadastro com histórico se inativa, histórico de estoque e auditoria são imutáveis.
 - Tela e documentação em português simples; código em inglês.
 - Mudou rota ou DTO: `crm-loja-docs/specs/api-contract.md` e `crm-loja-frontend/src/data/dto.ts` juntos.

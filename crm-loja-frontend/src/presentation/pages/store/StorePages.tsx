@@ -4,14 +4,17 @@ import { useToast } from '@/app/context/ToastContext';
 import { paymentLabel, saleStatusLabel, saleStatusTone } from '@/data/adapters';
 import type { MyDataInput, ShopProductDto } from '@/data/dto';
 import { ApiError } from '@/data/http';
-import { useCart, useMyData, useMyOrder, useMyOrders, useMyPartRequests, useRequestPart, useShopCategories, useShopProducts, useStoreActions } from '@/data/hooks';
+import { useProductImages, useCart, useMyData, useMyOrder, useMyOrders, useMyPartRequests, useRequestPart, useShopCategories, useShopProducts, useStoreActions } from '@/data/hooks';
 import { formatDateTime, formatMoney, maskPhone, maskZip } from '@/lib/format';
 import { useDebounced } from '@/lib/useDebounced';
 import { lookupZip } from '@/lib/viacep';
 import { Badge } from '../../components/atoms/Badge';
+import { ProductPhoto } from '../../components/atoms/ProductPhoto';
+import { Lightbox } from '../../components/organisms/ProductGallery';
 import { Button } from '../../components/atoms/Button';
 import { Input, Select } from '../../components/atoms/Field';
 import { Modal } from '../../components/molecules/Modal';
+import { CouponField, DiscountLines } from '../../components/molecules/CouponField';
 import { Icon } from '../../components/atoms/Icon';
 import { FakePixQr } from '../../components/molecules/FakePixQr';
 import { Pagination } from '../../components/molecules/Pagination';
@@ -129,7 +132,8 @@ function ProductCard({ p }: { p: ShopProductDto }) {
     }
   }
   return (
-    <li className="flex flex-col gap-2 rounded-xl border border-border bg-surface p-4">
+    <li className="flex flex-col gap-2 overflow-hidden rounded-xl border border-border bg-surface p-4">
+      <StorePhotos id={p.id} name={p.name} />
       <div className="flex items-start justify-between gap-2">
         <span className="text-xs text-muted">{p.category}</span>
         {p.lastUnits && <Badge tone="warning">Últimas unidades</Badge>}
@@ -152,6 +156,20 @@ function ProductCard({ p }: { p: ShopProductDto }) {
   );
 }
 
+// Foto da peça na vitrine; tocar abre todas as fotos em tela cheia.
+function StorePhotos({ id, name }: { id: number; name: string }) {
+  const [open, setOpen] = useState(false);
+  const images = useProductImages(open ? id : 0);
+  return (
+    <>
+      <button type="button" onClick={() => setOpen(true)} aria-label={`Ver as fotos de ${name}`} className="group -mx-4 -mt-4 mb-1 overflow-hidden">
+        <ProductPhoto productId={id} alt={name} className="aspect-square w-full transition-transform duration-300 group-hover:scale-105" />
+      </button>
+      {open && images.data && images.data.length > 0 && <Lightbox images={images.data} start={0} name={name} onClose={() => setOpen(false)} />}
+    </>
+  );
+}
+
 /* ------------------------------------------------------------------------------------------------ carrinho */
 
 // Na Prévia da loja cada tela troca pela versão sem servidor (StorePreview.tsx); a do cliente fica igual.
@@ -161,7 +179,7 @@ export function CartPage() {
 
 function CustomerCartPage() {
   const cart = useCart();
-  const { change, remove, checkout } = useStoreActions();
+  const { change, remove, checkout, applyCoupon, removeCoupon } = useStoreActions();
   const toast = useToast();
   const navigate = useNavigate();
   const [method, setMethod] = useState<'PIX' | 'CARD'>('PIX');
@@ -214,6 +232,10 @@ function CustomerCartPage() {
             </Card>
             <Card title="Pagamento">
               <form onSubmit={pay} className="flex flex-col gap-3 p-4">
+                <CouponField code={c.couponCode} discount={c.discount}
+                  onApply={(code) => applyCoupon.mutateAsync(code)} onRemove={() => removeCoupon.mutateAsync()}
+                  busy={applyCoupon.isPending || removeCoupon.isPending} />
+                <DiscountLines subtotal={c.subtotal} discount={c.discount} />
                 <p className="flex items-baseline justify-between text-sm">
                   Total <strong className="tabular text-xl">{formatMoney(c.total)}</strong>
                 </p>

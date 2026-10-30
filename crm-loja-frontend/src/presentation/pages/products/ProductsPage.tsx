@@ -16,6 +16,7 @@ import { QueryState } from '../../components/molecules/QueryState';
 import { DataTable } from '../../components/organisms/DataTable';
 import { Card, Filters, PageHeader } from '../../components/templates/Page';
 import { ExportButton } from '../../components/molecules/ExportButton';
+import { ProductPhoto } from '../../components/atoms/ProductPhoto';
 import { ProductFormModal } from './ProductFormModal';
 
 // Situação do produto (disponível, estoque baixo, sem estoque, inativo), igual em toda tela que mostra produto.
@@ -90,7 +91,7 @@ export function ProductsPage() {
                 onRowClick={(p) => navigate(`/produtos/${p.id}`)}
                 columns={[
                   { header: 'Código', cell: (p) => <span className="font-mono text-xs">{p.code}</span> },
-                  { header: 'Nome', cell: (p) => <span className="font-medium">{p.name}</span> },
+                  { header: 'Nome', cell: (p) => <span className="flex items-center gap-3"><ProductPhoto productId={p.id} alt="" className="size-10 shrink-0 rounded-md" /><span className="font-medium">{p.name}</span></span> },
                   { header: 'Categoria', cell: (p) => p.categoryName },
                   { header: 'Tam.', cell: (p) => p.size, align: 'center' },
                   { header: 'Cor', cell: (p) => p.color },

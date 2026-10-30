@@ -402,3 +402,21 @@ São 57 histórias em 13 épicos (HU01 a HU35 são o MVP do enunciado; HU36 a HU
 - Sugestão = previsão do mês × parte do vendedor nos últimos 90 dias × (1 + crescimento que eu escolho), arredondada para a centena.
 - Uso a sugestão de uma pessoa ou aplico a todos depois de confirmar; vale a mesma regra e auditoria da meta digitada.
 - Quem não vendeu nos últimos 90 dias não recebe sugestão: defino à mão.
+
+**HU60 · Catálogo visual com galeria.** Como equipe e como cliente, quero ver as fotos de cada peça (frente, costas, lateral e detalhe) e ampliar em tela cheia, para conhecer a peça sem ir ao estoque.
+
+- Catálogo com a foto de capa de cada peça; clicar abre a galeria; Ampliar abre em tela cheia com setas, teclado e deslizar no celular.
+- O gerente envia, troca a capa e exclui fotos na ficha do produto; cada foto mostra a autoria e a licença.
+
+**HU61 · Cupom de desconto.** Como cliente e como vendedor, quero aplicar um cupom no pedido, para dar ou receber o desconto combinado.
+
+- O gerente cria cupons em % ou em R$, com mínimo, validade e limite de usos, e desliga quando quiser.
+- No carrinho e na venda do balcão aparecem as peças, o desconto e o total; o uso só conta quando o pedido é confirmado.
+
+**HU62 · Criar conta de cliente.** Como cliente, quero criar a minha conta pelo site, para comprar pela loja online sem depender da loja.
+
+- Na tela de entrada escolho "Sou cliente" e Criar conta; depois de criar, já entro na vitrine.
+
+**HU63 · Esqueci minha senha.** Como cliente (ou equipe com e-mail cadastrado), quero receber um link por e-mail para criar uma senha nova.
+
+- A tela não revela se o e-mail tem conta; o link vale 30 minutos e uma vez só.

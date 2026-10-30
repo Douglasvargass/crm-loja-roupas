@@ -45,7 +45,9 @@ public class StoreService {
     public record CartItem(Long itemId, Long productId, String code, String name, BigDecimal unitPrice, int quantity,
                            BigDecimal subtotal, boolean available) {}
 
-    public record Cart(Long saleId, List<CartItem> items, BigDecimal total, int count) {}
+    // subtotal = soma das peças; discount = cupom; total = o que o cliente paga.
+    public record Cart(Long saleId, List<CartItem> items, BigDecimal total, int count, BigDecimal subtotal, BigDecimal discount,
+                       String couponCode) {}
 
     public record Order(Long id, String status, String channel, OffsetDateTime createdAt, OffsetDateTime confirmedAt,
                         BigDecimal total, int items, String paymentMethod, String paymentStatus, String cardLast4) {}
@@ -109,7 +111,8 @@ public class StoreService {
 
     @Transactional(readOnly = true)
     public Cart cart(Long userId) {
-        return openCartId(me(userId)).map(this::cartOf).orElse(new Cart(null, List.of(), BigDecimal.ZERO.setScale(2), 0));
+        return openCartId(me(userId)).map(this::cartOf).orElse(new Cart(null, List.of(), BigDecimal.ZERO.setScale(2), 0,
+                BigDecimal.ZERO.setScale(2), BigDecimal.ZERO.setScale(2), null));
     }
 
     // REQ-05: o mesmo produto de novo soma na linha; estoque conferido na hora (sem reservar).
@@ -137,6 +140,21 @@ public class StoreService {
     }
 
     // ------------------------------------------------------------------------------------------- pagamento
+
+    // Cupom no carrinho (spec crm/07 + RN61 a RN64).
+    @Transactional
+    public Cart applyCoupon(Long userId, String code) {
+        Long saleId = openCartId(me(userId)).orElseThrow(() -> new BusinessRuleException("cart_empty", "Seu carrinho está vazio."));
+        saleService.applyCoupon(saleId, code);
+        return cartOf(saleId);
+    }
+
+    @Transactional
+    public Cart removeCoupon(Long userId) {
+        Long saleId = openCartId(me(userId)).orElseThrow(() -> new BusinessRuleException("cart_empty", "Seu carrinho está vazio."));
+        saleService.removeCoupon(saleId);
+        return cartOf(saleId);
+    }
 
     // REQ-06 e REQ-07. noRollbackFor: o preço atualizado e a tentativa recusada ficam gravados mesmo com o 409.
     @Transactional(noRollbackFor = {PriceChangedException.class, PaymentDeclinedException.class})
@@ -264,6 +282,7 @@ public class StoreService {
         SaleResponse s = saleService.detail(saleId);
         List<CartItem> items = s.items().stream().map(i -> new CartItem(i.id(), i.productId(), i.productCode(),
                 i.productName(), i.unitPrice(), i.quantity(), i.subtotal(), i.availableStock() >= i.quantity())).toList();
-        return new Cart(saleId, items, s.total(), items.stream().mapToInt(CartItem::quantity).sum());
+        return new Cart(saleId, items, s.total(), items.stream().mapToInt(CartItem::quantity).sum(), s.subtotal(), s.discount(),
+                s.couponCode());
     }
 }

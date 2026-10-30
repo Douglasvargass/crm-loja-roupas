@@ -46,6 +46,25 @@ public class Sale {
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal total = BigDecimal.ZERO.setScale(2);
 
+    // V14: cupom. A venda guarda uma cópia da regra (tipo, valor, mínimo) para o total não mudar se o cupom mudar.
+    @Column(nullable = false, precision = 12, scale = 2)
+    private BigDecimal discount = BigDecimal.ZERO.setScale(2);
+
+    @Column(name = "coupon_id")
+    private Long couponId;
+
+    @Column(name = "coupon_code", length = 30)
+    private String couponCode;
+
+    @Column(name = "coupon_kind", length = 10)
+    private String couponKind;
+
+    @Column(name = "coupon_value", precision = 12, scale = 2)
+    private BigDecimal couponValue;
+
+    @Column(name = "coupon_min_order", precision = 12, scale = 2)
+    private BigDecimal couponMinOrder;
+
     @Column(name = "confirmed_at")
     private OffsetDateTime confirmedAt;
 
@@ -88,9 +107,41 @@ public class Sale {
     @PreUpdate
     void preUpdate() { updatedAt = OffsetDateTime.now(); }
 
-    // RN13: total sempre recalculado no servidor a partir dos itens.
+    // RN13: total sempre recalculado no servidor a partir dos itens, menos o desconto do cupom (RN61).
+    // Abaixo do mínimo do cupom, o desconto fica zero (a confirmação recusa e pede para tirar o cupom).
     public void recalculateTotal() {
-        total = items.stream().map(SaleItem::getSubtotal).reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2);
+        BigDecimal gross = getSubtotal();
+        BigDecimal d = BigDecimal.ZERO;
+        if (couponKind != null && gross.compareTo(couponMinOrder == null ? BigDecimal.ZERO : couponMinOrder) >= 0) {
+            d = "PERCENT".equals(couponKind)
+                    ? gross.multiply(couponValue).divide(BigDecimal.valueOf(100), 2, java.math.RoundingMode.HALF_UP)
+                    : couponValue.min(gross);
+        }
+        discount = d.setScale(2, java.math.RoundingMode.HALF_UP);
+        total = gross.subtract(discount).setScale(2, java.math.RoundingMode.HALF_UP);
+    }
+
+    // Soma dos itens, antes do desconto.
+    public BigDecimal getSubtotal() {
+        return items.stream().map(SaleItem::getSubtotal).reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2);
+    }
+
+    public void applyCoupon(Long id, String code, String kind, BigDecimal value, BigDecimal minOrder) {
+        couponId = id;
+        couponCode = code;
+        couponKind = kind;
+        couponValue = value;
+        couponMinOrder = minOrder;
+        recalculateTotal();
+    }
+
+    public void removeCoupon() {
+        applyCoupon(null, null, null, null, null);
+    }
+
+    // O pedido já alcança o mínimo do cupom? (sem cupom, sempre sim)
+    public boolean couponMinReached() {
+        return couponKind == null || getSubtotal().compareTo(couponMinOrder) >= 0;
     }
 
     public Optional<SaleItem> itemOf(Long productId) {
@@ -127,6 +178,10 @@ public class Sale {
     public Customer getCustomer() { return customer; }
     public SaleStatus getStatus() { return status; }
     public BigDecimal getTotal() { return total; }
+    public BigDecimal getDiscount() { return discount; }
+    public Long getCouponId() { return couponId; }
+    public String getCouponCode() { return couponCode; }
+    public BigDecimal getCouponMinOrder() { return couponMinOrder; }
     public OffsetDateTime getConfirmedAt() { return confirmedAt; }
     public OffsetDateTime getCancelledAt() { return cancelledAt; }
     public String getCancelReason() { return cancelReason; }

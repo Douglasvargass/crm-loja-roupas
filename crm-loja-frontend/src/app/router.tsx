@@ -20,6 +20,9 @@ import { ReplenishmentPage } from '@/presentation/pages/ReplenishmentPage';
 import { StockPage } from '@/presentation/pages/StockPage';
 import { TargetsPage } from '@/presentation/pages/TargetsPage';
 import { ForecastPage } from '@/presentation/pages/ForecastPage';
+import { CatalogPage } from '@/presentation/pages/CatalogPage';
+import { ForgotPasswordPage, ResetPasswordPage, SignupPage } from '@/presentation/pages/AccountPages';
+import { CouponsPage } from '@/presentation/pages/CouponsPage';
 import { UsersPage } from '@/presentation/pages/UsersPage';
 import { RequireActivePassword, RequireAuth, RequireCustomer, RequireRole, RequireStaff } from './guards';
 import { StoreShell } from '@/presentation/components/templates/StoreShell';
@@ -29,6 +32,9 @@ import { StorePreviewLayout } from '@/presentation/pages/store/StorePreview';
 // Telas internas: RequireAuth → RequireActivePassword → AppShell (seção 7 da documentação).
 export const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
+  { path: '/cadastro', element: <SignupPage /> },
+  { path: '/recuperar-senha', element: <ForgotPasswordPage /> },
+  { path: '/redefinir-senha', element: <ResetPasswordPage /> },
   {
     element: <RequireAuth />,
     children: [
@@ -81,6 +87,8 @@ export const router = createBrowserRouter([
               { path: 'usuarios', element: <RequireRole allow={can.users}><UsersPage /></RequireRole> },
               { path: 'meu-painel', element: <RequireRole allow={can.myPanel}><MyPanelPage /></RequireRole> },
               { path: 'metas', element: <RequireRole allow={can.targets}><TargetsPage /></RequireRole> },
+              { path: 'catalogo', element: <CatalogPage /> },
+              { path: 'cupons', element: <RequireRole allow={can.coupons}><CouponsPage /></RequireRole> },
               { path: 'previsao', element: <RequireRole allow={can.forecast}><ForecastPage /></RequireRole> },
               { path: 'chamados', element: <RequireRole allow={can.requests}><RequestsPage /></RequireRole> },
               { path: 'reposicao', element: <RequireRole allow={can.replenishment}><ReplenishmentPage /></RequireRole> },

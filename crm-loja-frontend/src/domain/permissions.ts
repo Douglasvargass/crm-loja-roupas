@@ -16,6 +16,8 @@ export const can = {
   categories: () => true,
   manageCategories: asManager,
   products: () => true,
+  // Catálogo visual com fotos: toda a equipe.
+  catalog: () => true,
   manageProducts: (r: Role) => asManager(r) || asStock(r),
   deleteProduct: asManager,
   stock: (r: Role) => asManager(r) || asStock(r),
@@ -25,6 +27,8 @@ export const can = {
   // Meu painel é de quem vende; a equipe técnica e o gerente acompanham pela tela Metas.
   myPanel: (r: Role) => r === 'SELLER',
   targets: asManager,
+  // Cupons de desconto (V14): o gerente cria e desliga.
+  coupons: asManager,
   // Previsão de vendas (spec crm/12).
   forecast: asManager,
   // HU32: baixar listas em planilha.
