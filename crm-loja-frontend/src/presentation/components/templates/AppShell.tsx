@@ -9,6 +9,7 @@ import { Icon, type IconName } from '../atoms/Icon';
 import { Logo } from '../atoms/Logo';
 import { MenuToggle } from '../atoms/MenuToggle';
 import { AlertBell } from '../organisms/AlertBell';
+import { AppearanceButton } from '../organisms/AppearanceMenu';
 import { PendingOnLogin } from '../organisms/PendingOnLogin';
 import { ViewAsBanner, ViewAsButton } from '../organisms/ViewAs';
 import { ThalitaChat } from '../organisms/ThalitaChat';
@@ -127,6 +128,7 @@ export function AppShell() {
 
   return (
     <div className="flex h-full flex-col">
+      <a href="#conteudo" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[60] focus:rounded-lg focus:bg-primary focus:px-3 focus:py-2 focus:text-sm focus:font-medium focus:text-on-primary">Pular para o conteúdo</a>
       <header className="chrome-light relative z-50 flex h-14 shrink-0 items-center gap-2 border-b border-border bg-surface px-2 sm:px-4">
         <MenuToggle
           expanded={menuVisible}
@@ -140,6 +142,7 @@ export function AppShell() {
           <Logo className="h-9" plate={false} />
         </Link>
         <div className="ml-auto flex items-center gap-3">
+          <AppearanceButton />
           <ViewAsButton />
           {role && <AlertBell />}
           <div className="hidden text-right leading-tight sm:block">
@@ -201,7 +204,7 @@ export function AppShell() {
           </aside>
         </div>
 
-        <main className="min-w-0 flex-1 overflow-y-auto px-4 py-5 sm:px-6 sm:py-6">
+        <main id="conteudo" tabIndex={-1} className="min-w-0 flex-1 overflow-y-auto px-4 py-5 outline-none sm:px-6 sm:py-6">
           <div className="mx-auto max-w-6xl pb-24">
             <Outlet />
           </div>

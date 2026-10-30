@@ -124,13 +124,13 @@ export function ViewAsBanner() {
   return (
     // Mesmo padrão da faixa do "Ver como" da Plataforma de Operações (olho, saída à direita), em azul claro fora da
     // paleta da marca, para chamar atenção (pedido do Douglas, 29/10).
-    <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b border-sky-300 bg-sky-100 px-4 py-2.5 text-sm text-sky-900" role="status">
+    <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b border-sky-300 bg-sky-100 px-4 py-2.5 text-sm text-sky-900 dark:border-sky-700 dark:bg-sky-950 dark:text-sky-100" role="status">
       <span className="flex items-center gap-2">
         <Icon name="eye" className="size-4 shrink-0" />
         <span>Vendo como <strong>{me.fullName}</strong> ({me.role ? roleLabel[me.role] : 'sem papel'}) · somente leitura</span>
       </span>
       <button type="button" disabled={busy} onClick={() => void stop()}
-        className="shrink-0 rounded-lg border border-sky-700/50 bg-white/70 px-3 py-1 text-xs font-semibold text-sky-900 hover:bg-white disabled:opacity-60">
+        className="shrink-0 rounded-lg border border-sky-700/50 bg-white/70 px-3 py-1 text-xs font-semibold text-sky-900 hover:bg-white dark:border-sky-400 dark:bg-sky-900 dark:text-sky-50 dark:hover:bg-sky-800 disabled:opacity-60">
         {busy ? 'Saindo…' : `Sair do modo · voltar a ser ${me.viewAs.viewerName.split(' ')[0]}`}
       </button>
     </div>

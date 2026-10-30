@@ -2,7 +2,7 @@ import { useId, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttribu
 import { cn } from '@/lib/cn';
 
 const control =
-  'w-full rounded-lg border bg-surface px-3 text-sm text-text placeholder:text-muted/70 ' +
+  'w-full rounded-lg border bg-surface px-3 text-sm text-text placeholder:text-muted ' +
   'focus:border-primary focus:ring-2 focus:ring-primary/25 focus:outline-none disabled:opacity-60';
 
 interface WrapperProps {
@@ -47,7 +47,7 @@ export function Input({ label, error, hint, className, ...rest }: InputProps) {
           aria-invalid={!!error || undefined}
           aria-describedby={describedBy}
           {...rest}
-          className={cn(control, 'h-10', error ? 'border-error' : 'border-border')}
+          className={cn(control, 'h-10', error ? 'border-error' : 'border-border-input')}
         />
       )}
     </FieldWrapper>
@@ -65,7 +65,7 @@ export function Select({ label, error, className, children, ...rest }: SelectPro
           aria-invalid={!!error || undefined}
           aria-describedby={describedBy}
           {...rest}
-          className={cn(control, 'h-10', error ? 'border-error' : 'border-border')}
+          className={cn(control, 'h-10', error ? 'border-error' : 'border-border-input')}
         >
           {children}
         </select>
@@ -86,7 +86,7 @@ export function Textarea({ label, error, className, ...rest }: TextareaProps) {
           aria-invalid={!!error || undefined}
           aria-describedby={describedBy}
           {...rest}
-          className={cn(control, 'py-2', error ? 'border-error' : 'border-border')}
+          className={cn(control, 'py-2', error ? 'border-error' : 'border-border-input')}
         />
       )}
     </FieldWrapper>

@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState, type ReactNode } from 'react';
+import { VLibras } from '@/presentation/components/organisms/VLibras';
 import { SessionProvider } from './context/SessionContext';
 import { ToastProvider } from './context/ToastContext';
 
@@ -20,6 +21,7 @@ export function Providers({ children }: { children: ReactNode }) {
     <QueryClientProvider client={client}>
       <ToastProvider>
         <SessionProvider>{children}</SessionProvider>
+        <VLibras />
       </ToastProvider>
     </QueryClientProvider>
   );

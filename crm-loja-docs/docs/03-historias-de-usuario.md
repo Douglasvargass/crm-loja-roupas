@@ -420,3 +420,21 @@ São 57 histórias em 13 épicos (HU01 a HU35 são o MVP do enunciado; HU36 a HU
 **HU63 · Esqueci minha senha.** Como cliente (ou equipe com e-mail cadastrado), quero receber um link por e-mail para criar uma senha nova.
 
 - A tela não revela se o e-mail tem conta; o link vale 30 minutos e uma vez só.
+
+### Adendo de 30/10/2026: acessibilidade (spec crm/13)
+
+**HU64 · Ajustar a aparência.** Como pessoa com sensibilidade à luz ou baixa visão, quero escolher tema claro ou escuro, tamanho da letra, alto contraste e menos movimento, para usar o sistema sem cansar.
+
+- Botão "Aparência" no topo de toda tela, inclusive no login e na loja do cliente.
+- Tema Claro (o visual oficial, que não muda), Escuro ou Automático (segue o computador); letra Normal, Grande ou Maior; alto contraste; reduzir movimento.
+- A escolha vale na hora, fica salva neste navegador e aparece sem piscar na próxima abertura; "Restaurar o padrão" desfaz tudo.
+
+**HU65 · Tradutor de Libras.** Como pessoa surda, quero que o texto da tela seja traduzido para Libras, para entender o sistema na minha primeira língua.
+
+- Botão azul do VLibras na borda da tela; ao selecionar um texto, o boneco o traduz. Pode ser desligado em Aparência.
+- A janela avisa que o texto selecionado é enviado ao servidor do governo e que a tradução é automática e pode errar.
+
+**HU66 · Avisos e teclado acessíveis.** Como pessoa que lê devagar ou usa só o teclado ou leitor de tela, quero tempo para ler os avisos e chegar ao conteúdo sem passar por todo o menu.
+
+- Avisos ficam mais tempo (8 s, ou 12 s se erro), pausam com o mouse ou o foco e fecham pelo botão ×.
+- "Pular para o conteúdo" é o primeiro item do Tab; todo botão, link e campo tem nome para o leitor de tela.

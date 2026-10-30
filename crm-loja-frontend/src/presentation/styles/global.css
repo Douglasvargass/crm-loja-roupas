@@ -1,11 +1,16 @@
 @import 'tailwindcss';
 @import './tokens.css';
 
+/* Variante dark: vale quando o <html> tem data-theme="dark" (a escolha da pessoa em Aparência), não só o modo do computador. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 @theme inline {
   --color-bg: var(--bg);
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
   --color-border: var(--border);
+  --color-border-input: var(--border-input);
+  --color-on-error: var(--on-error);
   --color-text: var(--text);
   --color-muted: var(--text-muted);
   --color-primary: var(--primary);
@@ -39,6 +44,12 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Foco visível para quem navega pelo teclado. Em @layer base, para as classes focus-visible:... dos componentes
+   continuarem mandando onde já têm o próprio anel. */
+@layer base {
+  :focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+}
+
 .tabular {
   font-variant-numeric: tabular-nums;
 }
@@ -60,6 +71,7 @@ body {
   .talita-pop, .talita-dot { animation: none; }
 }
 
-/* MODO TESTE PRETO E BRANCO: logo e imagens em tons de cinza. */
+/* Visual oficial (confirmado pelo Douglas em 30/10/2026): preto e branco, com logo e ícones em tons de cinza. As fotos
+   (Thalita e produtos) e o Dashboard em paleta Ice ficam coloridos. */
 img, svg { filter: grayscale(1); }
 .thalita-photo, .product-photo { filter: none !important; }  /* fotos sempre coloridas */  /* a foto da Thalita fica sempre colorida */

@@ -16,6 +16,7 @@ São 13 telas internas numa SPA React (mais as 5 do espaço do cliente). As inte
 | Nova venda | `/vendas/nova` | Cliente opcional, busca de produto, carrinho, total, Confirmar | G V | HU21–HU23 |
 | Detalhe da venda | `/vendas/:id` | Itens com preço praticado, Cancelar (G), dados do cancelamento | G V | HU24, HU26 |
 | Usuários | `/usuarios` | Contas, papel, ativo, Resetar senha (senha provisória) | G | HU35 |
+| Aparência | (janela, botão no topo de toda tela e do login) | Tema, tamanho da letra, alto contraste, reduzir movimento, tradutor de Libras e restaurar o padrão | Todos | HU64–HU65 |
 | Meu painel | `/meu-painel` | Tela inicial do vendedor: meta do mês com barra e frases, vendido, hoje, vendas por dia, mais vendidos, últimas vendas; mês escolhível | V | HU37 |
 | Loja (cliente) | `/loja`, `/loja/carrinho`, `/loja/pedidos[/:id]`, `/loja/meus-dados` | Layout próprio, sem o menu da equipe: vitrine, carrinho com Pix ou cartão simulado, pedidos e dados | C | HU40–HU45 |
 | Prévia da loja | `/previa-loja` | O site como qualquer cliente vê (vitrine de verdade, carrinho só na tela, Pix de demonstração, pedidos e dados de exemplo); nada é gravado. Abre pelo "Ver como" → Loja do cliente | G | HU50 |

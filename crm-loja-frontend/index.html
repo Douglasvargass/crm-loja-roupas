@@ -7,6 +7,19 @@
     <meta name="theme-color" content="#6b4f3a" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content" />
     <title>Orden</title>
+    <!-- Aparência (acessibilidade): aplica o tema, a letra, o contraste e o movimento escolhidos ANTES de a tela
+         aparecer, para não piscar claro e depois escuro. A mesma regra está em src/lib/appearance.ts. -->
+    <script>
+      try {
+        var a = JSON.parse(localStorage.getItem("orden.aparencia") || "{}"), d = document.documentElement;
+        var dark = a.theme === "dark" || (a.theme === "auto" && matchMedia("(prefers-color-scheme: dark)").matches);
+        var reduce = typeof a.reduceMotion === "boolean" ? a.reduceMotion : matchMedia("(prefers-reduced-motion: reduce)").matches;
+        d.dataset.theme = dark ? "dark" : "light";
+        d.dataset.contrast = a.contrast ? "high" : "normal";
+        d.dataset.font = a.font || "normal";
+        d.dataset.motion = reduce ? "reduce" : "normal";
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -100,7 +100,7 @@ semanas a loja deixa de repor essa categoria.
 
 - [ ] Fechar o navegador, abrir de novo → continua logado (até 24 h sem uso).
 - [ ] Parar o back-end (`Ctrl + C`) e subir de novo → todos os dados continuam lá.
-- [ ] Toda ação mostra aviso verde (sucesso) ou vermelho (erro), que some em uns 4 segundos.
+- [ ] Toda ação mostra aviso verde (sucesso) ou vermelho (erro), que fica uns 8 segundos (12 se for erro), pausa com o mouse em cima e fecha pelo ×.
 - [ ] Excluir e cancelar sempre pedem confirmação.
 - [ ] **Menu (3 traços), computador:** clicar nos 3 traços esconde o menu lateral; clicar de novo mostra. A escolha fica lembrada ao recarregar.
 - [ ] **Menu (3 traços), celular ou janela estreita:** o menu começa escondido; tocar nos 3 traços abre uma gaveta (os traços viram X); fecha tocando no X, fora do menu, na tecla Esc ou ao escolher uma tela.
@@ -259,3 +259,17 @@ A Thalita é o botão redondo no canto inferior direito, em todas as telas. Não
 - [ ] Tela de entrada: "Bem-vindo(a) à Orden"; abas **Sou da equipe** e **Sou cliente**; em Sou cliente, **Criar conta** → preencher (o CEP completa o endereço) → já entra na vitrine.
 - [ ] Criar conta com o mesmo e-mail → "Já existe uma conta com este e-mail"; sem marcar o aceite → pede o aceite.
 - [ ] **Esqueci minha senha** → e-mail → mensagem "Se este e-mail tiver conta, enviamos um link…" (igual para e-mail sem conta). No localhost, sem SMTP, o link aparece no terminal do back-end; abrir → **Criar uma senha nova** → entrar com a nova. Abrir o mesmo link de novo → "não vale mais".
+
+## 22. Acessibilidade: Aparência, Libras e teclado (spec crm/13)
+
+- [ ] Em qualquer tela (e no login), o botão **Aparência** abre a janela com Tema, Tamanho da letra, Alto contraste, Reduzir movimento e Tradutor de Libras. O visual padrão continua o oficial (preto e branco, Dashboard Ice).
+- [ ] **Escuro:** o fundo vira cinza bem escuro, a logo ganha placa clara, o menu e a barra de cima escurecem junto, o Dashboard Ice fica em tons mais claros; recarregar a página (F5) mantém o escuro, sem piscar claro.
+- [ ] **Automático:** muda sozinho quando o computador troca de claro para escuro.
+- [ ] **Maior:** os textos e botões crescem; no celular nada estoura para o lado.
+- [ ] **Alto contraste:** textos pretos (brancos no escuro), bordas marcadas, links do conteúdo sublinhados.
+- [ ] **Reduzir movimento:** o menu e a janela da Thalita abrem sem animação.
+- [ ] **Restaurar o padrão** volta ao claro oficial, letra normal, sem contraste.
+- [ ] **Libras:** o botão azul aparece na borda da tela; selecionar um texto e clicar nele mostra o boneco traduzindo (precisa de internet). Desligar em Aparência faz o botão sumir.
+- [ ] **Teclado:** apertar Tab numa tela nova mostra "Pular para o conteúdo"; Enter leva ao conteúdo. O foco aparece com contorno visível em botões e campos.
+- [ ] **Avisos:** um aviso de sucesso fica mais de 4 segundos, não some com o mouse em cima e fecha no ×.
+- [ ] Conferência de cores: `python crm-loja-docs/docs/qa/verificar-contraste.py` deve terminar com "falhas: 0" (os informativos são o verde, amarelo e vermelho oficiais do Ice).

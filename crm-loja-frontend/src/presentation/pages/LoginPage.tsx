@@ -4,6 +4,7 @@ import { useSession } from '@/app/context/SessionContext';
 import { homeOf } from '@/domain/permissions';
 import { cn } from '@/lib/cn';
 import { Button } from '../components/atoms/Button';
+import { AppearanceButton } from '../components/organisms/AppearanceMenu';
 import { Logo } from '../components/atoms/Logo';
 import { Input } from '../components/atoms/Field';
 
@@ -102,7 +103,8 @@ export function LoginPage() {
 // Moldura das telas sem login (entrar, criar conta, recuperar senha).
 export function AuthLayout({ title, subtitle, children, wide }: { title: string; subtitle?: string; children: ReactNode; wide?: boolean }) {
   return (
-    <div className="flex min-h-full items-center justify-center px-4 py-10">
+    <div className="relative flex min-h-full items-center justify-center px-4 py-10">
+      <div className="absolute top-3 right-3"><AppearanceButton /></div>
       <div className={cn('w-full', wide ? 'max-w-2xl' : 'max-w-sm')}>
         <div className="mb-6 flex flex-col items-center gap-2 text-center">
           <Logo className="h-28" />

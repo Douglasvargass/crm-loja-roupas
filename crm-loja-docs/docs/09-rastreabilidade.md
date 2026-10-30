@@ -60,6 +60,9 @@ Situação em 27/10/2026. **Feito** = implementado e coberto por teste automáti
 | HU61 | Cupom de desconto | `/cupons`, venda aberta, carrinho | `/crm/coupons` · `/crm/sales/{id}/coupon` · `/loja/cart/coupon` | CouponIT (3) | Feito |
 | HU62 | Criar conta de cliente | `/login` (Sou cliente) → `/cadastro` | `POST /loja/signup` | AccountIT (`clienteCriaConta…`, `cadastroRecusa…`) | Feito |
 | HU63 | Esqueci minha senha | `/recuperar-senha` → `/redefinir-senha` | `POST /auth/forgot-password` · `/auth/reset-password` | AccountIT (`esqueciASenha…`) | Feito |
+| HU64 | Ajustar a aparência (tema, letra, contraste, movimento) | botão Aparência no topo de toda tela | (só front-end) | roteiro seção 22; `verificar-contraste.py` | Feito (spec 13) |
+| HU65 | Tradutor de Libras (VLibras) | botão azul na borda da tela; Aparência | (plugin externo) | roteiro seção 22 | Feito (spec 13) |
+| HU66 | Avisos e teclado acessíveis | avisos com ×; "Pular para o conteúdo" | (só front-end) | roteiro seção 22 | Feito (spec 13) |
 | HU54 | Mudar data ou cancelar o pedido, com motivo | `/pedidos-compra` → Mudar data / Cancelar | `/reschedule` · `/cancel` | ReplenishmentIT | Feito (spec 11) |
 | HU40–HU45 | Espaço do cliente: conta e troca de senha, vitrine, carrinho, pagamento simulado, meus pedidos, meus dados | `/loja/...` | `/loja/**` | StoreIT | Feito (spec 07) |
 

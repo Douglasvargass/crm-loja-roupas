@@ -5,6 +5,7 @@ import { cn } from '@/lib/cn';
 import { Icon } from '../atoms/Icon';
 import { Logo } from '../atoms/Logo';
 import { useStorePreview } from '../../pages/store/previewContext';
+import { AppearanceButton } from '../organisms/AppearanceMenu';
 import { ThalitaChat } from '../organisms/ThalitaChat';
 
 // Caminhos relativos à base: /loja para o cliente, /previa-loja para a Prévia da loja da equipe.
@@ -24,6 +25,7 @@ export function StoreShell() {
   const count = pv ? pv.count : cart.data?.count ?? 0;
   return (
     <div className="flex min-h-full flex-col">
+      <a href="#conteudo" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[60] focus:rounded-lg focus:bg-primary focus:px-3 focus:py-2 focus:text-sm focus:font-medium focus:text-on-primary">Pular para o conteúdo</a>
       <header className="chrome-light sticky top-0 z-40 border-b border-border bg-surface">
         <div className="mx-auto flex h-14 max-w-6xl items-center gap-3 px-4">
           <Link to={base} aria-label="Orden: vitrine" className="flex items-center">
@@ -39,6 +41,7 @@ export function StoreShell() {
             ))}
           </nav>
           <div className="ml-auto flex items-center gap-2">
+            <AppearanceButton />
             <Link to={`${base}/carrinho`} className="relative flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium hover:bg-surface-2"
               aria-label={`Carrinho com ${count} peça(s)`}>
               <Icon name="sales" className="size-5" />
@@ -79,17 +82,17 @@ export function StoreShell() {
       {/* Faixa no padrão do "Ver como" da Plataforma de Operações (pedido do Douglas, 29/10): azul claro de propósito,
           fora da paleta da marca (pedido do Douglas, 29/10), para chamar atenção, ícone de olho e a saída sempre à vista à direita. */}
       {pv && (
-        <div role="status" className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b border-sky-300 bg-sky-100 px-4 py-2.5 text-sm text-sky-900">
+        <div role="status" className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b border-sky-300 bg-sky-100 px-4 py-2.5 text-sm text-sky-900 dark:border-sky-700 dark:bg-sky-950 dark:text-sky-100">
           <span className="flex items-center gap-2">
             <Icon name="eye" className="size-4 shrink-0" />
             <span><strong>Prévia da loja</strong> · é assim que o cliente vê o site · somente leitura, nada é gravado</span>
           </span>
-          <Link to="/" className="shrink-0 rounded-lg border border-sky-700/50 bg-white/70 px-3 py-1 text-xs font-semibold text-sky-900 hover:bg-white">
+          <Link to="/" className="shrink-0 rounded-lg border border-sky-700/50 bg-white/70 px-3 py-1 text-xs font-semibold text-sky-900 hover:bg-white dark:border-sky-400 dark:bg-sky-900 dark:text-sky-50 dark:hover:bg-sky-800">
             Sair da prévia
           </Link>
         </div>
       )}
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6">
+      <main id="conteudo" tabIndex={-1} className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 outline-none">
         <Outlet />
       </main>
       {/* Thalita do cliente (29/10/2026). Na prévia da equipe ela não aparece: a conversa é do cliente logado. */}
