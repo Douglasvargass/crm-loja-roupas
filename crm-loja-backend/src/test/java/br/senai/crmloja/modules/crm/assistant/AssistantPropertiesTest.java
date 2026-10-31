@@ -15,7 +15,7 @@ class AssistantPropertiesTest {
         assertThat(props.enabled()).isTrue();
         assertThat(props.openAiCompatible()).isFalse();
         assertThat(props.baseUrl()).isNull();
-        assertThat(props.model()).isEqualTo("claude-opus-5-5");
+        assertThat(props.model()).isEqualTo("claude-opus-5");
         assertThat(props.effort()).isEqualTo("medium");
         assertThat(props.maxToolRounds()).isEqualTo(8);
         assertThat(props.maxTokens()).isEqualTo(16000);

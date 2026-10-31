@@ -120,22 +120,22 @@ public class StoreService {
     public Cart add(Long userId, Long productId, int quantity) {
         Customer c = me(userId);
         Long saleId = openCartId(c).orElseGet(() -> saleService.open(c.getId(), userId, true).id());
-        saleService.addItem(saleId, productId, quantity);
+        saleService.addItem(saleId, productId, quantity, true);
         return cartOf(saleId);
     }
 
     @Transactional
     public Cart update(Long userId, Long itemId, int quantity) {
         Long saleId = openCartId(me(userId)).orElseThrow(() -> new NotFoundException("Seu carrinho está vazio."));
-        if (quantity < 1) saleService.removeItem(saleId, itemId);
-        else saleService.updateItem(saleId, itemId, quantity);
+        if (quantity < 1) saleService.removeItem(saleId, itemId, true);
+        else saleService.updateItem(saleId, itemId, quantity, true);
         return cartOf(saleId);
     }
 
     @Transactional
     public Cart remove(Long userId, Long itemId) {
         Long saleId = openCartId(me(userId)).orElseThrow(() -> new NotFoundException("Seu carrinho está vazio."));
-        saleService.removeItem(saleId, itemId);
+        saleService.removeItem(saleId, itemId, true);
         return cartOf(saleId);
     }
 
@@ -145,14 +145,14 @@ public class StoreService {
     @Transactional
     public Cart applyCoupon(Long userId, String code) {
         Long saleId = openCartId(me(userId)).orElseThrow(() -> new BusinessRuleException("cart_empty", "Seu carrinho está vazio."));
-        saleService.applyCoupon(saleId, code);
+        saleService.applyCoupon(saleId, code, true);
         return cartOf(saleId);
     }
 
     @Transactional
     public Cart removeCoupon(Long userId) {
         Long saleId = openCartId(me(userId)).orElseThrow(() -> new BusinessRuleException("cart_empty", "Seu carrinho está vazio."));
-        saleService.removeCoupon(saleId);
+        saleService.removeCoupon(saleId, true);
         return cartOf(saleId);
     }
 
@@ -199,7 +199,7 @@ public class StoreService {
         }
 
         // A mesma confirmação do balcão: trava os produtos, confere estoque de todos, baixa tudo ou nada.
-        saleService.confirm(saleId, userId);
+        saleService.confirm(saleId, userId, true);
         var params = new MapSqlParameterSource().addValue("sale", saleId).addValue("method", m)
                 .addValue("amount", sale.getTotal()).addValue("last4", last4);
         jdbc.update("insert into payment (sale_id, method, amount, card_last4) values (:sale, :method, :amount, :last4)", params);
