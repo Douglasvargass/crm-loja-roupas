@@ -81,7 +81,13 @@ public class SaleService {
     // cedo, mas quem garante é a confirmação, que trava os produtos.
     @Transactional
     public SaleResponse addItem(Long saleId, Long productId, int quantity) {
+        return addItem(saleId, productId, quantity, false);
+    }
+
+    @Transactional
+    public SaleResponse addItem(Long saleId, Long productId, int quantity, boolean doCliente) {
         Sale sale = draft(saleId);
+        if (!doCliente) somenteBalcao(sale);
         Product product = products.findById(productId)
                 .orElseThrow(() -> new NotFoundException("Produto não encontrado."));
         if (!product.isActive() || product.getStockQty() == 0) {
@@ -103,7 +109,13 @@ public class SaleService {
 
     @Transactional
     public SaleResponse updateItem(Long saleId, Long itemId, int quantity) {
+        return updateItem(saleId, itemId, quantity, false);
+    }
+
+    @Transactional
+    public SaleResponse updateItem(Long saleId, Long itemId, int quantity, boolean doCliente) {
         Sale sale = draft(saleId);
+        if (!doCliente) somenteBalcao(sale);
         SaleItem item = item(sale, itemId);
         checkStock(item.getProduct(), quantity);
         item.setQuantity(quantity);
@@ -113,7 +125,13 @@ public class SaleService {
 
     @Transactional
     public SaleResponse removeItem(Long saleId, Long itemId) {
+        return removeItem(saleId, itemId, false);
+    }
+
+    @Transactional
+    public SaleResponse removeItem(Long saleId, Long itemId, boolean doCliente) {
         Sale sale = draft(saleId);
+        if (!doCliente) somenteBalcao(sale);
         sale.removeItem(item(sale, itemId));
         return SaleResponse.from(sale);
     }
@@ -121,8 +139,14 @@ public class SaleService {
     // HU23: confirma e baixa o estoque. Tudo ou nada: qualquer exceção desfaz a transação inteira.
     @Transactional
     public SaleResponse confirm(Long saleId, Long actorId) {
+        return confirm(saleId, actorId, false);
+    }
+
+    @Transactional
+    public SaleResponse confirm(Long saleId, Long actorId, boolean doCliente) {
         Sale sale = sales.findByIdForUpdate(saleId)                   // trava a linha da venda
                 .orElseThrow(() -> new NotFoundException("Venda não encontrada."));
+        if (!doCliente) somenteBalcao(sale);
 
         if (sale.getStatus() != SaleStatus.DRAFT)                     // segunda confirmação para aqui
             throw new BusinessRuleException("sale_not_draft", "Esta venda já foi confirmada ou cancelada.");
@@ -157,14 +181,26 @@ public class SaleService {
     // RN61/RN62: aplica ou troca o cupom na venda aberta (balcão ou carrinho).
     @Transactional
     public SaleResponse applyCoupon(Long saleId, String code) {
+        return applyCoupon(saleId, code, false);
+    }
+
+    @Transactional
+    public SaleResponse applyCoupon(Long saleId, String code, boolean doCliente) {
         Sale sale = sales.findByIdForUpdate(saleId).orElseThrow(() -> new NotFoundException("Venda não encontrada."));
+        if (!doCliente) somenteBalcao(sale);
         coupons.apply(sale, code);
         return SaleResponse.from(sale);
     }
 
     @Transactional
     public SaleResponse removeCoupon(Long saleId) {
+        return removeCoupon(saleId, false);
+    }
+
+    @Transactional
+    public SaleResponse removeCoupon(Long saleId, boolean doCliente) {
         Sale sale = sales.findByIdForUpdate(saleId).orElseThrow(() -> new NotFoundException("Venda não encontrada."));
+        if (!doCliente) somenteBalcao(sale);
         if (sale.getStatus() != SaleStatus.DRAFT) {
             throw new BusinessRuleException("sale_not_draft", "Só dá para mexer no cupom antes de fechar o pedido.");
         }
@@ -241,6 +277,17 @@ public class SaleService {
     }
 
     // RN14: só venda aberta aceita mexer nos itens. Trava para dois cliques não se atropelarem.
+    // spec crm/07: o carrinho do site é uma venda ONLINE e só o próprio cliente mexe nele, pelas rotas /loja/**.
+    // Sem esta trava um vendedor confirmaria o carrinho de um cliente pelo balcão: o estoque sairia e o pedido
+    // ficaria sem linha em payment, porque o pagamento só existe no checkout da loja. Cancelar continua valendo
+    // para a equipe (é o caminho do estorno).
+    private void somenteBalcao(Sale sale) {
+        if ("ONLINE".equals(sale.getChannel())) {
+            throw new BusinessRuleException("online_sale",
+                    "Este pedido é da loja online: só o cliente mexe no carrinho dele.");
+        }
+    }
+
     private Sale draft(Long id) {
         Sale sale = sales.findByIdForUpdate(id).orElseThrow(() -> new NotFoundException("Venda não encontrada."));
         if (sale.getStatus() != SaleStatus.DRAFT) {

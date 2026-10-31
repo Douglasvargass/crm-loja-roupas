@@ -293,5 +293,22 @@ npx pnpm dev
       <a href="https://github.com/Douglasvargass/crm-loja-roupas">github.com/Douglasvargass/crm-loja-roupas</a>
     </div>
   </footer>
+
+  <!-- VLibras: tradutor de texto para Libras do governo federal (gratuito, código aberto). A pessoa seleciona
+       um texto e o boneco traduz. O mesmo recurso existe dentro do sistema (spec crm/13); aqui fica sempre
+       ligado, porque esta página não tem o menu "Aparência".
+
+       A versão é FIXA (7.12.2), a mesma do sistema, e não o endereço vlibras.gov.br/app/vlibras-plugin.js, que
+       apenas redireciona para a versão do momento. Assim o botão continua funcionando igual daqui a meses,
+       mesmo que o governo publique uma versão nova. Falha de rede é silenciosa: a página segue normal, só sem
+       o boneco. -->
+  <div vw class="enabled">
+    <div vw-access-button class="active"></div>
+    <div vw-plugin-wrapper>
+      <div class="vw-plugin-top-wrapper"></div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/gh/spbgovbr-vlibras/vlibras-portal@v7.12.2/app/vlibras-plugin.js"
+          onload="try { new window.VLibras.Widget('https://vlibras.gov.br/app'); } catch (e) {}"></script>
 </body>
 </html>

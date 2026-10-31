@@ -25,7 +25,7 @@ public record AssistantProperties(String provider, String apiKey, String baseUrl
         if (maxTokens <= 0) maxTokens = 16000;
 
         switch (provider) {
-            case "anthropic" -> { if (model == null) model = "claude-opus-5-5"; }
+            case "anthropic" -> { if (model == null) model = "claude-opus-5"; }
             case "groq" -> {
                 if (baseUrl == null) baseUrl = "https://api.groq.com/openai/v1";
                 if (model == null) model = "openai/gpt-oss-120b";

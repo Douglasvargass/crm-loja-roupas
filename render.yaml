@@ -35,11 +35,15 @@ services:
         fromDatabase: { name: crm-loja-db, property: user }
       - key: DB_PASSWORD
         fromDatabase: { name: crm-loja-db, property: password }
-      # Opcional: liga o assistente de IA. O Render pede os valores na criação (não ficam no Git).
-      # Grátis: ASSISTANT_PROVIDER=groq (chave gsk_… de console.groq.com) ou gemini (chave de aistudio.google.com).
-      # Pago: ASSISTANT_PROVIDER=anthropic (chave sk-ant-…). Modelo em branco = padrão do provedor.
+      # Endereço público das telas, usado para montar o link do e-mail de recuperação de senha. Precisa ficar
+      # definido: sem ele o link sai do cabeçalho Referer da requisição, que é escolhido por quem chama.
+      - key: PUBLIC_URL
+        value: https://crm-loja.onrender.com
+      # Liga o assistente de IA. Só a chave é pedida na criação (não fica no Git).
+      # Grátis: groq (chave gsk_… de console.groq.com) ou gemini (chave de aistudio.google.com).
+      # Pago: anthropic (chave sk-ant-…). Modelo em branco = padrão do provedor.
       - key: ASSISTANT_PROVIDER
-        sync: false
+        value: groq
       - key: ASSISTANT_API_KEY
         sync: false
       - key: ASSISTANT_MODEL

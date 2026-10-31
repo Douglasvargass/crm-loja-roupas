@@ -113,9 +113,13 @@ public class Sale {
         BigDecimal gross = getSubtotal();
         BigDecimal d = BigDecimal.ZERO;
         if (couponKind != null && gross.compareTo(couponMinOrder == null ? BigDecimal.ZERO : couponMinOrder) >= 0) {
+            // RN61: o desconto nunca zera o pedido. Em % o teto de 90% vem do cadastro do cupom; em R$ o valor
+            // é fixo e poderia passar do subtotal, então o mesmo teto vale aqui. Sem isto um cupom de valor
+            // alto zera o total e o checkout da loja quebra em ck_payment_amount > 0.
+            BigDecimal teto = gross.multiply(new BigDecimal("0.90")).setScale(2, java.math.RoundingMode.HALF_UP);
             d = "PERCENT".equals(couponKind)
                     ? gross.multiply(couponValue).divide(BigDecimal.valueOf(100), 2, java.math.RoundingMode.HALF_UP)
-                    : couponValue.min(gross);
+                    : couponValue.min(teto);
         }
         discount = d.setScale(2, java.math.RoundingMode.HALF_UP);
         total = gross.subtract(discount).setScale(2, java.math.RoundingMode.HALF_UP);

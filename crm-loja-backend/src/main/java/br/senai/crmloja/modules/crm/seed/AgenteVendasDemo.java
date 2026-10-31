@@ -153,6 +153,10 @@ public class AgenteVendasDemo implements ApplicationRunner {
             return;
         }
 
+        // A IA vem ANTES da trava: é uma chamada HTTP que pode levar mais de um minuto, e o lock abaixo
+        // segura todos os produtos — enquanto ela pensasse, nenhuma venda de verdade conseguiria confirmar.
+        HumorDoDia humor = humorDoDia(dia);
+
         // Trava o catálogo: uma venda de verdade feita agora espera o agente terminar, e o saldo não se perde.
         jdbc.queryForList("select id from product order by id for update", Long.class);
         Set<Long> ativos = new HashSet<>(jdbc.queryForList("select id from product where is_active", Long.class));
@@ -164,7 +168,6 @@ public class AgenteVendasDemo implements ApplicationRunner {
             return;
         }
 
-        HumorDoDia humor = humorDoDia(dia);
         List<Catalogo> comDestaque = catalogo.stream().map(c -> humor.familiaDestaque() != null
                 && humor.familiaDestaque().equals(c.familia())
                 ? new Catalogo(c.id(), c.codigo(), c.nome(), c.preco(), c.familia(), c.peso() * humor.fatorDestaque(),
